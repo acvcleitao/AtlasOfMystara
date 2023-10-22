@@ -28,3 +28,11 @@ Step 3 will use all this information to create the map, using whatever informati
 
 - 1st Contact -> https://docs.google.com/document/d/1X3xuly5_aY4tdo8RlVtbUTseC1qCqhgOm8x9EP0cXI0/edit
 - 1st Figma Prototype -> https://www.figma.com/file/cSNIjZVw9psdQMD66WC6E3/Atlas-of-Mystara
+
+## Considerations
+
+
+## Apendix
+
+
+This markdown (as well as the others in the repo) was made in Obsidian.md so some formating issues might occur
