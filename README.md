@@ -22,3 +22,9 @@ The focus of this thesis are the maps. There were lots of paper maps. Thorfinn T
 Step 1 is essentially to go through the Atlas and Vaults and see what is there (both these sites are indexed, so it should not be that hard) 
 Step 2 will probably imply some image processing to identify hex types etc. but this is not really rocket science, as we\`re dealing with, essentially, uniform grids of hexes with a pre-determined list of possible contents (plains, mountains, etc.). In some cases, yes, some manual checking of out-of-bounds cases will be necessary, alas. 
 Step 3 will use all this information to create the map, using whatever information is available, in a way In which if Thorf or some other cartographer creates a new map, we can just "drop it in there"
+
+
+## Valuable Links
+
+- 1st Contact -> https://docs.google.com/document/d/1X3xuly5_aY4tdo8RlVtbUTseC1qCqhgOm8x9EP0cXI0/edit
+- 1st Figma Prototype -> https://www.figma.com/file/cSNIjZVw9psdQMD66WC6E3/Atlas-of-Mystara
