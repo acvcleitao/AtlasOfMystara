@@ -11,13 +11,13 @@ def HexFinder(image):
     max_area = 0
     c = 0
     for i in contours:
-            area = cv2.contourArea(i)
-            if area > 1000:
-                    if area > max_area:
-                        max_area = area
-                        best_cnt = i
-                        image = cv2.drawContours(image, contours, c, (0, 255, 0), 3)
-            c+=1
+        area = cv2.contourArea(i)
+        if area > 1000:
+            if area > max_area:
+                max_area = area
+                best_cnt = i
+                image = cv2.drawContours(image, contours, c, (0, 255, 0), 3)
+        c+=1
     mask = np.zeros((gray.shape),np.uint8)
     cv2.drawContours(mask,[best_cnt],0,255,-1)
     cv2.drawContours(mask,[best_cnt],0,0,2)
