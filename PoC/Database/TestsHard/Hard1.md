@@ -10,10 +10,16 @@ title: Image Information
 
 ## Difficulties
 
-Describe any difficulties related to this image here.
+- very small hexagons with high resulution
+- Borders between countries are hard to find
+- Rivers and Roads
+- Ocean Edge cases very hard
+- Non hexagonal tiles which aren't mapped
 
 ## Considerations
 
-Mention any considerations or notes about this image.
+- Thick country borders
+- borders follow hexagons
+- Easy stamps
 
 ---

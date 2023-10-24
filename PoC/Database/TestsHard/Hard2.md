@@ -10,10 +10,13 @@ title: Image Information
 
 ## Difficulties
 
-Describe any difficulties related to this image here.
+- Lots of text
+- Rivers and Roads
 
 ## Considerations
 
-Mention any considerations or notes about this image.
+- Thick country borders
+- Easy edge cases
+- Easy stamp
 
 ---

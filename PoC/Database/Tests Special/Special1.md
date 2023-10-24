@@ -10,7 +10,9 @@ title: Image Information
 
 ## Difficulties
 
-Describe any difficulties related to this image here.
+- Very thin white Hexagon Borders
+- Some Text
+- Strange borders bettween regions
 
 ## Considerations
 

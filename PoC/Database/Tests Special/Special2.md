@@ -10,7 +10,7 @@ title: Image Information
 
 ## Difficulties
 
-Describe any difficulties related to this image here.
+- 3D hexagons
 
 ## Considerations
 

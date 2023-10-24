@@ -10,7 +10,8 @@ title: Image Information
 
 ## Difficulties
 
-Describe any difficulties related to this image here.
+- Warped prespective
+- Low res
 
 ## Considerations
 

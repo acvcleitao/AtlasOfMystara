@@ -10,7 +10,9 @@ title: Image Information
 
 ## Difficulties
 
-Describe any difficulties related to this image here.
+- Thin borders
+- Warped prespective
+- Irregular tiles
 
 ## Considerations
 
