@@ -5,15 +5,18 @@ from torch.utils.data import DataLoader
 from PoC.PoC_Classifier.HexDataset import HexagonDataset
 from PoC.PoC_Classifier.HexagonDetectionModule import HexagonDetectionModel
 
-## Example usage
-# Specify the path to your hexagon dataset
-dataset_path = '/path/to/your/hexagon/dataset'
+
 
 # Define transformations
 transform = transforms.Compose([
     transforms.Resize((256, 256)),
     transforms.ToTensor(),
 ])
+
+## Example usage
+# TODO: Create a dataset
+# Specify the path to your hexagon dataset
+dataset_path = '/path/to/your/hexagon/dataset'
 
 # Create an instance of your custom dataset
 hexagon_dataset = HexagonDataset(root_dir=dataset_path, transform=transform)
@@ -38,7 +41,6 @@ optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
 
 # Set up variables
-batch_size = 32
 num_epochs = 10
 
 # Training loop
