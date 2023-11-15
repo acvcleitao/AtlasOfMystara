@@ -2,6 +2,10 @@ import cv2
 import numpy as np
 from PIL import Image
 
+import cv2
+import numpy as np
+from PIL import Image
+
 def extract_hexagons(image_path):
     original_image = cv2.imread(image_path)
     hsv_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2HSV)
@@ -42,6 +46,40 @@ def extract_hexagons(image_path):
 
     return hexagon_data
 
+
+def find_and_save_black_parts(image_path, output_folder):
+    original_image = cv2.imread(image_path)
+    gray_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
+
+    # Apply binary threshold to create a binary image
+    _, binary_image = cv2.threshold(gray_image, 30, 255, cv2.THRESH_BINARY)
+
+    # Find contours in the binary image
+    contours, _ = cv2.findContours(binary_image, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    # Save images with padding for each contour with a blackish interior
+    padding = 20  # Adjust this value based on the desired padding
+    for i, contour in enumerate(contours):
+        # Calculate the area of the contour
+        area = cv2.contourArea(contour)
+
+        # Adjust the area threshold based on your preference
+        area_threshold = 500
+        if area > area_threshold:
+            x, y, w, h = cv2.boundingRect(contour)
+            black_part_image = original_image[max(0, y - padding):min(y + h + padding, original_image.shape[0]),
+                                               max(0, x - padding):min(x + w + padding, original_image.shape[1])]
+
+            # Draw contours on the original image
+            cv2.drawContours(original_image, [contour], -1, (0, 0, 255), 2)
+
+            cv2.imwrite(f"{output_folder}/black_part_{i}.png", black_part_image)
+
+    # Display the image with contours for debugging
+    cv2.imshow('Contours on Black Parts', original_image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
 def save_hexagon_images(hexagon_data, output_folder):
     for i, hexagon_image in enumerate(hexagon_data):
         rect_image = Image.fromarray(cv2.cvtColor(hexagon_image, cv2.COLOR_BGR2RGB))
@@ -53,3 +91,5 @@ if __name__ == "__main__":
 
     hexagon_data = extract_hexagons(image_path)
     save_hexagon_images(hexagon_data, output_folder)
+    find_and_save_black_parts(image_path, output_folder)
+
