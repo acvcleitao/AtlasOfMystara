@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+message Hexagon {
+  int32 map_id = 1;
+  int32 hexagon_id = 2;
+  repeated int32 position_relative = 3;
+  repeated int32 position_absolute = 4;
+  string image_url = 5;
+  string hexagon_type = 6;
+  string hexagon_size = 7;
+  string hexagon_shape = 8;
+  repeated Contour contours = 9;
+  string created_at = 10;
+  string updated_at = 11;
+
+  message Contour {
+    string type = 1;
+    string id = 2;
+  }
+}
