@@ -113,6 +113,9 @@ def save_hexagon_images_with_text(hexagon_data, output_folder):
         rect_image.save(filepath)
         print(f"Saved: {filename}")
 
+# TODO: Make it recieve arguments
+# args -> input file and output folder
+# Maybe tesseract input?
 if __name__ == "__main__":
     image_path = r"C:\Users\acvcl\Documents\GitHub\AtlasOfMystara\data\DatasetSource\adamantyr-legend.png"
     output_folder = r'C:\Users\acvcl\Documents\GitHub\AtlasOfMystara\PoC\ProcessedLabels'
