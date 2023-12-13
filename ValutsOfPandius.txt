@@ -1,0 +1,1721 @@
+Map Title: HWR3 The Milenian Empire
+Author: Ashtagon
+Update Date: N/A
+
+Map Title: GAZ8 The Five Shires
+Author: Ashtagon
+Update Date: N/A
+
+Map Title: Kleine
+Author: ShaneG
+Update Date: N/A
+
+Map Title: Karameikos
+Author: Lorenzo Tusorella
+Update Date: N/A
+
+Map Title: PC4 The Valley of Wolves
+Author: Ashtagon
+Update Date: N/A
+
+Map Title: Threshold
+Author: Lorenzo Tusorella
+Update Date: N/A
+
+Map Title: Thunder Rift
+Author: ShaneG
+Update Date: N/A
+
+Map Title: In the Beginning
+Author: Ashtagon
+Update Date: N/A
+
+Map Title: Bronze and Iron: Arqwen
+Author: Ashtagon
+Update Date: N/A
+
+Map Title: Karameikos Demographic map
+Author: Fabrizio Nuzzaci
+Update Date: N/A
+
+Map Title: Valley of the Hutaaka
+Author: Patrick Von Raven
+Update Date: N/A
+
+Map Title: hexes
+Author: Patrick Von Raven
+Update Date: N/A
+
+Map Title: Thunder Rift
+Author: GARGOYLIAN
+Update Date: N/A
+
+Map Title: Map of New Verge
+Author: Darren Bulmer
+Update Date: N/A
+
+Map Title: Gli Emirati di Ylauam
+Author: Thorfinn Tait
+Update Date: N/A
+
+Map Title: L'Impero di Thyatis (Continentale)
+Author: Thorfinn Tait
+Update Date: N/A
+
+Map Title: Le Terre del Nord
+Author: Thorfinn Tait
+Update Date: N/A
+
+Map Title: Terre Brulle Superiori
+Author: Thorfinn Tait
+Update Date: N/A
+
+Map Title: Il Mondo Conosciuto
+Author: Thorfinn Tait
+Update Date: N/A
+
+Map Title: Le Gilde di Minrothad
+Author: Thorfinn Tait
+Update Date: N/A
+
+Map Title: Il Granducato di Karameikos
+Author: Thorfinn Tait
+Update Date: N/A
+
+Map Title: Il Regno di Ierendi
+Author: Thorfinn Tait
+Update Date: N/A
+
+Map Title: Principati di Glantri
+Author: Thorfinn Tait
+Update Date: N/A
+
+Map Title: I Khanati di Ethengar
+Author: Thorfinn Tait
+Update Date: N/A
+
+Map Title: La Repubblica di Darokin
+Author: Thorfinn Tait
+Update Date: N/A
+
+Map Title: Le Cinque Contee
+Author: Thorfinn Tait
+Update Date: N/A
+
+Map Title: Il Regno di Casa di Roccia
+Author: Thorfinn Tait
+Update Date: N/A
+
+Map Title: I Clan di Atruaghin
+Author: Thorfinn Tait
+Update Date: N/A
+
+Map Title: Impero di Alphatian (continente)
+Author: Thorfinn Tait
+Update Date: N/A
+
+Map Title: Realm of Othrong
+Author: John Calvin
+Update Date: N/A
+
+Map Title: Maganshire
+Author: Cab Davidson
+Update Date: N/A
+
+Map Title: Known World
+Author: Mark Howard
+Update Date: N/A
+
+Map Title: Ochalea
+Author: Mark Howard
+Update Date: N/A
+
+Map Title: Alphatia
+Author: Mark Howard
+Update Date: N/A
+
+Map Title: Isle of Dawn
+Author: Mark Howard
+Update Date: N/A
+
+Map Title: Map of Glantri 1014 AC
+Author: Michael Berry
+Update Date: N/A
+
+Map Title: Glantrian Trade Centers
+Author: Michael Berry
+Update Date: N/A
+
+Map Title: Northern Sea of Dread
+Author: Patrick Von Raven
+Update Date: N/A
+
+Map Title: hexes
+Author: Patrick Von Raven
+Update Date: N/A
+
+Map Title: Fricana
+Author: Ignacio Ramos
+Update Date: N/A
+
+Map Title: Megales Amoses Desert
+Author: Ignacio Ramos
+Update Date: N/A
+
+Map Title: Adakkian sound north
+Author: Ignacio Ramos
+Update Date: N/A
+
+Map Title: Amalur
+Author: Ignacio Ramos
+Update Date: N/A
+
+Map Title: Arypt and Cestia
+Author: Ignacio Ramos
+Update Date: N/A
+
+Map Title: Samarak
+Author: Ignacio Ramos
+Update Date: N/A
+
+Map Title: Borean Valley
+Author: Ignacio Ramos
+Update Date: N/A
+
+Map Title: The Arm
+Author: Ignacio Ramos
+Update Date: N/A
+
+Map Title: Midlands
+Author: Ignacio Ramos
+Update Date: N/A
+
+Map Title: Pearl Islands
+Author: Ignacio Ramos
+Update Date: N/A
+
+Map Title: Isle of Dawn
+Author: Ignacio Ramos
+Update Date: N/A
+
+Map Title: Bellisarian Kingdoms and surrounding lands
+Author: Ignacio Ramos
+Update Date: N/A
+
+Map Title: image version
+Author: Michael Berry
+Update Date: N/A
+
+Map Title: image version
+Author: Michael Berry
+Update Date: N/A
+
+Map Title: The Black Mountains
+Author: Michael Berry
+Update Date: N/A
+
+Map Title: Grand Duchy of Karameikos
+Author: Joshua Armstrong
+Update Date: N/A
+
+Map Title: Map of Glantri 1014 AC
+Author: Michael Berry
+Update Date: N/A
+
+Map Title: Selenica
+Author: Mario Ciuffini
+Update Date: N/A
+
+Map Title: Map of South Alfheim
+Author: Lorena La Rocca
+Update Date: N/A
+
+Map Title: Specularum
+Author: Elvis Spadoni
+Update Date: N/A
+
+Map Title: without text
+Author: Elvis Spadoni
+Update Date: N/A
+
+Map Title: text only
+Author: Elvis Spadoni
+Update Date: N/A
+
+Map Title: Map of the Sea of Dread
+Author: Elvis Spadoni
+Update Date: N/A
+
+Map Title: with hexes
+Author: Elvis Spadoni
+Update Date: N/A
+
+Map Title: Map of Emoren
+Author: Elvis Spadoni
+Update Date: N/A
+
+Map Title: Map of Utsiwano
+Author: Elvis Spadoni
+Update Date: N/A
+
+Map Title: Map of Arachne
+Author: Elvis Spadoni
+Update Date: N/A
+
+Map Title: Major Known World Trading Routes
+Author: Fabrizio Nuzzaci
+Update Date: N/A
+
+Map Title: Cynidicean Underworld, 8 miles per hex
+Author: Geoff Gander
+Update Date: N/A
+
+Map Title: Gran Ducato di Karameikos
+Author: Elvis Spadoni
+Update Date: N/A
+
+Map Title: Ameron and vicinity
+Author: Geoff Gander
+Update Date: N/A
+
+Map Title: Alfheim, 8 miles per hex
+Author: Fabrizio Nuzzaci
+Update Date: N/A
+
+Map Title: Returned Blackmoor
+Author: Francesco Defferrari
+Update Date: N/A
+
+Map Title: Northern Reaches, 8 miles per hex
+Author: Fabrizio Nuzzaci
+Update Date: N/A
+
+Map Title: Darokin, 8 miles per hex
+Author: Fabrizio Nuzzaci
+Update Date: N/A
+
+Map Title: Kerothar Island
+Author: Pol Ginés
+Update Date: N/A
+
+Map Title: Map of the Known World AC 1010
+Author: Dave Lister
+Update Date: N/A
+
+Map Title: Map of the Kingdom of Karameikos AC 1010
+Author: Dave Lister
+Update Date: N/A
+
+Map Title: Northern Reaches and Rockhome
+Author: Pol Ginés
+Update Date: N/A
+
+Map Title: colour
+Author: Pol Ginés
+Update Date: N/A
+
+Map Title: black and white
+Author: Pol Ginés
+Update Date: N/A
+
+Map Title: Broken Sea Archipelago
+Author: Robin
+Update Date: N/A
+
+Map Title: image version
+Author: Michael Berry
+Update Date: N/A
+
+Map Title: image version
+Author: Michael Berry
+Update Date: N/A
+
+Map Title: download
+Author: Mario Ciuffini
+Update Date: N/A
+
+Map Title: Southern Glantri
+Author: Emanuele Betti
+Update Date: N/A
+
+Map Title: Northern Glantri
+Author: Emanuele Betti
+Update Date: N/A
+
+Map Title: Penhaligon
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Isle of Dawn
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Alphatia
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Empire of Thyatis
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: The Atruaghin Clans
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Wendar and Denagoth
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: The Shadowlands
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Ethengar Khanates
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Republic of Darokin
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Broken Lands
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Minrothad Guilds
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Five Shires
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Northern Reaches
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Rockhome
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Kingdom of Alfheim
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Kingdom of Ierendi
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Principalities of Glantri
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Emirates of Ylaruam
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Grand Duchy of Karameikos
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Drawn map of the Known World
+Author: Josh Lawson
+Update Date: N/A
+
+Map Title: Grand Duchy of Karameikos
+Author: Rich Brungard
+Update Date: N/A
+
+Map Title: House Hostilities circa AC 1000
+Author: Kurt Stoffer
+Update Date: N/A
+
+Map Title: House Alliances circa AC 1000
+Author: Kurt Stoffer
+Update Date: N/A
+
+Map Title: Village of Volnay
+Author: Kurt Stoffer
+Update Date: N/A
+
+Map Title: Rockhome
+Author: Josh Lawson
+Update Date: N/A
+
+Map Title: Kingdom of Alfheim
+Author: Josh Lawson
+Update Date: N/A
+
+Map Title: Grand Duchy of Karameikos
+Author: Josh Lawson
+Update Date: N/A
+
+Map Title: region surrounding Penhaligon
+Author: Robert Sampson
+Update Date: N/A
+
+Map Title: Town of Penhaligon
+Author: Robert Sampson
+Update Date: N/A
+
+Map Title: Threshold
+Author: Josh Lawson
+Update Date: N/A
+
+Map Title: Halag, 1 mile per hex
+Author: Francesco Defferrari
+Update Date: N/A
+
+Map Title: Blight Swamp, 1 mile per hex
+Author: Francesco Defferrari
+Update Date: N/A
+
+Map Title: download
+Author: argentmantle
+Update Date: N/A
+
+Map Title: download
+Author: argentmantle
+Update Date: N/A
+
+Map Title: Barony of Gulluvia
+Author: Gary Davies
+Update Date: N/A
+
+Map Title: Adri Varma Plateau
+Author: Gary Davies
+Update Date: N/A
+
+Map Title: Kavkaz
+Author: Gary Davies
+Update Date: N/A
+
+Map Title: Gonica and Boyarski
+Author: Gary Davies
+Update Date: N/A
+
+Map Title: Hulean Empire
+Author: Gary Davies
+Update Date: N/A
+
+Map Title: Hule and Kavkaz
+Author: Gary Davies
+Update Date: N/A
+
+Map Title: City of Selenica
+Author: PitchSilent
+Update Date: N/A
+
+Map Title: Mystara
+Author: Dustan Weidman
+Update Date: N/A
+
+Map Title: brown mountain variant
+Author: Dustan Weidman
+Update Date: N/A
+
+Map Title: greenish-grey toned variant
+Author: Dustan Weidman
+Update Date: N/A
+
+Map Title: Kastelios
+Author: Taliesyn Tink
+Update Date: N/A
+
+Map Title: Ylaruam
+Author: Josh Lawson
+Update Date: N/A
+
+Map Title: variant
+Author: Josh Lawson
+Update Date: N/A
+
+Map Title: Glantri
+Author: Josh Lawson
+Update Date: N/A
+
+Map Title: Thyatis
+Author: Josh Lawson
+Update Date: N/A
+
+Map Title: Darokin
+Author: Josh Lawson
+Update Date: N/A
+
+Map Title: Known World
+Author: Sebastian Quincy Sajda
+Update Date: N/A
+
+Map Title: Archwizardate of Lagrius
+Author: Ignacio Ramos
+Update Date: N/A
+
+Map Title: Kingdom of Horken
+Author: Ignacio Ramos
+Update Date: N/A
+
+Map Title: Kingdom of Meriander
+Author: Ignacio Ramos
+Update Date: N/A
+
+Map Title: Kingdom of Notrion
+Author: Ignacio Ramos
+Update Date: N/A
+
+Map Title: Dawrim Territories
+Author: Ignacio Ramos
+Update Date: N/A
+
+Map Title: Kingdom of Eirun-Drynn
+Author: Ignacio Ramos
+Update Date: N/A
+
+Map Title: Kingdom of Surshield
+Author: Ignacio Ramos
+Update Date: N/A
+
+Map Title: Esterhold Peninsula
+Author: Ignacio Ramos
+Update Date: N/A
+
+Map Title: Barony of Qeodhar
+Author: Ignacio Ramos
+Update Date: N/A
+
+Map Title: Island of Zyxl
+Author: Ignacio Ramos
+Update Date: N/A
+
+Map Title: Alphatia Imperial Territories
+Author: Ignacio Ramos
+Update Date: N/A
+
+Map Title: Frosthaven and Northern Norwold
+Author: Ignacio Ramos
+Update Date: N/A
+
+Map Title: Map of Karameikos
+Author: Zach Henderson
+Update Date: N/A
+
+Map Title: Map of Eastern Karameikos
+Author: Richard Hogan
+Update Date: N/A
+
+Map Title: Skaufskogr region
+Author: Giampaolo Agosta
+Update Date: N/A
+
+Map Title: Alol and Ka
+Author: Ignacio Ramos
+Update Date: N/A
+
+Map Title: Vulture Peninsula
+Author: Ignacio Ramos
+Update Date: N/A
+
+Map Title: Oceania
+Author: Ignacio Ramos
+Update Date: N/A
+
+Map Title: Isles of Steam
+Author: Ignacio Ramos
+Update Date: N/A
+
+Map Title: Sind-Serpent
+Author: Ignacio Ramos
+Update Date: N/A
+
+Map Title: All Davanian Shallows
+Author: Ignacio Ramos
+Update Date: N/A
+
+Map Title: Land of Denagoth
+Author: Ignacio Ramos
+Update Date: N/A
+
+Map Title: Southeast Karameikos
+Author: Robin
+Update Date: N/A
+
+Map Title: legend
+Author: Robin
+Update Date: N/A
+
+Map Title: Mid South Karameikos
+Author: Robin
+Update Date: N/A
+
+Map Title: legend
+Author: Robin
+Update Date: N/A
+
+Map Title: Mid Southwest Karameikos
+Author: Robin
+Update Date: N/A
+
+Map Title: legend
+Author: Robin
+Update Date: N/A
+
+Map Title: Northwest Karameikos
+Author: Robin
+Update Date: N/A
+
+Map Title: legend
+Author: Robin
+Update Date: N/A
+
+Map Title: West Karameikos
+Author: Robin
+Update Date: N/A
+
+Map Title: legend
+Author: Robin
+Update Date: N/A
+
+Map Title: Southwest Karameikos Blight Swamp
+Author: Robin
+Update Date: N/A
+
+Map Title: legend
+Author: Robin
+Update Date: N/A
+
+Map Title: Sea of Dread, 8 miles per hex
+Author: John Calvin
+Update Date: N/A
+
+Map Title: Sea of Dread: Undersea, 8 miles per hex
+Author: John Calvin
+Update Date: N/A
+
+Map Title: Arch of Fire
+Author: Robin
+Update Date: N/A
+
+Map Title: Redstone
+Author: Robin
+Update Date: N/A
+
+Map Title: image version
+Author: Michael Berry
+Update Date: N/A
+
+Map Title: Redstone
+Author: Michael Berry
+Update Date: N/A
+
+Map Title: Krandai/Streel River
+Author: Robin
+Update Date: N/A
+
+Map Title: 1
+Author: Banesbox
+Update Date: N/A
+
+Map Title: 2
+Author: Banesbox
+Update Date: N/A
+
+Map Title: Updated 
+Thunder Rift setting map
+Author: Banesbox
+Update Date: N/A
+
+Map Title: The town of Threshold poster map
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: Nathrat
+Author: Robin
+Update Date: N/A
+
+Map Title: Satolas
+Author: Robin
+Update Date: N/A
+
+Map Title: South Kabree
+Author: Robin
+Update Date: N/A
+
+Map Title: southeast Glantri (Ritternour)
+Author: Robin
+Update Date: N/A
+
+Map Title: Isles of Steam
+Author: Geoff Gander
+Update Date: N/A
+
+Map Title: Monzag
+Author: Gary Davies
+Update Date: N/A
+
+Map Title: Bulzan
+Author: Gary Davies
+Update Date: N/A
+
+Map Title: Olgar
+Author: Gary Davies
+Update Date: N/A
+
+Map Title: Antasyn
+Author: Gary Davies
+Update Date: N/A
+
+Map Title: The Orc's Head Peninsula, Savage Coast, Great Northway Lands and Greater Hule (a.k.a. "Southold")
+Author: Matthew Fleet
+Update Date: N/A
+
+Map Title: Map of Glantri
+Author: Glenn Moyer
+Update Date: N/A
+
+Map Title: image version
+Author: Michael Berry
+Update Date: N/A
+
+Map Title: image version
+Author: Michael Berry
+Update Date: N/A
+
+Map Title: Blackmoor, 5 miles per hex, vector
+Author: Dave L
+Update Date: N/A
+
+Map Title: Thunder Rift, 1 mile per hex
+Author: Dave L
+Update Date: N/A
+
+Map Title: alternate
+Author: Dave L
+Update Date: N/A
+
+Map Title: Blackmoor, 12 miles per hex - blank
+Author: Dave L
+Update Date: N/A
+
+Map Title: Blackmoor, DA combined, 12 miles per hex
+Author: Dave L
+Update Date: N/A
+
+Map Title: numbered
+Author: Dave L
+Update Date: N/A
+
+Map Title: Map 5: The Northlands (DA4), 12  miles per hex
+Author: Dave L
+Update Date: N/A
+
+Map Title: numbered
+Author: Dave L
+Update Date: N/A
+
+Map Title: DA3
+Author: Dave L
+Update Date: N/A
+
+Map Title: numbered
+Author: Dave L
+Update Date: N/A
+
+Map Title: Map 5: The Northlands (DA1), 12  miles per hex
+Author: Dave L
+Update Date: N/A
+
+Map Title: numbered
+Author: Dave L
+Update Date: N/A
+
+Map Title: Blackmoor, 5 miles per hex
+Author: Dave L
+Update Date: N/A
+
+Map Title: numbered
+Author: Dave L
+Update Date: N/A
+
+Map Title: Blackmoor, 1977
+Author: Dave L
+Update Date: N/A
+
+Map Title: numbered
+Author: Dave L
+Update Date: N/A
+
+Map Title: Detailed Map of Northeast Brun
+Author: Robin
+Update Date: N/A
+
+Map Title: Threshold area
+Author: Daniel Reid
+Update Date: N/A
+
+Map Title: Central Brun, 1000 AC
+Author: Christian Constantin
+Update Date: N/A
+
+Map Title: 990 AC: Grand Duchy of Karameikos
+Author: Francesco Defferrari
+Update Date: N/A
+
+Map Title: 960 AC: Thyatian Occupation
+Author: Francesco Defferrari
+Update Date: N/A
+
+Map Title: 892 AC: The Last Radu and Marilenev Kings
+Author: Francesco Defferrari
+Update Date: N/A
+
+Map Title: 710 AC: Radu and Marilenev Kings
+Author: Francesco Defferrari
+Update Date: N/A
+
+Map Title: 440 AC: Radu and Marilenev Kings
+Author: Francesco Defferrari
+Update Date: N/A
+
+Map Title: 310 AC: The Last Ivanov Kings
+Author: Francesco Defferrari
+Update Date: N/A
+
+Map Title: 1 AC: The First Ivanov Kings
+Author: Francesco Defferrari
+Update Date: N/A
+
+Map Title: 495 BC: The Last Halarov Kings
+Author: Francesco Defferrari
+Update Date: N/A
+
+Map Title: 760 BC: The Halarov Kingdom
+Author: Francesco Defferrari
+Update Date: N/A
+
+Map Title: 1000 BC: The Gnoll Invasion
+Author: Francesco Defferrari
+Update Date: N/A
+
+Map Title: 1200 BC: Time of the Hutaakans
+Author: Francesco Defferrari
+Update Date: N/A
+
+Map Title: 1432 BC: Kingdom of Tarku Radu
+Author: Francesco Defferrari
+Update Date: N/A
+
+Map Title: 1500 BC: The arrival of the Traldars
+Author: Francesco Defferrari
+Update Date: N/A
+
+Map Title: Central Isle of Dawn, 8 miles/hex
+Author: Francesco Defferrari
+Update Date: N/A
+
+Map Title: Adri Varma Plateau, 8 miles/hex
+Author: Francesco Defferrari
+Update Date: N/A
+
+Map Title: The Vale in Thunder Rift
+Author: DirtSkull
+Update Date: N/A
+
+Map Title: Outer World map, with latitude and longitude
+Author: LoZompatore
+Update Date: N/A
+
+Map Title: The Barony of Fiorenza
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: New Kolland
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: Breajr AC 700
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: The Warrens
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: Bel Lendh Monandry
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: Cruth Lowlands map
+Author: Giampaolo Agosta
+Update Date: N/A
+
+Map Title: Aelos, 56 sq miles per hex
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: Arqwen, 56 sq miles per hex
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: Outer World ocean and air currents
+Author: DJ Hartel
+Update Date: N/A
+
+Map Title: Regions of Davania
+Author: JTR
+Update Date: N/A
+
+Map Title: Elstrich Valley through Athenos
+Author: Mike Phillips
+Update Date: N/A
+
+Map Title: Thunder Rift, 0.5 mile per hex
+Author: Dave L
+Update Date: N/A
+
+Map Title: The Barrowfields (1/2 mile hex)
+Author: Geoff Gander
+Update Date: N/A
+
+Map Title: The Callair Hills (2 2/3 miles per hex)
+Author: Geoff Gander
+Update Date: N/A
+
+Map Title: Bathymetric contour map
+Author: John Calvin
+Update Date: N/A
+
+Map Title: Sind, AC 1160
+Author: Andrea Francolini
+Update Date: N/A
+
+Map Title: Norwold, AC 1160
+Author: Andrea Francolini
+Update Date: N/A
+
+Map Title: Central Norwold, AC 1160
+Author: Andrea Francolini
+Update Date: N/A
+
+Map Title: Brun, AC 1160
+Author: Andrea Francolini
+Update Date: N/A
+
+Map Title: Borea region
+Author: Andrea Francolini
+Update Date: N/A
+
+Map Title: Thunder Rift numbered hex map
+Author: gnarfunk
+Update Date: N/A
+
+Map Title: Tortles of the Purple Sage
+Author: Rimx
+Update Date: N/A
+
+Map Title: The Territory of Itämaa
+Author: JTR
+Update Date: N/A
+
+Map Title: The Kingdom of Kaarjala and the Autuasmaa Plain
+Author: JTR
+Update Date: N/A
+
+Map Title: Sukiskyn
+Author: Lucky
+Update Date: N/A
+
+Map Title: Grand Duchy of Karameikos
+Author: Lucky
+Update Date: N/A
+
+Map Title: Grand Duchy of Karameikos
+Author: Corey Sonnenberg
+Update Date: N/A
+
+Map Title: Idrisian Sphere
+Author: JTR
+Update Date: N/A
+
+Map Title: The Kingdom of Oceansend and The Norwold Coast
+Author: JTR
+Update Date: N/A
+
+Map Title: The Streets of Landfall
+Author: JTR
+Update Date: N/A
+
+Map Title: Landfall and Kamminer Bay
+Author: JTR
+Update Date: N/A
+
+Map Title: The Reptile Kingdoms
+Author: Adamantyr
+Update Date: N/A
+
+Map Title: Jibaru and Nimmur
+Author: Adamantyr
+Update Date: N/A
+
+Map Title: The Orc's Head Peninsula
+Author: Adamantyr
+Update Date: N/A
+
+Map Title: Magiocracy of Herath
+Author: Adamantyr
+Update Date: N/A
+
+Map Title: The Animal Kingdoms
+Author: Adamantyr
+Update Date: N/A
+
+Map Title: The Savage Baronies
+Author: Adamantyr
+Update Date: N/A
+
+Map Title: Eastern Gulf of Hule
+Author: Adamantyr
+Update Date: N/A
+
+Map Title: Heldannic Territories
+Author: JTR
+Update Date: N/A
+
+Map Title: Sylvan Realm Map
+Author: Håvard
+Update Date: N/A
+
+Map Title: Garl Territories
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: Forest of Aelos
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: Arquen
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: Anvil of the World
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: High Shire
+Author: Charles Diamond
+Update Date: N/A
+
+Map Title: Infernus-Dumfur Region
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: The Kingdom of Littonia
+Author: JTR
+Update Date: N/A
+
+Map Title: Upper Levels of Castle Marilenev
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: Castle Marilenev and Village
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: Isle of Dread
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: Isle of Dread
+Author: Ray Allen
+Update Date: N/A
+
+Map Title: The Western Alliance
+Author: JTR
+Update Date: N/A
+
+Map Title: Kingdom of Ghyr and Allies
+Author: JTR
+Update Date: N/A
+
+Map Title: Known World, Sea of Dread, Isle of Dawn, Alphatia. etc
+Author: Mark Howard
+Update Date: N/A
+
+Map Title: Known World
+Author: Mark Howard
+Update Date: N/A
+
+Map Title: Blackmoor
+Author: Håvard
+Update Date: N/A
+
+Map Title: alternate location
+Author: Håvard
+Update Date: N/A
+
+Map Title: Northern Wildlands
+Author: JTR
+Update Date: N/A
+
+Map Title: The Dominions of Norwold AC 1015
+Author: Geoff Gander
+Update Date: N/A
+
+Map Title: Geologic Map of the Known World
+Author: Isabelle Sarikhan
+Update Date: N/A
+
+Map Title: Isle of Dread
+Author: Thorfinn Tait
+Update Date: N/A
+
+Map Title: Physical map of Southeastern Brun (c BC 2000)
+Author: Geoff Gander
+Update Date: N/A
+
+Map Title: Arm of the Immortals and the Orc's Head Peninsula, 1000 AC
+Author: Thorfinn Tait
+Update Date: N/A
+
+Map Title: Kingdom of Nithia, 1000 AC
+Author: Thorfinn Tait
+Update Date: N/A
+
+Map Title: Western Isle of Dawn, 1000 AC
+Author: Thorfinn Tait
+Update Date: N/A
+
+Map Title: 700 AC
+Author: Geoff Gander
+Update Date: N/A
+
+Map Title: 300 BC
+Author: Sheldon Morris
+Update Date: N/A
+
+Map Title: Milenian Empire
+Author: Thorfinn Tait
+Update Date: N/A
+
+Map Title: Azcan Empire
+Author: Thorfinn Tait
+Update Date: N/A
+
+Map Title: Known World
+Author: Sheldon Morris
+Update Date: N/A
+
+Map Title: Northern Reaches
+Author: Sheldon Morris
+Update Date: N/A
+
+Map Title: Malpheggi Swamp
+Author: Morphius Shadowleaf
+Update Date: N/A
+
+Map Title: Taymora
+Author: James Mishler
+Update Date: N/A
+
+Map Title: Skothar as Oerik: A Mystaran Flanaess
+Author: James Mishler
+Update Date: N/A
+
+Map Title: Southeastern Brun: 2500 BC
+Author: James Mishler
+Update Date: N/A
+
+Map Title: Patera
+Author: Giovanni Paniccia
+Update Date: N/A
+
+Map Title: High Shire
+Author: Charles Diamond
+Update Date: N/A
+
+Map Title: Heldann Freeholds
+Author: Geoff Gander
+Update Date: N/A
+
+Map Title: Leehashire
+Author: Dan Eustace
+Update Date: N/A
+
+Map Title: Xyqata
+Author: Andrew Theisen
+Update Date: N/A
+
+Map Title: Northern Gnollheim Hills
+Author: Andrew Theisen
+Update Date: N/A
+
+Map Title: Dogvale
+Author: Andrew Theisen
+Update Date: N/A
+
+Map Title: Province of Redstone
+Author: Paul Holroyd
+Update Date: N/A
+
+Map Title: Republic of Darokin
+Author: Paul Holroyd
+Update Date: N/A
+
+Map Title: Kingdom of Alfheim
+Author: Paul Holroyd
+Update Date: N/A
+
+Map Title: Ochalea (East)
+Author: Thibault Sarlat
+Update Date: N/A
+
+Map Title: Ochalea (West)
+Author: Thibault Sarlat
+Update Date: N/A
+
+Map Title: Nuar Island
+Author: Thibault Sarlat
+Update Date: N/A
+
+Map Title: Yavdlom and the Great Waste
+Author: Thibault Sarlat
+Update Date: N/A
+
+Map Title: Wendar
+Author: Thibault Sarlat
+Update Date: N/A
+
+Map Title: Nueva Ispanola
+Author: Thibault Sarlat
+Update Date: N/A
+
+Map Title: Isle of Dread
+Author: Thibault Sarlat
+Update Date: N/A
+
+Map Title: Extreme Western Borea
+Author: Thibault Sarlat
+Update Date: N/A
+
+Map Title: Central Borea
+Author: Thibault Sarlat
+Update Date: N/A
+
+Map Title: Eastern Borea
+Author: Thibault Sarlat
+Update Date: N/A
+
+Map Title: The Nine Kingdoms of the Great Valley 1950 BC
+Author: Christian Constantin
+Update Date: N/A
+
+Map Title: First Hulean Empire 700 BC
+Author: Christian Constantin
+Update Date: N/A
+
+Map Title: Second Hulean Empire 150 AC
+Author: Christian Constantin
+Update Date: N/A
+
+Map Title: Great Hule and the Midlands AC 1000
+Author: Christian Constantin
+Update Date: N/A
+
+Map Title: Adri Varma region
+Author: Christian Constantin
+Update Date: N/A
+
+Map Title: Western Brun, AC 1000
+Author: Christian Constantin
+Update Date: N/A
+
+Map Title: Borea
+Author: Christian Constantin
+Update Date: N/A
+
+Map Title: Skothar, AC 1000
+Author: Christian Constantin
+Update Date: N/A
+
+Map Title: AC 1016
+Author: Andrew Theisen
+Update Date: N/A
+
+Map Title: map
+Author: Geoff Gander
+Update Date: N/A
+
+Map Title: continent of Lhomarr
+Author: Geoff Gander
+Update Date: N/A
+
+Map Title: Ancient Nithian Empire
+Author: James Mishler
+Update Date: N/A
+
+Map Title: Great Crater
+Author: Andrew Theisen
+Update Date: N/A
+
+Map Title: Aryptian Region
+Author: Geoff Gander
+Update Date: N/A
+
+Map Title: Aryptian Savannah-Jungle Coast Region
+Author: Geoff Gander
+Update Date: N/A
+
+Map Title: Lost Valley
+Author: Geoff Gander
+Update Date: N/A
+
+Map Title: Vulcanian Peninsula
+Author: Geoff Gander
+Update Date: N/A
+
+Map Title: Izondian Deep
+Author: Geoff Gander
+Update Date: N/A
+
+Map Title: Bay of Pelatan
+Author: Geoff Gander
+Update Date: N/A
+
+Map Title: Denagothian Plateau
+Author: Geoff Gander
+Update Date: N/A
+
+Map Title: map
+Author: Geoff Gander
+Update Date: N/A
+
+Map Title: Adakkian Sound
+Author: Geoff Gander
+Update Date: N/A
+
+Map Title: map
+Author: Geoff Gander
+Update Date: N/A
+
+Map Title: overview
+Author: Timothy Klanderud
+Update Date: N/A
+
+Map Title: levels 1 to 4
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: level 5
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: level 6
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: Vaults of Aagol
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: Tower of Zordaz
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: The Citadel
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: The Pale Gate
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: The Black Gates
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: Tenkar's Tavern
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: Waystar Highpoint
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: Tower of the Archmage
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: The Hydra's Grotto
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: The Badger King's Lair
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: Gothridge Manor
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: Castle Dragonscar
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: Bloodstone Keep
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: Castle Dreadwood
+Author: Robin
+Update Date: N/A
+
+Map Title: Wander-On-Inn
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: Temple of Demogorgon
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: Quag Keep
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: Lich House
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: The Stirge
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: level 1
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: level 2
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: level 3
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: level 4
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: Temple of Bulbul
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: image version
+Author: Michael Berry
+Update Date: N/A
+
+Map Title: image version
+Author: Michael Berry
+Update Date: N/A
+
+Map Title: The Gauntlet
+Author: Daniel Reid
+Update Date: N/A
+
+Map Title: Underground
+Author: Daniel Reid
+Update Date: N/A
+
+Map Title: Eik-am-gar
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: Temple of Killitkillitnow
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: Dungeon of Hurty Things
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: The Hive
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: Falhaven Manor
+Author: Sean Meaney
+Update Date: N/A
+
+Map Title: levels from -2 to 3
+Author: Francesco Defferrari
+Update Date: N/A
+
+Map Title: levels from 4 to 7
+Author: Francesco Defferrari
+Update Date: N/A
+
+Map Title: Returned Blackmoor with superimposed colored territories modified by
+Author: Francesco Defferrari
+Update Date: N/A
+
+Map Title: Northern Reaches, 8 miles per hex
+Author: Fabrizio Nuzzaci
+Update Date: N/A
+
+Map Title: Darokin, 8 miles per hex
+Author: Fabrizio Nuzzaci
+Update Date: N/A
+
+Map Title: Kerothar Island
+Author: Pol Ginés
+Update Date: N/A
+
+Map Title: Map of the Known World AC 1010
+Author: Dave Lister
+Update Date: N/A
+
+Map Title: Map of the Kingdom of Karameikos AC 1010
+Author: Dave Lister
+Update Date: N/A
+
+Map Title: Northern Reaches and Rockhome
+Author: Pol Ginés
+Update Date: N/A
+
+Map Title: colour
+Author: Pol Ginés
+Update Date: N/A
+
+Map Title: black and white
+Author: Pol Ginés
+Update Date: N/A
+
+Map Title: Broken Sea Archipelago
+Author: Robin
+Update Date: N/A
+
+Map Title: image version
+Author: Michael Berry
+Update Date: N/A
+
+Map Title: image version
+Author: Michael Berry
+Update Date: N/A
+
+Map Title: download
+Author: Mario Ciuffini
+Update Date: N/A
+
+Map Title: Southern Glantri
+Author: Emanuele Betti
+Update Date: N/A
+
+Map Title: Northern Glantri
+Author: Emanuele Betti
+Update Date: N/A
+
+Map Title: Penhaligon
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Isle of Dawn
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Alphatia
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Empire of Thyatis
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: The Atruaghin Clans
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Wendar and Denagoth
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: The Shadowlands
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Ethengar Khanates
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Republic of Darokin
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Broken Lands
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Minrothad Guilds
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Five Shires
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Northern Reaches
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Rockhome
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Kingdom of Alfheim
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Kingdom of Ierendi
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Principalities of Glantri
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Emirates of Ylaruam
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Grand Duchy of Karameikos
+Author: Jason Hibdon
+Update Date: N/A
+
+Map Title: Drawn map of the Known World
+Author: Josh Lawson
+Update Date: N/A
+
+Map Title: Grand Duchy of Karameikos
+Author: Rich Brungard
+Update Date: N/A
+
+Map Title: House Hostilities circa AC 1000
+Author: Kurt Stoffer
+Update Date: N/A
+
+Map Title: House Alliances circa AC 1000
+Author: Kurt Stoffer
+Update Date: N/A
+
+Map Title: Village of Volnay
+Author: Kurt Stoffer
+Update Date: N/A
+
+Map Title: Rockhome
+Author: Josh Lawson
+Update Date: N/A
+
+Map Title: Kingdom of Alfheim
+Author: Josh Lawson
+Update Date: N/A
+
+Map Title: Grand Duchy of Karameikos
+Author: Josh Lawson
+Update Date: N/A
+
