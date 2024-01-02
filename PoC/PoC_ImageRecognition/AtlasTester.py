@@ -1,4 +1,4 @@
-# combined_script.py
+# Runs PoCBitmapToHex.py over a folder
 import os
 import subprocess
 import argparse

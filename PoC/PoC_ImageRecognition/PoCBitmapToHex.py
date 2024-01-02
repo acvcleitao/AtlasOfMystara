@@ -20,6 +20,7 @@ def process_image(image_path):
 
     result = Test.HexTranslator(hexFound)
     # Grid parameters
+    # TODO: Get these values dynamically
     grid_size = (7, 3)  # Number of hexagons in each direction (width, height)
     tile_size = 19     # Size of each hexagon
     orientation = 'pointy'  # 'pointy' or 'flat'
@@ -31,10 +32,12 @@ def process_image(image_path):
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
+    """
     parser = argparse.ArgumentParser(description='Image Processing for Hexagonal Grid')
     parser.add_argument('image_path', help='Path to the image for processing')
     
     args = parser.parse_args()
     image_path = args.image_path
-    
+    """
+    image_path = r"PoC\Database\Tests101\your_image3.jpg"
     process_image(image_path)
