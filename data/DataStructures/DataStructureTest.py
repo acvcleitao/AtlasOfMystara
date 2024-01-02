@@ -17,6 +17,7 @@ hexagon_data = {
     "position_absolute": [],
     "image_url": "/images/hexagon101.png",
     "hexagon_type": "Jungle",
+    "hexagon_layer": "Land",
     "hexagon_size": "Large",
     "hexagon_shape": "Flat",
     "contours": [
