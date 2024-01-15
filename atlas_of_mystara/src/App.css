@@ -1,38 +1,87 @@
-.App {
-  text-align: center;
+/* App.css */
+
+/* Reset some default styles */
+body, h1, h2, p {
+  margin: 0;
+  padding: 0;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Apply background image to the entire page */
+body {
+  background-image: url('../public/images/background.jpg'); /* Adjusted path */
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  margin: 0; /* Remove default margin to extend the background to the viewport edges */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white; /* Set text color to white for better visibility on the background */
+  overflow: hidden; /* Hide overflowing content */
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+/* Style for the main title */
+h1 {
+  font-size: 3em;
+  font-family: 'Your Chosen Font', sans-serif; /* Replace with your desired font */
+  margin-bottom: 20px;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+/* Style for the buttons */
+button {
+  background-color: #4CAF50; /* Green background color */
+  color: white;
+  padding: 15px 40px; /* Adjusted padding for consistent button sizes */
+  margin: 10px;
+  font-size: 1.2em;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Style for the login button in the top left corner */
+.login-button {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: #333; /* Dark background color */
+  color: white;
+  padding: 10px 15px;
+  font-size: 1em;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  z-index: 2; /* Ensure the login button is on top of other elements */
+}
+
+/* Center the content vertically and horizontally */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+/* Ensure the image covers the entire viewport */
+body::before {
+  content: '';
+  background-image: inherit;
+  background-size: inherit;
+  background-position: inherit;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+}
+
+/* Added style to stack buttons vertically */
+.app-container > div {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }
