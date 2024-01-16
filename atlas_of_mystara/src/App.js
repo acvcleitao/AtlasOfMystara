@@ -8,99 +8,80 @@ import AdminDashboard from './AdminDashboard';
 
 import './App.css';
 
-function App() {
+const Home = () => (
+  <div className="home-container">
+    <Link to="/explore">
+      <button>Explore the Atlas</button>
+    </Link>
+    <Link to="/upload">
+      <button>Upload Map</button>
+    </Link>
+  </div>
+)
+
+const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [newMapsCount, setNewMapsCount] = useState(0);
   const [showLoginPopup, setShowLoginPopup] = useState(false);
 
   const handleLogin = () => {
     setIsLoggedIn(true);
-    setIsAdmin(true);
-    setNewMapsCount(3);
     setShowLoginPopup(false);
   };
 
   const handleLogout = () => {
     setIsLoggedIn(false);
-    setIsAdmin(false);
-    setNewMapsCount(0);
   };
+
+  const handleNewMaps = () => {
+    return 1;
+  }
 
   return (
     <Router>
       <div className="app-container">
         <h1>Atlas of Mystara</h1>
         <h2>Welcome to the Atlas of Mystara</h2>
-        {isLoggedIn && (
-          <div>
-            <Link to="/explore">
-              <button>Explore the Atlas</button>
-            </Link>
-            <Link to="/upload">
-              <button>Upload Map</button>
-            </Link>
-            {isAdmin && (
-              <Link to="/admin">
-                <button>New Maps ({newMapsCount})</button>
-              </Link>
-            )}
-            <button className="login-button" onClick={handleLogout}>
-              Logout
-            </button>
-          </div>
-        )}
-        {!isLoggedIn && (
-          <div>
-            <Link to="/explore">
-              <button>Explore the Atlas</button>
-            </Link>
-            <Link to="/upload">
-              <button>Upload Map</button>
-            </Link>
+
+        <Routes>
+          <Route path="/" element={<Home isLoggedIn={isLoggedIn}/>} />
+          <Route path="/explore" element={<ExploreAtlas />} />
+          <Route path="/upload" element={<UploadMap />} />
+          <Route
+            path="/admin"
+            element={isLoggedIn ? <AdminDashboard /> : <Navigate to="/" />}
+          />
+        </Routes>
+
+        <div>
+          {!isLoggedIn && (
             <button className="login-button" onClick={() => setShowLoginPopup(true)}>
               Login
             </button>
-          </div>
+          )}
+
+          {isLoggedIn && (
+            <button className="login-button" onClick={handleLogout}>
+              Logout
+            </button>
+          )}
+        </div>
+
+        <div>
+        {isLoggedIn && (
+          <button className='newmaps-button' onClick={handleNewMaps}>
+            New Maps
+          </button>
         )}
-        <Routes>
-          <Route
-            path="/"
-            element={
-              isLoggedIn ? (
-                <Home isLoggedIn={isLoggedIn} newMapsCount={newMapsCount} />
-              ) : (
-                <Navigate to="/" />
-              )
-            }
-          />
-          <Route path="/explore" element={<ExploreAtlas />} />
-          <Route path="/upload" element={<UploadMap />} />
-          <Route path="/admin" element={<AdminDashboard newMapsCount={newMapsCount} />} />
-        </Routes>
-        {showLoginPopup && (
-          <Login onLogin={handleLogin} onClosePopup={() => setShowLoginPopup(false)} />
-        )}
+        </div>
+
+        <div>
+          {showLoginPopup && (
+            <Login onLogin={handleLogin} onClosePopup={() => setShowLoginPopup(false)} />
+          )}
+        </div>
       </div>
     </Router>
   );
-}
-
-function Home({ newMapsCount }) {
-  return (
-    <div>
-      <Link to="/explore">
-        <button>Explore the Atlas</button>
-      </Link>
-      <Link to="/upload">
-        <button>Upload Map</button>
-      </Link>
-      <Link to="/admin">
-        <button>New Maps ({newMapsCount})</button>
-      </Link>
-    </div>
-  );
-}
-
+};
 
 export default App;

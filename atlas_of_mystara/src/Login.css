@@ -6,21 +6,21 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 1); /* Darker background */
     justify-content: center;
     align-items: center;
+    z-index: 2; /* Ensure the container is on top of other elements */
   }
   
   .login-popup {
-    background: #fff;
+    background: rgba(0, 0, 0, 1); /* Slightly more opaque black background */
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
     text-align: center;
+    color: black; /* Set text color to black */
   }
   
   .login-title {
-    color: black; /* Change text color to black */
     margin-bottom: 10px; /* Add margin to the bottom of the title */
   }
   
@@ -31,6 +31,11 @@
   .login-input label {
     display: block;
     margin-bottom: 5px;
+    color: black; /* Set text color to black */
+  }
+  
+  .login-input input {
+    color: black; /* Set text color to black */
   }
   
   .login-submit-button {

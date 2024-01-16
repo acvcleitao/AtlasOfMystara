@@ -1,0 +1,43 @@
+/* MapView.css */
+.map-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    cursor: grab;
+  }
+  
+  img {
+    user-drag: none;
+    user-select: none;
+  }
+  
+  .zoom-buttons {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  button {
+    margin-bottom: 10px;
+  }
+  
+  .search-bar {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+  }
+  
+  input {
+    padding: 8px;
+    margin-right: 8px;
+  }
+  
+  button {
+    padding: 8px;
+  }
+  

@@ -12,6 +12,34 @@ function Login({ onLogin, onClosePopup }) {
     // Close the popup
     onClosePopup();
   };
+  const handleLoginBackend = async () => {
+    try {
+      // Make a request to your backend to authenticate the user
+      const response = await fetch('http://your-backend-url/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Assuming the backend sends back whether the user is an admin or not
+        if (data.isAdmin) {
+          onLogin();
+        } else {
+          alert('User is not an admin');
+        }
+        onClosePopup();
+      } else {
+        alert('Invalid username or password');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('An error occurred during login');
+    }
+  };
 
   return (
     <div className="popup-container">
