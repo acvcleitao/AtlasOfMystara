@@ -1,0 +1,45 @@
+/* Login.css */
+.popup-container {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .login-popup {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    text-align: center;
+  }
+  
+  .login-title {
+    color: black; /* Change text color to black */
+    margin-bottom: 10px; /* Add margin to the bottom of the title */
+  }
+  
+  .login-input {
+    margin-bottom: 10px;
+  }
+  
+  .login-input label {
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  .login-submit-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 15px 40px;
+    font-size: 1.2em;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  

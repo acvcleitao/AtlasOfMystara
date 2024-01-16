@@ -1,4 +1,4 @@
-// src/App.js
+// App.js
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 import ExploreAtlas from './ExploreAtlas';
@@ -12,11 +12,13 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [newMapsCount, setNewMapsCount] = useState(0);
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
 
   const handleLogin = () => {
     setIsLoggedIn(true);
     setIsAdmin(true);
     setNewMapsCount(3);
+    setShowLoginPopup(false);
   };
 
   const handleLogout = () => {
@@ -29,7 +31,8 @@ function App() {
     <Router>
       <div className="app-container">
         <h1>Atlas of Mystara</h1>
-        {isLoggedIn ? (
+        <h2>Welcome to the Atlas of Mystara</h2>
+        {isLoggedIn && (
           <div>
             <Link to="/explore">
               <button>Explore the Atlas</button>
@@ -37,46 +40,67 @@ function App() {
             <Link to="/upload">
               <button>Upload Map</button>
             </Link>
-            <Link to="/login">
-              <button>Login</button>
-            </Link>
             {isAdmin && (
               <Link to="/admin">
                 <button>New Maps ({newMapsCount})</button>
               </Link>
             )}
-            <button onClick={handleLogout}>Logout</button>
+            <button className="login-button" onClick={handleLogout}>
+              Logout
+            </button>
           </div>
-        ) : (
-          <Navigate to="/" />
+        )}
+        {!isLoggedIn && (
+          <div>
+            <Link to="/explore">
+              <button>Explore the Atlas</button>
+            </Link>
+            <Link to="/upload">
+              <button>Upload Map</button>
+            </Link>
+            <button className="login-button" onClick={() => setShowLoginPopup(true)}>
+              Login
+            </button>
+          </div>
         )}
         <Routes>
+          <Route
+            path="/"
+            element={
+              isLoggedIn ? (
+                <Home isLoggedIn={isLoggedIn} newMapsCount={newMapsCount} />
+              ) : (
+                <Navigate to="/" />
+              )
+            }
+          />
           <Route path="/explore" element={<ExploreAtlas />} />
           <Route path="/upload" element={<UploadMap />} />
-          <Route path="/login" element={<Login onLogin={handleLogin} />} />
           <Route path="/admin" element={<AdminDashboard newMapsCount={newMapsCount} />} />
-          <Route path="/" element={<Home onLogin={handleLogin} />} />
         </Routes>
+        {showLoginPopup && (
+          <Login onLogin={handleLogin} onClosePopup={() => setShowLoginPopup(false)} />
+        )}
       </div>
     </Router>
   );
 }
 
-function Home({ onLogin }) {
+function Home({ newMapsCount }) {
   return (
     <div>
-      <h2>Welcome to the Atlas of Mystara</h2>
       <Link to="/explore">
         <button>Explore the Atlas</button>
       </Link>
       <Link to="/upload">
         <button>Upload Map</button>
       </Link>
-      <Link to="/login">
-        <button onClick={onLogin}>Login</button>
+      <Link to="/admin">
+        <button>New Maps ({newMapsCount})</button>
       </Link>
     </div>
   );
 }
+
 
 export default App;
