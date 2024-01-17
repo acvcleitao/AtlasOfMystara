@@ -1,21 +1,17 @@
 // Login.js
 import React, { useState } from 'react';
+import { useUser } from './UserContext';
 import './Login.css';
 
-function Login({ onLogin, onClosePopup }) {
+function Login({ onClosePopup }) {
+  const { login } = useUser();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    // Perform login logic
-    onLogin();
-    // Close the popup
-    onClosePopup();
-  };
-  const handleLoginBackend = async () => {
+  const handleLogin = async () => {
     try {
       // Make a request to your backend to authenticate the user
-      const response = await fetch('http://your-backend-url/login', {
+      const response = await fetch('http://127.0.0.1:5000', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -27,7 +23,7 @@ function Login({ onLogin, onClosePopup }) {
         const data = await response.json();
         // Assuming the backend sends back whether the user is an admin or not
         if (data.isAdmin) {
-          onLogin();
+          login();
         } else {
           alert('User is not an admin');
         }
