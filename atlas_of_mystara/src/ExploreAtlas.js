@@ -1,6 +1,6 @@
-// MapView.js
+// ExploreAtlas.js
 import React, { useRef, useEffect, useState } from 'react';
-import './ExploreAtlas.css'; // Create a new CSS file for MapView styling
+import styles from './ExploreAtlas.css'; // Import the CSS module
 
 const ExploreAtlas = () => {
   const mapContainerRef = useRef(null);
@@ -39,7 +39,7 @@ const ExploreAtlas = () => {
   }, []);
 
   return (
-    <div className="map-container" ref={mapContainerRef}>
+    <div className={styles.mapContainer} ref={mapContainerRef}>
       {/* Your very large image goes here */}
       <img
         src="path/to/your/very/large/image.jpg"
@@ -48,7 +48,7 @@ const ExploreAtlas = () => {
       />
 
       {/* Zoom in/out buttons */}
-      <div className="zoom-buttons">
+      <div className={styles.zoomButtons}>
         <button onClick={() => setZoomLevel((prevZoom) => prevZoom + 0.1)}>Zoom In</button>
         <button onClick={() => setZoomLevel((prevZoom) => Math.max(1, prevZoom - 0.1))}>
           Zoom Out
@@ -56,7 +56,7 @@ const ExploreAtlas = () => {
       </div>
 
       {/* SearchBar */}
-      <div className="search-bar">
+      <div className={styles.searchBar}>
         <input type="text" placeholder="Search location..." />
         <button>Search</button>
       </div>

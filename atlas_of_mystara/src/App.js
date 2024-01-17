@@ -1,23 +1,13 @@
 // App.js
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
-import ExploreAtlas from './ExploreAtlas';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import ExploreAtlas from './ExploreAtlas';  
 import UploadMap from './UploadMap';
 import Login from './Login';
 import AdminDashboard from './AdminDashboard';
+import Home from './Home';
 
 import './App.css';
-
-const Home = () => (
-  <div className="home-container">
-    <Link to="/explore">
-      <button>Explore the Atlas</button>
-    </Link>
-    <Link to="/upload">
-      <button>Upload Map</button>
-    </Link>
-  </div>
-)
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -43,13 +33,13 @@ const App = () => {
         <h2>Welcome to the Atlas of Mystara</h2>
 
         <Routes>
-          <Route path="/" element={<Home isLoggedIn={isLoggedIn}/>} />
-          <Route path="/explore" element={<ExploreAtlas />} />
+          <Route path="/" element={<Home />} />
           <Route path="/upload" element={<UploadMap />} />
           <Route
             path="/admin"
             element={isLoggedIn ? <AdminDashboard /> : <Navigate to="/" />}
           />
+          <Route path="/explore" element={<ExploreAtlas />} />
         </Routes>
 
         <div>
