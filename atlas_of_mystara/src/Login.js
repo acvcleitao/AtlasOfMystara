@@ -1,5 +1,5 @@
 // Import necessary dependencies
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useUser } from './UserContext';
 import './Login.css';
 
@@ -41,9 +41,32 @@ function Login({ onClosePopup }) {
     }
   };
 
+  // Close the popup when clicking outside the popup
+  const handleClosePopup = (e) => {
+    if (e.target.classList.contains('popup-container')) {
+      onClosePopup();
+    }
+  };
+
+  // Close the popup when clicking on the "X" button
+  const handleCloseButtonClick = () => {
+    onClosePopup();
+  };
+
+  // Attach a click event listener to the document for the entire component
+  useEffect(() => {
+    document.addEventListener('click', handleClosePopup);
+
+    // Clean up the event listener on component unmount
+    return () => {
+      document.removeEventListener('click', handleClosePopup);
+    };
+  }, [onClosePopup]);
+
   return (
     <div className="popup-container">
       <div className="login-popup">
+        <span className="close" onClick={handleCloseButtonClick}>&times;</span>
         <h2 className="login-title">Hello Admin! Please login.</h2>
         <div className="login-input">
           <label>

@@ -1,50 +1,63 @@
 /* Login.css */
 .popup-container {
-    display: flex;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 1); /* Darker background */
-    justify-content: center;
-    align-items: center;
-    z-index: 2; /* Ensure the container is on top of other elements */
-  }
-  
-  .login-popup {
-    background: rgba(0, 0, 0, 1); /* Slightly more opaque black background */
-    padding: 20px;
-    border-radius: 8px;
-    text-align: center;
-    color: black; /* Set text color to black */
-  }
-  
-  .login-title {
-    margin-bottom: 10px; /* Add margin to the bottom of the title */
-  }
-  
-  .login-input {
-    margin-bottom: 10px;
-  }
-  
-  .login-input label {
-    display: block;
-    margin-bottom: 5px;
-    color: black; /* Set text color to black */
-  }
-  
-  .login-input input {
-    color: black; /* Set text color to black */
-  }
-  
-  .login-submit-button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 15px 40px;
-    font-size: 1.2em;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
+  display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 1); /* Darker background */
+  justify-content: center;
+  align-items: center;
+  z-index: 2; /* Ensure the container is on top of other elements */
+}
+
+.login-popup {
+  background: rgba(0, 0, 0, 1); /* Slightly more opaque black background */
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  color: black; /* Set text color to black */
+  position: relative; /* Ensure positioning is relative */
+}
+
+.login-title {
+  margin-bottom: 10px;
+  margin-top: 8px;
+}
+
+.login-input {
+  font-size: 2em;
+  margin-bottom: 10px;
+}
+
+.login-input label {
+  font-family:'DragonFont', sans-serif;
+  display: block;
+  margin: 40px;
+  color: black; /* Set text color to black */
+}
+
+.login-submit-button {
+  background-color: #fceca5;
+  color: #132c3f;
+  padding: 15px 15px;
+  font-size: 1.5em;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.close {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  font-size: 30px; /* Increase font size */
+  cursor: pointer;
+  color: #132c3f; /* Set text color to black */
+  padding: 0px; /* Increase padding for a larger close button */
+  padding-left: 5px;
+  padding-right: 5px;
+  border: 2px solid #132c3f; /* Add a border */
+  border-radius: 10px; /* Add rounded edges */
+}
