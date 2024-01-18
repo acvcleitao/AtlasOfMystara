@@ -68,7 +68,7 @@ body, h1, h2, p {
     cursor: pointer;
   }
   
-  .login-button {
+  .login-out-button {
     position: absolute;
     top: 10px;
     right: 10px;

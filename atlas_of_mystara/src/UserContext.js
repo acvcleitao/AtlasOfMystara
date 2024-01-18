@@ -5,6 +5,7 @@ const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [newMapsCount, setNewMapsCount] = useState(0);
 
   const login = () => {
     // Your login logic here
@@ -17,7 +18,7 @@ export const UserProvider = ({ children }) => {
   };
 
   return (
-    <UserContext.Provider value={{ isLoggedIn, login, logout }}>
+    <UserContext.Provider value={{ isLoggedIn, login, logout, newMapsCount, setNewMapsCount }}>
       {children}
     </UserContext.Provider>
   );

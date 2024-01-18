@@ -1,17 +1,18 @@
-// Login.js
+// Import necessary dependencies
 import React, { useState } from 'react';
 import { useUser } from './UserContext';
 import './Login.css';
 
 function Login({ onClosePopup }) {
-  const { login } = useUser();
+  // Destructure the necessary functions from useUser
+  const { login, setNewMapsCount } = useUser();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = async () => {
     try {
       // Make a request to your backend to authenticate the user
-      const response = await fetch('http://127.0.0.1:5000', {
+      const response = await fetch('http://127.0.0.1:5000/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -21,15 +22,18 @@ function Login({ onClosePopup }) {
 
       if (response.ok) {
         const data = await response.json();
-        // Assuming the backend sends back whether the user is an admin or not
-        if (data.isAdmin) {
-          login();
-        } else {
-          alert('User is not an admin');
+        alert(data.message);  // Display the login message
+
+        // Update the newMaps count in the UserContext
+        if (typeof data.newMaps === 'number') {
+          setNewMapsCount(data.newMaps);
         }
+
+        login();
         onClosePopup();
       } else {
-        alert('Invalid username or password');
+        const errorData = await response.json();
+        alert(`Error: ${errorData.message}`);
       }
     } catch (error) {
       console.error('Login error:', error);
