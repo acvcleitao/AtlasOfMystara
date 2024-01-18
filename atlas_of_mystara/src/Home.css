@@ -1,4 +1,4 @@
-/* App.css */
+/* Home.css */
 /* Reset some default styles */
 body, h1, h2, p {
   margin: 0;
@@ -17,12 +17,11 @@ body {
   align-items: center;
   color: black;
   background-color: rgba(255, 255, 255, 0.5);
-  overflow: hidden; /* Add overflow: hidden to hide any content that extends beyond the viewport */
 }
 
 body::before {
   content: '';
-  background-image: url('../public/images/background.jpg'); /* Adjusted path */
+  background-image: url('../public/images/background.jpg');
   background-size: cover;
   background-position: center;
   height: 100%;
@@ -119,10 +118,9 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 80vh; /* Increased height */
-  background-color: rgba(255, 255, 255, 0.7);
-  padding: 40px; /* Increased padding */
-  width: 70vw; /* Increased width */
+  height: 100vh; /* Increased height */
+  width: 100vw; /* Increased width */
+  padding: 20px;
   box-sizing: border-box;
   border-radius: 15px; /* Increased border radius */
 }
@@ -131,5 +129,4 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 0; /* Set margin-top to 0 to remove any top margin */
 }
