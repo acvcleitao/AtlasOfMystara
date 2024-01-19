@@ -4,6 +4,7 @@ from flask import Flask
 from flask_pymongo import PyMongo
 import bcrypt
 from mongoengine import Document, StringField, connect
+from datetime import datetime
 
 load_dotenv()
 
@@ -24,9 +25,13 @@ class User(Document):
     salt = StringField(required=True)
 
 class CollectionItem(Document):
-    # Define your fields here
     field1 = StringField(required=True)
     field2 = StringField(required=True)
+
+class NewMap(Document):
+    title = StringField(required=True)
+    image_path = StringField(required=True)
+    timestamp = StringField(required=True)
 
 def hash_password(password):
     salt = bcrypt.gensalt()
@@ -45,13 +50,25 @@ def create_user():
 def create_collection():
     collection_name = input("Enter collection name: ")
 
-    # Create a new CollectionItem document
-    new_item = CollectionItem(
-        field1=input("Enter field1: "),
-        field2=input("Enter field2: "),
-        # Add more fields as needed
-    )
-    new_item.save()
+    # Create a new empty CollectionItem document
+    new_collection = CollectionItem()
+    new_collection.save(collection_name)
+
+def create_new_map():
+    title = input("Enter map title: ")
+    image_path = input("Enter image path: ")
+
+    # Ask the user if they want to use the current timestamp
+    use_current_timestamp = input("Do you want to use the current timestamp? (y/n): ").lower() == 'y'
+
+    # Set the timestamp accordingly
+    timestamp = str(datetime.now()) if use_current_timestamp else input("Enter timestamp: ")
+
+    # Create a new NewMap document
+    new_map = NewMap(title=title, image_path=image_path, timestamp=timestamp)
+    new_map.save()
+
+
 
 def main():
     command = input("Enter command: ")
@@ -59,6 +76,7 @@ def main():
     commands = {
         "create user": create_user,
         "create collection": create_collection,
+        "create new map": create_new_map,
         # Add more commands as needed
     }
 

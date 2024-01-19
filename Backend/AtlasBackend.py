@@ -8,20 +8,16 @@ from flask_pymongo import PyMongo
 import bcrypt
 from werkzeug.utils import secure_filename
 from datetime import datetime
+import jsonschema
+import sys
+from config import create_app, configure_folders, configure_mongo
+from schemas import new_map_schema
+from data_utils import build_new_map_data
 
 load_dotenv()
-
-app = Flask(__name__)
-CORS(app)
-
-# Set the MongoDB URI from the environment variable
-app.config['MONGO_URI'] = os.getenv("MONGO_URI")
-mongo = PyMongo(app)
-# Create a folder named 'NewMaps' within the backend's folder
-NewMapsFolder = os.path.join(os.path.dirname(__file__), 'NewMaps')
-os.makedirs(NewMapsFolder, exist_ok=True)
-ApprovedMapsFolder = os.path.join(os.path.dirname(__file__), 'ApprovedMaps')
-os.makedirs(NewMapsFolder, exist_ok=True)
+app = create_app()
+NewMapsFolder, ApprovedMapsFolder = configure_folders(app)
+mongo = configure_mongo(app)
 
 # Root URL
 @app.route('/')
@@ -70,33 +66,16 @@ def upload_map():
         title = request.form.get('title')
         image_data = request.form.get('image')
 
-        # Validate the input
-        if not title or not image_data:
-            return jsonify({'message': 'Title and image are required'}), 400
-
-        # Decode base64 string and save the image to the server
-        unique_identifier = str(uuid.uuid4())
-        filename = secure_filename(f"{unique_identifier}_map.png")
-        filepath = os.path.join(NewMapsFolder, filename)
-
-        # Remove the 'data:image/png;base64,' prefix
-        image_data = image_data.split(',')[1]
-        image_binary = base64.b64decode(image_data)
-
-        # Save the image to the server
-        with open(filepath, 'wb') as file:
-            file.write(image_binary)
+        # Build map data and validate against the schema
+        map_data = build_new_map_data(title, image_data, NewMapsFolder)
 
         # Insert map data into the 'new_maps' collection
-        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        map_data = {
-            'title': title,
-            'image_path': filepath,
-            'timestamp': timestamp,
-        }
         mongo.db.new_maps.insert_one(map_data)
 
         return jsonify({'message': 'Map Uploaded Successfully'}), 200
+
+    except jsonschema.ValidationError as e:
+        return jsonify({'message': f'Invalid Data: {e.message}'}), 400
 
     except Exception as e:
         print(f"Error uploading map: {str(e)}")
@@ -109,3 +88,4 @@ else:
     # For Gunicorn deployment
     gunicorn_cmd = f"gunicorn -c gunicorn_config.py AtlasBackend:app"
     os.system(gunicorn_cmd)
+
