@@ -1,9 +1,13 @@
 import os
+import uuid
+import base64
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_pymongo import PyMongo
-import bcrypt  # Import the necessary module
+import bcrypt
+from werkzeug.utils import secure_filename
+from datetime import datetime
 
 load_dotenv()
 
@@ -13,6 +17,11 @@ CORS(app)
 # Set the MongoDB URI from the environment variable
 app.config['MONGO_URI'] = os.getenv("MONGO_URI")
 mongo = PyMongo(app)
+# Create a folder named 'NewMaps' within the backend's folder
+NewMapsFolder = os.path.join(os.path.dirname(__file__), 'NewMaps')
+os.makedirs(NewMapsFolder, exist_ok=True)
+ApprovedMapsFolder = os.path.join(os.path.dirname(__file__), 'ApprovedMaps')
+os.makedirs(NewMapsFolder, exist_ok=True)
 
 # Root URL
 @app.route('/')
@@ -51,6 +60,47 @@ def get_new_maps_count():
     # Count the number of new maps in the collection
     new_maps_count = mongo.db.new_maps.count_documents({})
     return jsonify({'newMapsCount': new_maps_count}), 200
+
+
+# Route for uploading a new map
+@app.route('/uploadMap', methods=['POST'])
+def upload_map():
+    try:
+        # Get form data
+        title = request.form.get('title')
+        image_data = request.form.get('image')
+
+        # Validate the input
+        if not title or not image_data:
+            return jsonify({'message': 'Title and image are required'}), 400
+
+        # Decode base64 string and save the image to the server
+        unique_identifier = str(uuid.uuid4())
+        filename = secure_filename(f"{unique_identifier}_map.png")
+        filepath = os.path.join(NewMapsFolder, filename)
+
+        # Remove the 'data:image/png;base64,' prefix
+        image_data = image_data.split(',')[1]
+        image_binary = base64.b64decode(image_data)
+
+        # Save the image to the server
+        with open(filepath, 'wb') as file:
+            file.write(image_binary)
+
+        # Insert map data into the 'new_maps' collection
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        map_data = {
+            'title': title,
+            'image_path': filepath,
+            'timestamp': timestamp,
+        }
+        mongo.db.new_maps.insert_one(map_data)
+
+        return jsonify({'message': 'Map Uploaded Successfully'}), 200
+
+    except Exception as e:
+        print(f"Error uploading map: {str(e)}")
+        return jsonify({'message': 'Internal Server Error'}), 500
 
 if __name__ == '__main__':
     # For development with Flask's built-in server

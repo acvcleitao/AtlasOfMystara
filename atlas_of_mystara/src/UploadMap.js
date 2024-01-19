@@ -22,17 +22,39 @@ const UploadMap = ({ onUpload }) => {
     setMapName(e.target.value);
   };
 
-  const handleUploadMap = () => {
-    // Check if mapName is not empty and uploadedImage is not null
-    if (mapName.trim() !== '' && uploadedImage) {
-      // Send the map data to the server
-      // You can make a fetch request to your server here
-      // For now, we'll just call the onUpload callback
-      onUpload({ mapName, imageData: uploadedImage });
+  const handleUploadMap = async () => {
+    try {
+      // Check if mapName is not empty and uploadedImage is not null
+      if (mapName.trim() !== '' && uploadedImage) {
+        // Create a FormData object to send the image and map title
+        const formData = new FormData();
+        formData.append('title', mapName);
+        formData.append('image', uploadedImage);
 
-      // Reset state
-      setUploadedImage(null);
-      setMapName('');
+        // Make a request to your backend to upload the map
+        const response = await fetch('http://127.0.0.1:5000/uploadMap', {
+          method: 'POST',
+          body: formData,
+        });
+  
+        if (response.ok) {
+          const data = await response.json();
+          alert(data.message);  // Display the upload message
+  
+          // Reset state
+          setUploadedImage(null);
+          setMapName('');
+  
+          // You can update other state or perform additional actions if needed
+  
+        } else {
+          const errorData = await response.json();
+          alert(`Error: ${errorData.message}`);
+        }
+      }
+    } catch (error) {
+      console.error('Upload map error:', error);
+      alert('An error occurred during map upload');
     }
   };
 
