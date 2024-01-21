@@ -1,0 +1,36 @@
+.map-details-container {
+    position: relative;
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .map-image-container {
+    max-width: 80%; /* Adjust as needed */
+    max-height: 70vh; /* Set maximum height to 70% of viewport height */
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden; /* Add overflow property to hide overflow content */
+  }
+  
+  .map-image-container img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .overlay-buttons {
+    position: absolute;
+    bottom: 10px; /* Adjust as needed */
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 20px; /* Adjust the gap between buttons */
+  }
+  
+  .overlay-buttons button {
+    padding: 15px;
+    font-size: 18px;
+  }
+  

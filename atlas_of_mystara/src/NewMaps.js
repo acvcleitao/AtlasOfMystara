@@ -1,13 +1,17 @@
-// NewMapsPage.js
+// NewMaps.js
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import './NewMaps.css';
 
 const NewMaps = () => {
   const [newMaps, setNewMaps] = useState([]);
 
   useEffect(() => {
-    // Fetch new maps from the backend when the component mounts
     fetchNewMaps();
+    document.body.classList.add('newmaps');
+    return () => {
+      document.body.classList.remove('newmaps');
+    };
   }, []);
 
   const fetchNewMaps = async () => {
@@ -15,6 +19,7 @@ const NewMaps = () => {
       const response = await fetch('http://127.0.0.1:5000/getNewMapsWithURL');
       if (response.ok) {
         const data = await response.json();
+        console.log('Fetched Maps:', data.maps);
         setNewMaps(data.maps);
       } else {
         console.error('Failed to fetch new maps');
@@ -29,10 +34,10 @@ const NewMaps = () => {
       <h1>New Maps Page</h1>
       <div className="maps-grid">
         {newMaps.map((map) => (
-          <div key={map._id} className="map-item">
+          <Link to={map._id ? `/map/${map._id}` : '#'} key={map._id} className="map-item">
             <img src={map.image_url} alt={map.title} className="map-image" />
             <p className="map-title">{map.title}</p>
-          </div>
+          </Link>
         ))}
       </div>
     </div>
