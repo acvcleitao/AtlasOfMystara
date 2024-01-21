@@ -5,6 +5,7 @@ import Home from './Home';
 import ExploreAtlas from './ExploreAtlas';
 import UploadMap from './UploadMap';
 import AdminDashboard from './AdminDashboard';
+import NewMaps from './NewMaps';
 import { UserProvider } from './UserContext';
 
 const App = () => {
@@ -15,7 +16,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/upload" element={<UploadMap />} />
-            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/new_maps" element={<NewMaps />} />
             <Route path="/explore" element={<ExploreAtlas />} />
           </Routes>
         </div>

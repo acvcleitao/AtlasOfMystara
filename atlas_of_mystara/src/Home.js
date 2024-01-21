@@ -72,9 +72,11 @@ const Home = () => {
       {isLoggedIn ? (
         <div>
           <button className='login-out-button' onClick={handleLogout}>Logout</button>
-          <button className='new-maps-button'>
-            New Maps ({newMapsCount})
-          </button>
+          <Link to="/new_maps">
+            <button className='new-maps-button'>
+              New Maps ({newMapsCount})
+            </button>
+          </Link>
         </div>
       ) : (
         <button className='login-out-button' onClick={handleLogin}>Login</button>
