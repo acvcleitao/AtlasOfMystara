@@ -1,5 +1,6 @@
-// NewMaps.js
+// NewMapsPage.js
 import React, { useState, useEffect } from 'react';
+import './NewMaps.css';
 
 const NewMaps = () => {
   const [newMaps, setNewMaps] = useState([]);
@@ -11,7 +12,7 @@ const NewMaps = () => {
 
   const fetchNewMaps = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:5000/getNewMaps');
+      const response = await fetch('http://127.0.0.1:5000/getNewMapsWithURL');
       if (response.ok) {
         const data = await response.json();
         setNewMaps(data.maps);
@@ -25,12 +26,12 @@ const NewMaps = () => {
 
   return (
     <div>
-      <h1>New Maps</h1>
+      <h1>New Maps Page</h1>
       <div className="maps-grid">
         {newMaps.map((map) => (
           <div key={map._id} className="map-item">
-            <img src={map.imageURL} alt={map.title} />
-            <p>{map.title}</p>
+            <img src={map.image_url} alt={map.title} className="map-image" />
+            <p className="map-title">{map.title}</p>
           </div>
         ))}
       </div>

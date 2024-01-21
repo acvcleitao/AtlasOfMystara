@@ -2,7 +2,7 @@ import os
 import uuid
 import base64
 from dotenv import load_dotenv
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from flask_pymongo import PyMongo
 import bcrypt
@@ -80,6 +80,40 @@ def upload_map():
     except Exception as e:
         print(f"Error uploading map: {str(e)}")
         return jsonify({'message': 'Internal Server Error'}), 500
+    
+
+# Route for getting the list of new maps
+@app.route('/getNewMaps', methods=['GET'])
+def get_new_maps():
+    try:
+        # Retrieve the list of new maps from the 'new_maps' collection
+        new_maps = list(mongo.db.new_maps.find({}, {'_id': 0}))
+        return jsonify({'maps': new_maps}), 200
+    except Exception as e:
+        print(f"Error fetching new maps: {str(e)}")
+        return jsonify({'message': 'Internal Server Error'}), 500
+
+# ... (existing imports)
+
+# Route for getting the list of new maps with correct image URLs
+@app.route('/getNewMapsWithURL', methods=['GET'])
+def get_new_maps_with_url():
+    try:
+        # Retrieve the list of new maps from the 'new_maps' collection
+        new_maps = list(mongo.db.new_maps.find({}, {'_id': 0}))
+        
+        # Update each map with the correct image URL
+        for map in new_maps:
+            map['image_url'] = f'http://127.0.0.1:5000/static/images/{os.path.basename(map["image_path"])}'
+        
+        return jsonify({'maps': new_maps}), 200
+    except Exception as e:
+        print(f"Error fetching new maps: {str(e)}")
+        return jsonify({'message': 'Internal Server Error'}), 500
+# Serve images statically
+@app.route('/static/images/<path:image_filename>')
+def serve_image(image_filename):
+    return send_from_directory(NewMapsFolder, image_filename)
 
 if __name__ == '__main__':
     # For development with Flask's built-in server
