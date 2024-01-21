@@ -10,6 +10,15 @@ const Home = () => {
   const [showLoginPopup, setShowLoginPopup] = useState(false);
 
   useEffect(() => {
+    // Add the 'home' class to the body when the component mounts
+    document.body.classList.add('home');
+    // Remove the 'home' class from the body when the component unmounts
+    return () => {
+      document.body.classList.remove('home');
+    };
+  }, []);
+
+  useEffect(() => {
     const fetchNewMapsCount = async () => {
       try {
         // Make a request to the backend to get the new maps count
@@ -36,7 +45,6 @@ const Home = () => {
       fetchNewMapsCount();
     }
   }, [isLoggedIn, setNewMapsCount]);
-
 
   const handleLogin = () => {
     setShowLoginPopup(true);
