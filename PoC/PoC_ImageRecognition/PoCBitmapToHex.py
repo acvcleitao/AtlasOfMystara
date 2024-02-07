@@ -31,10 +31,12 @@ def process_image(image_path):
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
+    """
     parser = argparse.ArgumentParser(description='Image Processing for Hexagonal Grid')
     parser.add_argument('image_path', help='Path to the image for processing')
     
     args = parser.parse_args()
     image_path = args.image_path
-    
+    """
+    image_path = r"C:\Users\acvcl\Documents\GitHub\AtlasOfMystara\PoC\Database\Tests101\your_image3.jpg"
     process_image(image_path)
