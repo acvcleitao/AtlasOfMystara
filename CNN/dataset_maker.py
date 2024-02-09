@@ -95,6 +95,18 @@ def fill_missing_hexagons(hexagon_images, hexagon_positions, original_image):
     # Initialize the dataset directory path
     dataset_dir = r"C:\Users\acvcl\Documents\GitHub\AtlasOfMystara\CNN\Dataset"
 
+    # Display the grids created by phase 2 before iterating over the hexagons found
+    grid_image = np.copy(original_image)
+    for row_index in range(num_rows):
+        for col_index in range(num_columns):
+            cv2.rectangle(grid_image,
+                          (column_positions[col_index], row_positions[row_index]),
+                          (column_right_sides[col_index], column_lower_sides[row_index]),
+                          (0, 0, 255), 1)  # Draw red rectangles to represent grid cells
+    cv2.imshow('Grids - Phase 2', grid_image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
     # Display each sector isolated
     for row_index in range(num_rows):
         for col_index in range(num_columns):
@@ -103,8 +115,8 @@ def fill_missing_hexagons(hexagon_images, hexagon_positions, original_image):
                 sector_image = visualized_image[row_positions[row_index]:column_lower_sides[row_index], 
                                                 column_positions[col_index]:column_right_sides[col_index]]
                 cv2.imshow(f'Sector {row_index}-{col_index}', sector_image)
-                cv2.imshow('Original Image - Phase 2', visualized_image)
-                cv2.waitKey(1000)
+                cv2.imshow('Original Image', original_image)
+                cv2.waitKey(3000)
                 cv2.destroyAllWindows()
                 hexagon_name = input(f"Enter a name for hexagon at row {row_index}, column {col_index} (type 'no' to skip): ").strip()
                 if hexagon_name.lower() == "no":
