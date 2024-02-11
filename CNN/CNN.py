@@ -38,10 +38,3 @@ class MultiTaskCNN(nn.Module):
         hex_map_output = self.hex_map_branch(x)
         
         return hex_type_output, hex_map_output
-
-# Instantiate the MultiTaskCNN model
-num_hex_types = 30
-multi_task_model = MultiTaskCNN(num_hex_types)
-
-# Print the model architecture
-print(multi_task_model)

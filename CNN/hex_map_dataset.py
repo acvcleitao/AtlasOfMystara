@@ -1,7 +1,6 @@
 import os
 from PIL import Image
 from torch.utils.data import Dataset
-
 class HexMapDataset(Dataset):
     def __init__(self, root_dir, transform=None):
         self.root_dir = root_dir
@@ -29,4 +28,5 @@ class HexMapDataset(Dataset):
         image = Image.open(image_path).convert("RGB")
         if self.transform:
             image = self.transform(image)
-        return image, class_idx
+        return image, class_idx, 0  # Placeholder value for hex map labels
+
