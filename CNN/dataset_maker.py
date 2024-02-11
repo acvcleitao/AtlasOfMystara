@@ -3,10 +3,36 @@ import numpy as np
 from collections import Counter
 import os
 from uuid import uuid4
+from PIL import Image
 
 def extract_hexagons(image_path):
-    original_image = cv2.imread(image_path)
-    hsv_image = cv2.cvtColor(original_image, cv2.COLOR_BGR2HSV)
+    try:
+        # Read the image using Pillow
+        original_image = Image.open(image_path).convert('RGB')
+        original_image = np.array(original_image)  # Convert to numpy array
+
+        # Get original image dimensions
+        original_height, original_width = original_image.shape[:2]
+
+        # Resize the image while maintaining aspect ratio
+        max_size = 1080
+        if original_height > original_width:
+            new_height = max_size
+            new_width = int(original_width * max_size / original_height)
+        else:
+            new_width = max_size
+            new_height = int(original_height * max_size / original_width)
+        
+        resized_image = cv2.resize(original_image, (new_width, new_height))
+
+    except Exception as e:
+        print(f"Error: Unable to read the image at {image_path}: {e}")
+        return None, None, None
+
+    # Convert the image to BGR format for compatibility with OpenCV
+    resized_image = cv2.cvtColor(resized_image, cv2.COLOR_RGB2BGR)
+    
+    hsv_image = cv2.cvtColor(resized_image, cv2.COLOR_BGR2HSV)
 
     # Define a color range for the hexagons based on the provided colors
     lower_color = np.array([0, 50, 50], dtype=np.uint8)  # Lower bound for any color
@@ -32,18 +58,18 @@ def extract_hexagons(image_path):
 
             # Filter contours based on size
             if w * h > min_hexagon_size:
-                hexagon_image = original_image[y:y+h, x:x+w]
+                hexagon_image = resized_image[y:y+h, x:x+w]
                 hexagon_images.append(hexagon_image)
                 hexagon_positions.append((x, y))
 
     print(f"Phase 1: Found {len(hexagon_images)} hexagons.")
 
     # Display the original image without contours for phase 1
-    cv2.imshow('Original Image - Phase 1', original_image)
+    cv2.imshow('Original Image - Phase 1', resized_image)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-    return hexagon_images, hexagon_positions, original_image
+    return hexagon_images, hexagon_positions, resized_image
 
 def fill_missing_hexagons(hexagon_images, hexagon_positions, original_image):
     # Assuming hexagons are arranged in a grid, find the positions of columns and rows
@@ -111,24 +137,24 @@ def fill_missing_hexagons(hexagon_images, hexagon_positions, original_image):
     for row_index in range(num_rows):
         for col_index in range(num_columns):
             # Only process the sector if it's not empty
-            if not np.all(grid[row_index][col_index] == 0):
-                sector_image = visualized_image[row_positions[row_index]:column_lower_sides[row_index], 
-                                                column_positions[col_index]:column_right_sides[col_index]]
-                cv2.imshow(f'Sector {row_index}-{col_index}', sector_image)
-                cv2.imshow('Original Image', original_image)
-                cv2.waitKey(3000)
-                cv2.destroyAllWindows()
-                hexagon_name = input(f"Enter a name for hexagon at row {row_index}, column {col_index} (type 'no' to skip): ").strip()
-                if hexagon_name.lower() == "no":
-                    continue  # Skip saving this hexagon
-                subfolder_name = hexagon_name.lower()
-                subfolder_path = os.path.join(dataset_dir, subfolder_name)
-                if not os.path.exists(subfolder_path):
-                    os.makedirs(subfolder_path)
-                hexagon_uid = uuid4().hex
-                hexagon_filename = f"{hexagon_name}_{hexagon_uid}.png"
-                hexagon_path = os.path.join(subfolder_path, hexagon_filename)
-                cv2.imwrite(hexagon_path, sector_image)
+            # if not np.all(grid[row_index][col_index] == 0):
+            sector_image = visualized_image[row_positions[row_index]:column_lower_sides[row_index], 
+                                            column_positions[col_index]:column_right_sides[col_index]]
+            cv2.imshow(f'Sector {row_index}-{col_index}', sector_image)
+            cv2.imshow('Original Image', original_image)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
+            hexagon_name = input(f"Enter a name for hexagon at row {row_index}, column {col_index} (type 'no' to skip): ").strip()
+            if hexagon_name.lower() == "no" or hexagon_name.lower() == "":
+                continue  # Skip saving this hexagon
+            subfolder_name = hexagon_name.lower()
+            subfolder_path = os.path.join(dataset_dir, subfolder_name)
+            if not os.path.exists(subfolder_path):
+                os.makedirs(subfolder_path)
+            hexagon_uid = uuid4().hex
+            hexagon_filename = f"{hexagon_name}_{hexagon_uid}.png"
+            hexagon_path = os.path.join(subfolder_path, hexagon_filename)
+            cv2.imwrite(hexagon_path, sector_image)
 
     cv2.destroyAllWindows()  # Move this line outside the loop
 
