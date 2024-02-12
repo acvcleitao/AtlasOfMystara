@@ -28,5 +28,5 @@ class HexMapDataset(Dataset):
         image = Image.open(image_path).convert("RGB")
         if self.transform:
             image = self.transform(image)
-        return image, class_idx, 0  # Placeholder value for hex map labels
+        return image, class_idx, 1  # Placeholder value for hex map labels
 

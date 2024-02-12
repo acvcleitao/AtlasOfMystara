@@ -29,5 +29,5 @@ class HexTypeDataset(Dataset):
         image = Image.open(image_path).convert("RGB")
         if self.transform:
             image = self.transform(image)
-        return image, class_idx, 0  # Assuming hex map labels are not used during training
+        return image, class_idx, 58  # Assuming hex map labels are not used during training
 

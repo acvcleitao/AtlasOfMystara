@@ -44,6 +44,6 @@ class HexMapDetectionBranch(nn.Module):
 
         # Fully connected layers
         x = self.relu(self.fc1(x))
-        x = self.sigmoid(self.fc2(x))  # Sigmoid for binary classification
+        x = self.fc2(x)  # No activation function here, as BCELoss includes sigmoid
 
-        return x
+        return self.sigmoid(x)  # Apply sigmoid activation here
