@@ -32,6 +32,16 @@ class NewMap(Document):
     title = StringField(required=True)
     image_path = StringField(required=True)
     timestamp = StringField(required=True)
+from mongoengine import Document, StringField, IntField
+
+class Hexagon(Document):
+    type = StringField(required=True)
+    x_coordinate = IntField(required=True)
+    y_coordinate = IntField(required=True)
+    imageUrl = StringField(required=True)
+    zoomLevel = IntField(required=True)
+    author = StringField(required=True)
+
 
 def hash_password(password):
     salt = bcrypt.gensalt()
@@ -68,7 +78,38 @@ def create_new_map():
     new_map = NewMap(title=title, image_path=image_path, timestamp=timestamp)
     new_map.save()
 
+def create_hexagon():
+    hexagon_type = input("Enter hexagon type: ")
+    x_coordinate = int(input("Enter X coordinate: "))
+    y_coordinate = int(input("Enter Y coordinate: "))
+    image_url = input("Enter hexagon image URL: ")
+    zoom_level = input("Enter zoom level: ")
+    author = input("Enter author: ")
 
+    # Create a new Hexagon document
+    new_hexagon = Hexagon(type=hexagon_type, x_coordinate=x_coordinate, y_coordinate=y_coordinate,
+                          imageUrl=image_url, zoomLevel=zoom_level, author=author)
+    new_hexagon.save()
+    print("Hexagon added successfully.")
+
+def add_hexagons():
+    hexagon_type = "farmland"
+    image_url = "Thorf/forest_1fc07fc451a247108eb2dfaa24f9d065.png"
+    author = "Thorf"
+    zoom_level = 2
+
+    # Define the starting and ending coordinates
+    start_x, start_y = 5, 5
+    end_x, end_y = 100, 20
+
+    for x in range(start_x, end_x + 1):
+        for y in range(start_y, end_y + 1):
+            # Create a new Hexagon document
+            new_hexagon = Hexagon(type=hexagon_type, x_coordinate=x, y_coordinate=y, imageUrl=image_url, 
+                                  zoomLevel=zoom_level, author=author)
+            new_hexagon.save()
+
+    print("100 hexagons added successfully.")
 
 def main():
     command = input("Enter command: ")
@@ -77,6 +118,8 @@ def main():
         "create user": create_user,
         "create collection": create_collection,
         "create new map": create_new_map,
+        "add hexagon": create_hexagon,
+        "test hexagon": add_hexagons,
         # Add more commands as needed
     }
 

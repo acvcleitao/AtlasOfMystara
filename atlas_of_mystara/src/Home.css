@@ -57,7 +57,7 @@ h3 {
   color: #132c3f; /* Set text color to black */
 }
 
-button {
+.main-button {
   font-family: 'DragonFont', sans-serif;
   background-color: #fceca5;
   color: #132c3f;

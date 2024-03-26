@@ -64,10 +64,10 @@ const Home = () => {
       <h1>Atlas of Mystara</h1>
       <h2>Welcome to the Atlas of Mystara</h2>
       <Link to="/explore">
-        <button>Explore the Atlas</button>
+        <button className='main-button'>Explore the Atlas</button>
       </Link>
       <Link to="/upload">
-        <button>Upload Map</button>
+        <button className='main-button'>Upload Map</button>
       </Link>
       {isLoggedIn ? (
         <div>

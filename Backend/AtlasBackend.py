@@ -19,6 +19,8 @@ load_dotenv()
 app = create_app()
 NewMapsFolder, ApprovedMapsFolder = configure_folders(app)
 mongo = configure_mongo(app)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+HEXAGONS_FOLDER = os.path.join(BASE_DIR, 'Hexagons')
 
 # Root URL
 @app.route('/')
@@ -120,12 +122,17 @@ def get_new_maps_with_url():
         print(f"Error fetching new maps: {str(e)}")
         return jsonify({'message': 'Internal Server Error'}), 500
 
-
-
 # Serve images statically
 @app.route('/static/images/<path:image_filename>')
 def serve_image(image_filename):
     return send_from_directory(NewMapsFolder, image_filename)
+
+@app.route('/static/hexagons/<path:image_filename>')
+def serve_hexagon(image_filename):
+    try:
+        return send_from_directory(HEXAGONS_FOLDER, image_filename)
+    except FileNotFoundError:
+        return 'Image not found', 404
 
 # Route for getting details of a specific map
 @app.route('/getMapDetails/<id>', methods=['GET'])
@@ -144,7 +151,7 @@ def get_map_details(id):
             map_data['_id'] = str(map_data['_id'])
             # Build URL for image
             base_image_url = "http://127.0.0.1:5000/static/images/"
-            map_data['image_url'] = f"{base_image_url}{map_data['image_path'].replace('\\', '/').split('/')[-1]}"
+            map_data['image_url'] = f"{base_image_url}{map_data['image_path'].replace(r'\\', '/').split('/')[-1]}"
             return jsonify({'map': map_data}), 200
         else:
             print(f"Map not found for ID: {id}")
@@ -154,6 +161,58 @@ def get_map_details(id):
         print(f"Error fetching map details: {str(e)}")
         return jsonify({'message': 'Internal Server Error'}), 500
 
+@app.route('/hexagons/<author>/<hex_type>')
+def get_hexagon_image(author, hex_type):
+    hexagon_path = os.path.join(HEXAGONS_FOLDER, author)
+    # Find the correct filename by checking all possible extensions
+    for extension in ['.png', '.jpg', '.jpeg', '.gif']:  # Add more if needed
+        filename = f"{hex_type}{extension}"
+        if os.path.exists(os.path.join(hexagon_path, filename)):
+            return send_from_directory(hexagon_path, filename)
+    # If none of the extensions exist, return 404
+    return 'Image not found', 404
+
+# Route for getting hexagons based on zoom level, author, and coordinates
+@app.route('/getHexagons', methods=['GET'])
+def get_hexagons():
+    try:
+        # Get query parameters from the request
+        zoom_level = int(request.args.get('zoomLevel'))
+        author = request.args.get('author')
+        top_left = list(map(float, request.args.get('topLeft').split(',')))
+        bottom_right = list(map(float, request.args.get('bottomRight').split(',')))
+
+        # Separate coordinates
+        top_left_x, top_left_y = top_left
+        bottom_right_x, bottom_right_y = bottom_right
+
+        # Query the database for hexagons based on the provided parameters
+        hexagons = list(mongo.db.hexagon.find({
+            'zoomLevel': zoom_level,
+            'author': author,
+            '$and': [
+                {'x_coordinate': {'$gte': top_left_x, '$lte': bottom_right_x}},
+                {'y_coordinate': {'$gte': top_left_y, '$lte': bottom_right_y}}
+            ]
+        }))
+
+        # Group hexagons by type
+        grouped_hexagons = {}
+        for hexagon in hexagons:
+            hex_type = hexagon['type']
+            if hex_type not in grouped_hexagons:
+                grouped_hexagons[hex_type] = {'coordinates': [], 'imageURL': hexagon['imageUrl']}
+            grouped_hexagons[hex_type]['coordinates'].append((hexagon['x_coordinate'], hexagon['y_coordinate']))
+
+        # Format the grouped hexagons into the desired structure
+        formatted_hexagons = [{'type': hex_type, 'coordinates': group['coordinates'], 'imageURL': group['imageURL']} for hex_type, group in grouped_hexagons.items()]
+        print(formatted_hexagons)
+        # Return the formatted hexagons as a JSON response
+        return jsonify({'hexagons': formatted_hexagons}), 200
+
+    except Exception as e:
+        print(f"Error fetching hexagons: {str(e)}")
+        return jsonify({'message': 'Internal Server Error'}), 500
 
 
 if __name__ == '__main__':
