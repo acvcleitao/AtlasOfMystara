@@ -14,6 +14,9 @@ import sys
 from config import create_app, configure_folders, configure_mongo
 from schemas import new_map_schema
 from data_utils import build_new_map_data
+import requests
+from bs4 import BeautifulSoup
+
 
 load_dotenv()
 app = create_app()
@@ -212,6 +215,92 @@ def get_hexagons():
 
     except Exception as e:
         print(f"Error fetching hexagons: {str(e)}")
+        return jsonify({'message': 'Internal Server Error'}), 500
+
+# Function to find map information for a place in Mystara
+def find_mystara_info(place):
+    try:
+        # Construct the URLs for the main Atlas page, Maps page, and search
+        atlas_url = "https://www.pandius.com/atlas.html"
+        maps_url = "https://www.pandius.com/maps.html"
+        search_url = f"https://www.pandius.com/search.html?q={place}&s=Search"
+        
+        # Send a GET request to the Atlas page
+        atlas_response = requests.get(atlas_url)
+        
+        # Check if the request to the Atlas page was successful
+        if atlas_response.status_code == 200:
+            # Parse the HTML content of the Atlas page
+            atlas_soup = BeautifulSoup(atlas_response.content, 'html.parser')
+            
+            # Search for the place name in the Atlas page
+            atlas_result = atlas_soup.find('a', string=place)
+            
+            # If the place is found in the Atlas page, return the URL
+            if atlas_result:
+                return f"More information: {atlas_result['href']}"
+            
+        # If the place is not found in the Atlas page, proceed to the Maps page
+        maps_response = requests.get(maps_url)
+        
+        # Check if the request to the Maps page was successful
+        if maps_response.status_code == 200:
+            # Parse the HTML content of the Maps page
+            maps_soup = BeautifulSoup(maps_response.content, 'html.parser')
+            
+            # Search for the place name in the Maps page
+            maps_result = maps_soup.find('a', string=place)
+            
+            # If the place is found in the Maps page, return the URL
+            if maps_result:
+                return f"More information: {maps_result['href']}"
+        
+        # If the place is not found in both the Atlas and Maps pages, use the search
+        search_response = requests.get(search_url)
+        
+        # Check if the request to the search page was successful
+        if search_response.status_code == 200:
+            # Parse the HTML content of the search page
+            search_soup = BeautifulSoup(search_response.content, 'html.parser')
+            
+            # Find relevant information in the search results
+            results = search_soup.find_all('div', class_='Result')
+            
+            # Check if there are any results
+            if results:
+                # Extract the first result
+                first_result = results[0]
+                
+                # Extract the title and URL
+                title = first_result.find('a').text.strip()
+                url = first_result.find('a')['href']
+                
+                return f"Title: {title}\nMore information: {url}"
+            
+        return "No information found for that place."
+
+    except Exception as e:
+        print(f"Error finding map information for place {place}: {str(e)}")
+        return None
+
+# Route for getting details of a specific map
+@app.route('/getMapFromVault/<place>', methods=['GET'])
+def get_map_from_vault(place):
+    try:
+        print(f"Received place: {place}")
+
+        # Call the find_mystara_info function to search for map information based on the provided place
+        map_info = find_mystara_info(place)
+        
+        if map_info:
+            # Return the map information as JSON response
+            return jsonify({'map_info': map_info}), 200
+        else:
+            print(f"No map information found for place: {place}")
+            return jsonify({'message': 'Map information not found'}), 404
+
+    except Exception as e:
+        print(f"Error fetching map details: {str(e)}")
         return jsonify({'message': 'Internal Server Error'}), 500
 
 
