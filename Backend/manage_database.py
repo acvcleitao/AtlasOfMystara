@@ -19,7 +19,7 @@ app.config['MONGO_URI'] = app_config['MONGO_URI']
 mongo = PyMongo(app)
 connect(db='AtlasOfMystara', host=app_config['MONGO_URI'])
 
-class User(Document):
+class Users(Document):
     username = StringField(required=True, unique=True)
     password = StringField(required=True)
     salt = StringField(required=True)
@@ -54,7 +54,7 @@ def create_user():
     hashed_password, salt = hash_password(password)
 
     # Create a new user document
-    new_user = User(username=username, password=hashed_password, salt=salt)
+    new_user = Users(username=username, password=hashed_password, salt=salt)
     new_user.save()
 
 def create_collection():
