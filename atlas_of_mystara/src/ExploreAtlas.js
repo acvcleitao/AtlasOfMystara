@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './ExploreAtlas.css'; // Import your ExploreAtlas CSS file
+import './ExploreAtlas.css';
 
 const ExploreAtlas = () => {
   const [zoomLevel, setZoomLevel] = useState(1);
@@ -9,18 +9,40 @@ const ExploreAtlas = () => {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const mapContainerRef = useRef(null);
   const mapContainerPosRef = useRef({ x: 0, y: 0 });
+  const [viewportCenter, setViewportCenter] = useState({ x: 0, y: 0 });
+  const [lastFetchedCenter, setLastFetchedCenter] = useState({ x: 0, y: 0 });
+  const hexSize = 50;
+  var centerX = -16;
+  var centerY = -16;
 
-  const fetchHexagons = async () => {
+  const fetchHexagons = async (center) => {
     try {
-      const coordinates = { topLeft: [0, 0], bottomRight: [256, 256] };
-      const response = await fetch(`http://127.0.0.1:5000/getHexagons?zoomLevel=${zoomLevel}&author=${selectedAuthor}&topLeft=${coordinates.topLeft.join(',')}&bottomRight=${coordinates.bottomRight.join(',')}`);
+      const col = Math.round(center.x / (3 / 2 * hexSize));
+      const row = Math.round(center.y / (hexSize * Math.sqrt(3)));
+
+      const numRows = 32;
+      const numCols = 32;
+
+      const topLeft = [
+        col - Math.floor(numCols / 2),
+        row - Math.floor(numRows / 2)
+      ];
+      const bottomRight = [
+        col + Math.ceil(numCols / 2),
+        row + Math.ceil(numRows / 2)
+      ];
+      // Calculate centerX and centerY as the midpoint between topLeft and bottomRight
+      centerX = (topLeft[0] + bottomRight[0]) / 2;
+      centerY = (topLeft[1] + bottomRight[1]) / 2;
+
+      const response = await fetch(`http://127.0.0.1:5000/getHexagons?zoomLevel=${zoomLevel}&author=${selectedAuthor}&topLeft=${topLeft.join(',')}&bottomRight=${bottomRight.join(',')}`);
       if (!response.ok) {
         throw new Error('Failed to fetch hexagons');
       }
       const data = await response.json();
       if (data.hexagons) {
         for (let i = 0; i < data.hexagons.length; i++) {
-          console.log('New Image Received:', data.hexagons[i].imageURL);
+          // console.log('New Image Received:', data.hexagons[i].imageURL);
           const imageResponse = await fetch(`http://127.0.0.1:5000/static/hexagons/${data.hexagons[i].imageURL}`);
           if (imageResponse.ok) {
             const blob = await imageResponse.blob();
@@ -31,17 +53,18 @@ const ExploreAtlas = () => {
           }
         }
         setHexagons(data.hexagons);
-        console.log('Got Hexagons!', data.hexagons);
+        setLastFetchedCenter(center); // Update the last fetched center
+        // console.log('Got Hexagons!', data.hexagons);
+        HexGrid(data.hexagons, centerX, centerY)
       }
     } catch (error) {
       console.error('Error fetching hexagons:', error);
     }
   };
-  
+
   useEffect(() => {
-    fetchHexagons();
-  }, [zoomLevel, selectedAuthor, isDragging]);
-  
+    fetchHexagons(viewportCenter);
+  }, [zoomLevel, selectedAuthor]);
 
   useEffect(() => {
     const handleMouseMove = (event) => {
@@ -55,6 +78,10 @@ const ExploreAtlas = () => {
         mapContainerRef.current.style.transform = `translate(${mapContainerPosRef.current.x}px, ${mapContainerPosRef.current.y}px)`;
 
         setDragStart({ x: event.clientX, y: event.clientY });
+        setViewportCenter((prev) => ({
+          x: prev.x - deltaX,
+          y: prev.y - deltaY
+        }));
       }
     };
 
@@ -70,6 +97,18 @@ const ExploreAtlas = () => {
       document.removeEventListener('mouseup', handleMouseUp);
     };
   }, [isDragging, dragStart]);
+
+  useEffect(() => {
+    const distance = Math.sqrt(
+      Math.pow(viewportCenter.x - lastFetchedCenter.x, 2) +
+      Math.pow(viewportCenter.y - lastFetchedCenter.y, 2)
+    );
+
+    if (distance > 16 * hexSize) {
+      fetchHexagons(viewportCenter);
+      console.log("fetching hexagons...");
+    }
+  }, [viewportCenter]);
 
   const handleMouseDown = (event) => {
     setIsDragging(true);
@@ -125,17 +164,18 @@ const ExploreAtlas = () => {
         style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
       >
         {/* SVG grid of hexagons */}
-        <HexGrid hexagonsData={hexagons} />
+        <HexGrid hexagonsData={hexagons} centerX={centerX} centerY={centerY} />
       </div>
     </div>
   );
 };
 
-const HexGrid = ({ hexagonsData }) => {
-  console.log('HexGrid - hexagonsData:', hexagonsData);
+const HexGrid = ({ hexagonsData, centerX, centerY }) => {
+  console.log("Creating hex grid arround center:(" + centerX + "," + centerY + ")");
+  // console.log('HexGrid - hexagonsData:', hexagonsData);
   const hexSize = 50; // Adjust hexagon size as needed
-  const numRows = 20; // Number of rows
-  const numCols = 30; // Number of columns
+  const numRows = 32; // Number of rows
+  const numCols = 64; // Number of columns
 
   const horizSpacing = 3 / 2 * hexSize;
   const vertSpacing = hexSize * Math.sqrt(3);
@@ -143,7 +183,6 @@ const HexGrid = ({ hexagonsData }) => {
   let hexagons = [];
 
   if (hexagonsData && hexagonsData.length > 0) {
-    // Map fetched hexagons to their coordinates
     const hexagonsMap = {};
     hexagonsData.forEach(({ type, coordinates, imageURL }) => {
       coordinates.forEach(([x, y]) => {
@@ -151,24 +190,22 @@ const HexGrid = ({ hexagonsData }) => {
       });
     });
 
-    for (let row = 0; row < numRows; row++) {
-      for (let col = 0; col < numCols; col++) {
-        const x = col * horizSpacing;
-        const y = row * vertSpacing + (col % 2) * (vertSpacing / 2);
+    for (let row = centerY - Math.floor(numRows / 2); row <= centerY + Math.ceil(numRows / 2); row++) {
+      for (let col = centerX - Math.floor(numCols / 2); col <= centerX + Math.ceil(numCols / 2); col++) {
+        const x = (col - (centerX - Math.floor(numCols / 2))) * horizSpacing; // Calculate x position
+        const y = (row - (centerY - Math.floor(numRows / 2))) * vertSpacing + (col % 2) * (vertSpacing / 2); // Calculate y position
         const key = `${row}-${col}`; // Unique key for each hexagon
-        const hexagonData = hexagonsMap[key];
+        const hexagonData = hexagonsMap[`${col}-${row}`]; // Note the reversal of x and y here
         hexagons.push(
           <Hexagon key={key} id={key} x={x} y={y} size={hexSize} hexagonData={hexagonData} />
         );
       }
     }
-    console.log(hexagonsData)
   } else {
-    // Render placeholder hexagons if no hexagon data is available
-    for (let row = 0; row < numRows; row++) {
-      for (let col = 0; col < numCols; col++) {
-        const x = col * horizSpacing;
-        const y = row * vertSpacing + (col % 2) * (vertSpacing / 2);
+    for (let row = centerY - Math.floor(numRows / 2); row <= centerY + Math.ceil(numRows / 2); row++) {
+      for (let col = centerX - Math.floor(numCols / 2); col <= centerX + Math.ceil(numCols / 2); col++) {
+        const x = (col - (centerX - Math.floor(numCols / 2))) * horizSpacing; // Calculate x position
+        const y = (row - (centerY - Math.floor(numRows / 2))) * vertSpacing + (col % 2) * (vertSpacing / 2); // Calculate y position
         const key = `${row}-${col}`; // Unique key for each hexagon
         hexagons.push(
           <Hexagon key={key} id={key} x={x} y={y} size={hexSize} />
@@ -177,11 +214,11 @@ const HexGrid = ({ hexagonsData }) => {
     }
   }
 
+  const svgWidth = horizSpacing * numCols;
+  const svgHeight = vertSpacing * numRows;
+
   return (
-    <svg
-      width={horizSpacing * (numCols - 1) + hexSize}
-      height={vertSpacing * (numRows - 1) + hexSize}
-    >
+    <svg width={svgWidth} height={svgHeight}>
       {hexagons}
     </svg>
   );
@@ -189,7 +226,7 @@ const HexGrid = ({ hexagonsData }) => {
 
 const Hexagon = ({ id, x, y, size, hexagonData }) => {
   const points = [
-    [x + size * Math.cos(0), y + size *Math.sin(0)],
+    [x + size * Math.cos(0), y + size * Math.sin(0)],
     [x + size * Math.cos(Math.PI / 3), y + size * Math.sin(Math.PI / 3)],
     [x + size * Math.cos(2 * Math.PI / 3), y + size * Math.sin(2 * Math.PI / 3)],
     [x + size * Math.cos(Math.PI), y + size * Math.sin(Math.PI)],
@@ -198,7 +235,6 @@ const Hexagon = ({ id, x, y, size, hexagonData }) => {
   ].map((point) => point.join(',')).join(' ');
 
   const handleClick = () => {
-    // Handle click event for the hexagon
     console.log('Hexagon clicked:', id);
   };
 
@@ -206,7 +242,7 @@ const Hexagon = ({ id, x, y, size, hexagonData }) => {
     <g>
       <polygon points={points} fill="#555" stroke="#000" strokeWidth="2" onClick={handleClick} />
       {hexagonData && hexagonData.imageURL && (
-        <image href={hexagonData.imageURL} x={x - size} y={y - size} width={size*2} height={2*size} />
+        <image href={hexagonData.imageURL} x={x - size} y={y - size} width={size * 2} height={size * 2} />
       )}
     </g>
   );

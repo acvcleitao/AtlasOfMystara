@@ -1,13 +1,12 @@
 // index.js or your root file
 import React from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
 import App from './App';
-import { UserProvider } from './UserContext';
 import 'leaflet/dist/leaflet.css';
 
-ReactDOM.render(
-  <UserProvider>
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <React.StrictMode>
     <App />
-  </UserProvider>,
-  document.getElementById('root')
+  </React.StrictMode>
 );

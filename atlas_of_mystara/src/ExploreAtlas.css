@@ -11,7 +11,7 @@
   top: 20px; /* Adjust as needed */
   width: 100%; /* Adjust as needed */
   height: 100px;
-  z-index: 1;
+  z-index: 10;
   margin-left: 20px;
 }
 
@@ -78,8 +78,10 @@
 }
 
 .map-container {
-  position: relative;
+  position: absolute;
   z-index: 5; /* Ensure a higher z-index value than the hexagons */
+    top: 0;
+  left: 0;
 }
 
 .map-container svg {

@@ -190,14 +190,24 @@ def get_hexagons():
         bottom_right_x, bottom_right_y = bottom_right
 
         # Query the database for hexagons based on the provided parameters
-        hexagons = list(mongo.db.hexagon.find({
-            'zoomLevel': zoom_level,
-            'author': author,
-            '$and': [
-                {'x_coordinate': {'$gte': top_left_x, '$lte': bottom_right_x}},
-                {'y_coordinate': {'$gte': top_left_y, '$lte': bottom_right_y}}
-            ]
-        }))
+        # If author is not given it searches for all authors
+        if author == "":
+            hexagons = list(mongo.db.hexagon.find({
+                'zoomLevel': zoom_level,
+                '$and': [
+                    {'x_coordinate': {'$gte': top_left_x, '$lte': bottom_right_x}},
+                    {'y_coordinate': {'$gte': top_left_y, '$lte': bottom_right_y}}
+                ]
+            }))
+        else:
+            hexagons = list(mongo.db.hexagon.find({
+                'zoomLevel': zoom_level,
+                'author': author,
+                '$and': [
+                    {'x_coordinate': {'$gte': top_left_x, '$lte': bottom_right_x}},
+                    {'y_coordinate': {'$gte': top_left_y, '$lte': bottom_right_y}}
+                ]
+            }))
 
         # Group hexagons by type
         grouped_hexagons = {}
