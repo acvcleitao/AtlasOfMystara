@@ -63,6 +63,33 @@ def get_new_maps_count():
     new_maps_count = mongo.db.new_maps.count_documents({})
     return jsonify({'newMapsCount': new_maps_count}), 200
 
+@app.route('/getHexagonTypes', methods=['GET'])
+def get_hexagon_types():
+    try:
+        # Query the database for distinct hexagon types grouped by author
+        pipeline = [
+            {
+                '$group': {
+                    '_id': '$author',
+                    'hexTypes': {'$addToSet': '$type'}
+                }
+            },
+            {
+                '$project': {
+                    '_id': 0,
+                    'author': '$_id',
+                    'hexTypes': 1
+                }
+            }
+        ]
+        hexagon_types = list(mongo.db.hexagon.aggregate(pipeline))
+
+        # Return the hexagon types grouped by author as a JSON response
+        return jsonify({'hexagonTypes': hexagon_types}), 200
+
+    except Exception as e:
+        print(f"Error fetching hexagon types: {str(e)}")
+        return jsonify({'message': 'Internal Server Error'}), 500
 
 # Route for uploading a new map
 @app.route('/uploadMap', methods=['POST'])
@@ -227,7 +254,35 @@ def get_hexagons():
         print(f"Error fetching hexagons: {str(e)}")
         return jsonify({'message': 'Internal Server Error'}), 500
 
-# Function to find map information for a place in Mystara
+@app.route('/updateHexType', methods=['POST'])
+def update_hex_type():
+    try:
+        data = request.get_json()
+        hex_id = data.get('hexId')
+        new_hex_type = data.get('hexType')
+
+        # Extract the hexagon properties from the hex_id
+        author, zoom_level, x, y = hex_id.split('_')
+        zoom_level = int(zoom_level)
+        x = float(x)
+        y = float(y)
+
+        # Update the hexagon in the database
+        result = mongo.db.hexagon.update_one(
+            {'author': author, 'zoomLevel': zoom_level, 'x_coordinate': x, 'y_coordinate': y},
+            {'$set': {'type': new_hex_type}}
+        )
+
+        if result.matched_count == 0:
+            return jsonify({'message': 'Hexagon not found'}), 404
+
+        return jsonify({'message': 'Hexagon updated successfully'}), 200
+
+    except Exception as e:
+        print(f"Error updating hexagon type: {str(e)}")
+        return jsonify({'message': 'Internal Server Error'}), 500
+
+# Find map information for a place in Mystara
 def find_mystara_info(place):
     try:
         # Construct the URLs for the main Atlas page, Maps page, and search
@@ -313,6 +368,16 @@ def get_map_from_vault(place):
         print(f"Error fetching map details: {str(e)}")
         return jsonify({'message': 'Internal Server Error'}), 500
 
+@app.route('/getAuthors', methods=['GET'])
+def get_authors():
+    try:
+        authors = list(mongo.db.authors.find({}, {'_id': 0, 'name': 1}))
+        author_names = [author['name'] for author in authors]
+        return jsonify({'authors': author_names}), 200
+    except Exception as e:
+        print(f"Error fetching authors: {str(e)}")
+        return jsonify({'message': 'Internal Server Error'}), 500
+    
 
 if __name__ == '__main__':
     # For development with Flask's built-in server
