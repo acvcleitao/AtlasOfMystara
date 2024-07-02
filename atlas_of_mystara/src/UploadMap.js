@@ -1,10 +1,12 @@
 // UploadMap.js
 import React, { useState, useRef } from 'react';
 import './UploadMap.css';
+import ProcessMap from './ProcessMap';
 
 const UploadMap = ({ onUpload }) => {
   const [uploadedImage, setUploadedImage] = useState(null);
   const [mapName, setMapName] = useState('');
+  const [showPreview, setShowPreview] = useState(false);
   const fileInputRef = useRef();
 
   const handleImageUpload = (e) => {
@@ -22,16 +24,23 @@ const UploadMap = ({ onUpload }) => {
     setMapName(e.target.value);
   };
 
+  const handleProceedToPreview = () => {
+    setShowPreview(true);
+  };
+
+  const handleBack = () => {
+    setShowPreview(false);
+  };
+
   const handleUploadMap = async () => {
     try {
-      // Check if mapName is not empty and uploadedImage is not null
       if (mapName.trim() !== '' && uploadedImage) {
         // Create a FormData object to send the image and map title
         const formData = new FormData();
         formData.append('title', mapName);
         formData.append('image', uploadedImage);
 
-        // Make a request to your backend to upload the map
+        // Make a request to the backend to upload the map
         const response = await fetch('http://127.0.0.1:5000/uploadMap', {
           method: 'POST',
           body: formData,
@@ -44,9 +53,8 @@ const UploadMap = ({ onUpload }) => {
           // Reset state
           setUploadedImage(null);
           setMapName('');
-  
-          // You can update other state or perform additional actions if needed
-  
+          setShowPreview(false);
+    
         } else {
           const errorData = await response.json();
           alert(`Error: ${errorData.message}`);
@@ -66,40 +74,51 @@ const UploadMap = ({ onUpload }) => {
 
   return (
     <div className="upload-map-container">
-      <div className="upload-image-container" onClick={handleImageClick}>
-        {uploadedImage ? (
-          <img src={uploadedImage} alt="Uploaded Map" className="uploaded-image" />
-        ) : (
-          <label className="upload-label">Click to Upload Map</label>
-        )}
-        <input
-          type="file"
-          id="fileInput"
-          accept="image/*"
-          onChange={handleImageUpload}
-          ref={fileInputRef}
-          style={{ display: 'none' }}
+      {showPreview ? (
+        <ProcessMap
+          uploadedImage={uploadedImage}
+          mapName={mapName}
+          onConfirm={handleUploadMap}
+          onBack={handleBack}
         />
-      </div>
-      <div className="map-details-container">
-        <label>
-          Map Name:
-          <input
-            type="text"
-            value={mapName}
-            onChange={handleMapNameChange}
-            placeholder="Enter map name"
-            disabled={!uploadedImage}
-          />
-        </label>
-        <button
-          className="upload-button"
-          onClick={handleUploadMap}
-          disabled={!uploadedImage || mapName.trim() === ''}
-        >
-          Upload Map
-        </button>
-      </div>
+      ) : (
+        <>
+          <div className="upload-image-container" onClick={handleImageClick}>
+            {uploadedImage ? (
+              <img src={uploadedImage} alt="Uploaded Map" className="uploaded-image" />
+            ) : (
+              <label className="upload-label">Click to Upload Map</label>
+            )}
+            <input
+              type="file"
+              id="fileInput"
+              accept="image/*"
+              onChange={handleImageUpload}
+              ref={fileInputRef}
+              style={{ display: 'none' }}
+            />
+          </div>
+          <div className="map-details-container">
+            <label>
+              Map Name:
+              <input
+                type="text"
+                value={mapName}
+                onChange={handleMapNameChange}
+                placeholder="Enter map name"
+                disabled={!uploadedImage}
+              />
+            </label>
+            <button
+              className="proceed-button"
+              onClick={handleProceedToPreview}
+              disabled={!uploadedImage || mapName.trim() === ''}
+            >
+              Proceed to Preview
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 };
