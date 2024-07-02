@@ -32,33 +32,32 @@ const UploadMap = ({ onUpload }) => {
     setShowPreview(false);
   };
 
-  const handleUploadMap = async () => {
+  const handleUploadMap = async (mapName, uploadedImage, hexagonSize) => {
     try {
-      if (mapName.trim() !== '' && uploadedImage) {
-        // Create a FormData object to send the image and map title
-        const formData = new FormData();
-        formData.append('title', mapName);
-        formData.append('image', uploadedImage);
+      // Create a FormData object to send the image, map title, and float parameter
+      const formData = new FormData();
+      formData.append('title', mapName);
+      formData.append('image', uploadedImage);
+      formData.append('hexagonSize', hexagonSize);
 
-        // Make a request to the backend to upload the map
-        const response = await fetch('http://127.0.0.1:5000/uploadMap', {
-          method: 'POST',
-          body: formData,
-        });
-  
-        if (response.ok) {
-          const data = await response.json();
-          alert(data.message);  // Display the upload message
-  
-          // Reset state
-          setUploadedImage(null);
-          setMapName('');
-          setShowPreview(false);
-    
-        } else {
-          const errorData = await response.json();
-          alert(`Error: ${errorData.message}`);
-        }
+      // Make a request to the backend to upload the map
+      const response = await fetch('http://127.0.0.1:5000/uploadMap', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        alert(data.message);  // Display the upload message
+
+        // Reset state
+        setUploadedImage(null);
+        setMapName('');
+        setShowPreview(false);
+
+      } else {
+        const errorData = await response.json();
+        alert(`Error: ${errorData.message}`);
       }
     } catch (error) {
       console.error('Upload map error:', error);
