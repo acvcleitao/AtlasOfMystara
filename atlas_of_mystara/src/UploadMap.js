@@ -32,13 +32,14 @@ const UploadMap = ({ onUpload }) => {
     setShowPreview(false);
   };
 
-  const handleUploadMap = async (mapName, uploadedImage, hexagonSize) => {
+  const handleUploadMap = async (mapName, uploadedImage, hexagonSize, selectedColor) => {
     try {
-      // Create a FormData object to send the image, map title, and float parameter
+      // Create a FormData object to send the image, map title, float parameter, and selected color
       const formData = new FormData();
       formData.append('title', mapName);
       formData.append('image', uploadedImage);
       formData.append('hexagonSize', hexagonSize);
+      formData.append('selectedColor', selectedColor);
 
       // Make a request to the backend to upload the map
       const response = await fetch('http://127.0.0.1:5000/uploadMap', {
