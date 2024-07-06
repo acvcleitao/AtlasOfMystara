@@ -33,18 +33,18 @@ const ProcessMap = ({ uploadedImage, mapName, onConfirm, onBack }) => {
   };
 
   const handleConfirmUpload = () => {
-    let floatParameter;
+    let hexSize;
     if (hexMaskType === 'flat') {
-      floatParameter = hexGridWidth / 20;
+      hexSize = hexGridWidth / 20;
     } else if (hexMaskType === 'pointy') {
-      floatParameter = hexGridHeight / 20;
+      hexSize = hexGridHeight / 20;
     } else {
       // Default to pointy top if no type is selected
-      floatParameter = hexGridHeight / 20;
+      hexSize = hexGridHeight / 20;
     }
 
     // Call onConfirm function with necessary data
-    onConfirm(mapName, uploadedImage, floatParameter, selectedColor);
+    onConfirm(mapName, uploadedImage, hexSize, selectedColor);
   };
 
   const proceedToColorPicker = () => {

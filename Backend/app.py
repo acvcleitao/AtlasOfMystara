@@ -1,3 +1,4 @@
+from io import BytesIO
 import os
 import uuid
 import base64
@@ -11,12 +12,15 @@ from werkzeug.utils import secure_filename
 from datetime import datetime
 import jsonschema
 import sys
+import cv2
+import numpy as np
+from PIL import Image
+import matplotlib.pyplot as plt
 from config import create_app, configure_folders, configure_mongo
 from schemas import new_map_schema
 from data_utils import build_new_map_data
 import requests
 from bs4 import BeautifulSoup
-
 
 load_dotenv()
 app = create_app()
@@ -98,6 +102,11 @@ def upload_map():
         # Get form data
         title = request.form.get('title')
         image_data = request.form.get('image')
+        hexagon_size = request.form.get('hexagonSize')
+        selected_color = request.form.get('selectedColor')
+
+        # Call the processMap function
+        processMap(title, image_data, hexagon_size, selected_color)
 
         # Build map data and validate against the schema
         map_data = build_new_map_data(title, image_data, NewMapsFolder)
@@ -113,7 +122,65 @@ def upload_map():
     except Exception as e:
         print(f"Error uploading map: {str(e)}")
         return jsonify({'message': 'Internal Server Error'}), 500
+
+# Function to isolate the ocean of a map given a specific color for it
+def isolate_ocean(image_data, target_color):
+    # Convert base64 image data to a NumPy array
+    image = Image.open(BytesIO(base64.b64decode(image_data.split(',')[1])))
+    image = cv2.cvtColor(np.array(image), cv2.COLOR_RGB2BGR)
     
+    hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+
+    # Define the range of the target color in HSV
+    lower_color = np.array([target_color[0] - 10, 100, 100])
+    upper_color = np.array([target_color[0] + 10, 255, 255])
+
+    # Create a mask to isolate the target color
+    mask = cv2.inRange(hsv_image, lower_color, upper_color)
+
+    # Create a result image that keeps only the target color
+    result = cv2.bitwise_and(image, image, mask=mask)
+
+    # Save the result image
+    result_path = os.path.join(HEXAGONS_FOLDER, f'isolated_{uuid.uuid4()}.png')
+    cv2.imwrite(result_path, result)
+
+    return result_path
+
+def hex_to_rgb(hex_color):
+    hex_color = hex_color.lstrip('#')
+    if len(hex_color) != 6:
+        raise ValueError(f"Invalid hex color: {hex_color}")
+    return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+
+def rgb_str_to_tuple(rgb_str):
+    rgb_str = rgb_str.strip('rgb() ')
+    rgb_tuple = tuple(map(int, rgb_str.split(',')))
+    if len(rgb_tuple) != 3:
+        raise ValueError(f"Invalid RGB color: {rgb_str}")
+    return rgb_tuple
+
+def processMap(title, image_data, hexagon_size, selected_color):
+    try:
+        if selected_color.startswith('#'):
+            # Convert the selected_color from hex to RGB
+            selected_color_rgb = hex_to_rgb(selected_color)
+        elif selected_color.startswith('rgb'):
+            # Convert the selected_color from RGB string to RGB tuple
+            selected_color_rgb = rgb_str_to_tuple(selected_color)
+        else:
+            raise ValueError(f"Invalid color format: {selected_color}")
+        
+        # Convert the RGB color to HSV
+        selected_color_hsv = cv2.cvtColor(np.uint8([[selected_color_rgb]]), cv2.COLOR_RGB2HSV)[0][0]
+        
+        # Call the isolate_ocean function with the processed image data and target color
+        result_path = isolate_ocean(image_data, selected_color_hsv)
+        print(f"Isolated ocean image saved at: {result_path}")
+        
+    except ValueError as e:
+        print(f"Error processing map: {str(e)}")
+        raise
 
 # Route for getting the list of new maps
 @app.route('/getNewMaps', methods=['GET'])
