@@ -1,4 +1,3 @@
-// UploadMap.js
 import React, { useState, useRef } from 'react';
 import './UploadMap.css';
 import ProcessMap from './ProcessMap';
@@ -32,24 +31,20 @@ const UploadMap = ({ onUpload }) => {
     setShowPreview(false);
   };
 
-  const handleUploadMap = async (mapName, uploadedImage, hexagonSize, selectedColor) => {
+  const handleUploadMap = async (data) => {
     try {
-      // Create a FormData object to send the image, map title, float parameter, and selected color
-      const formData = new FormData();
-      formData.append('title', mapName);
-      formData.append('image', uploadedImage);
-      formData.append('hexagonSize', hexagonSize);
-      formData.append('selectedColor', selectedColor);
-
       // Make a request to the backend to upload the map
       const response = await fetch('http://127.0.0.1:5000/uploadMap', {
         method: 'POST',
-        body: formData,
+        body: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
 
       if (response.ok) {
-        const data = await response.json();
-        alert(data.message);  // Display the upload message
+        const responseData = await response.json();
+        alert(responseData.message);  // Display the upload message
 
         // Reset state
         setUploadedImage(null);
@@ -78,8 +73,8 @@ const UploadMap = ({ onUpload }) => {
         <ProcessMap
           uploadedImage={uploadedImage}
           mapName={mapName}
-          onConfirm={handleUploadMap}
-          onBack={handleBack}
+          onConfirm={handleUploadMap} // Pass the handleUploadMap function
+          onBack={handleBack} // Pass the handleBack function
         />
       ) : (
         <>

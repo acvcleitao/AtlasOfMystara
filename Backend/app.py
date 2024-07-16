@@ -21,6 +21,9 @@ from schemas import new_map_schema
 from data_utils import build_new_map_data
 import requests
 from bs4 import BeautifulSoup
+import pytesseract
+
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 load_dotenv()
 app = create_app()
@@ -95,35 +98,6 @@ def get_hexagon_types():
         print(f"Error fetching hexagon types: {str(e)}")
         return jsonify({'message': 'Internal Server Error'}), 500
 
-# Route for uploading a new map
-@app.route('/uploadMap', methods=['POST'])
-def upload_map():
-    try:
-        # Get form data
-        title = request.form.get('title')
-        image_data = request.form.get('image')
-        hexagon_size = request.form.get('hexagonSize')
-        selected_color = request.form.get('selectedColor')
-
-        # Call the processMap function
-        processMap(title, image_data, hexagon_size, selected_color)
-
-        # Build map data and validate against the schema
-        map_data = build_new_map_data(title, image_data, NewMapsFolder)
-
-        # Insert map data into the 'new_maps' collection
-        mongo.db.new_maps.insert_one(map_data)
-
-        return jsonify({'message': 'Map Uploaded Successfully'}), 200
-
-    except jsonschema.ValidationError as e:
-        return jsonify({'message': f'Invalid Data: {e.message}'}), 400
-
-    except Exception as e:
-        print(f"Error uploading map: {str(e)}")
-        return jsonify({'message': 'Internal Server Error'}), 500
-
-# Function to isolate the ocean of a map given a specific color for it
 def isolate_ocean(image_data, target_color):
     # Convert base64 image data to a NumPy array
     image = Image.open(BytesIO(base64.b64decode(image_data.split(',')[1])))
@@ -160,7 +134,42 @@ def rgb_str_to_tuple(rgb_str):
         raise ValueError(f"Invalid RGB color: {rgb_str}")
     return rgb_tuple
 
-def processMap(title, image_data, hexagon_size, selected_color):
+# Route for uploading a new map
+@app.route('/uploadMap', methods=['POST'])
+def upload_map():
+    try:
+        # Get form data
+        data = request.get_json()
+
+        title = data.get('mapName')
+        image_data = data.get('uploadedImage')
+        hex_mask_type = data.get('hexMaskType')
+        selected_color = data.get('selectedColor')
+        combined_image = data.get('combinedImage')
+
+        # Save or process the combined image as needed
+        # For now, we'll just save it
+        combined_image_path = os.path.join(HEXAGONS_FOLDER, f'combined_{uuid.uuid4()}.png')
+        with open(combined_image_path, 'wb') as f:
+            f.write(base64.b64decode(combined_image.split(',')[1]))
+        
+
+        # Call the isolate_ocean function to isolate ocean color
+        processMap(title, image_data, hex_mask_type, selected_color, combined_image)
+
+        # Example response
+        response = {
+            'message': 'Map uploaded successfully',
+            'title': title,
+        }
+        return jsonify(response), 200
+
+    except Exception as e:
+        print(f"Error uploading map: {str(e)}")
+        return jsonify({'message': 'Internal Server Error'}), 500
+
+# Process map function
+def processMap(title, image_data, hex_mask_type, selected_color, combined_image):
     try:
         if selected_color.startswith('#'):
             # Convert the selected_color from hex to RGB
@@ -170,17 +179,21 @@ def processMap(title, image_data, hexagon_size, selected_color):
             selected_color_rgb = rgb_str_to_tuple(selected_color)
         else:
             raise ValueError(f"Invalid color format: {selected_color}")
-        
+
         # Convert the RGB color to HSV
         selected_color_hsv = cv2.cvtColor(np.uint8([[selected_color_rgb]]), cv2.COLOR_RGB2HSV)[0][0]
-        
-        # Call the isolate_ocean function with the processed image data and target color
+
         result_path = isolate_ocean(image_data, selected_color_hsv)
         print(f"Isolated ocean image saved at: {result_path}")
-        
+
+        # Example response
+        response = {
+            'message': 'Map processed successfully',
+        }
+        return jsonify(response), 200
     except ValueError as e:
         print(f"Error processing map: {str(e)}")
-        raise
+        return jsonify({'message': str(e)}), 400
 
 # Route for getting the list of new maps
 @app.route('/getNewMaps', methods=['GET'])

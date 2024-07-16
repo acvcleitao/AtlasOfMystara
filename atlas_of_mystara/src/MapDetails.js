@@ -31,14 +31,14 @@ const MapDetails = () => {
   }
 
   const handleApprove = (mapId) => {
-    // Perform any additional logic (e.g., API call, state update) for approval
+    //TODO: Perform any additional logic (e.g., API call, state update) for approval
     console.log('Approved');
     // Redirect user to the newMaps window
     navigate('/new_maps'); // Update to use navigate
   };
 
   const handleDiscard = (mapId) => {
-    // Perform any additional logic (e.g., API call, state update) for discarding
+    //TODO: Perform any additional logic (e.g., API call, state update) for discarding
     console.log('Discarded');
     // Redirect user to the newMaps window
     navigate('/new_maps'); // Update to use navigate

@@ -1,100 +1,105 @@
-/* ProcessMap.css */
-
 .process-map-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    height: 100vh;
-    width: 100vw;
-    padding: 20px;
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  padding: 20px;
+  box-sizing: border-box; /* Add box-sizing for better control over sizes */
+}
 
-  .map-title{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    background-color: #a2d1e7;
-    border: 2px solid #132c3f; /* Changed border property */
-    border-radius: 15px;
-    box-shadow: 0 0 15px #132c3f;
-    padding-left: 10px;
-    padding-right: 10px;
-    font-size: 1.2em;
-    text-align: center;
-  }
-  
-  .upload-image-container {
-    width: 80%;
-    height: 70%;
-    margin-top: 20px; /* Adjust as needed */
-    background-color: #ececec;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    background-color: #a2d1e7;
-    border: 2px solid #132c3f; /* Changed border property */
-    border-radius: 15px;
-    box-shadow: 0 0 15px #132c3f;
-  }
-  
-  .uploaded-image {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    border-radius: 15px; /* Rounded border */
-    cursor: pointer;
-  }
-  
-  .map-details-container {
-    width: 80%;
-    margin-top: 20px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #a2d1e7;
-    border: 2px solid #132c3f; /* Changed border property */
-    border-radius: 15px;
-    box-shadow: 0 0 15px #132c3f;
-    padding: 10px 20px;
-  }
-  
-  .map-details-container label {
-    font-size: 1.2em;
-  }
-  
-  .map-details-container input {
-    flex: 1;
-    padding: 10px;
-    font-size: 1em;
-    margin-left: 10px;
-  }
-  
-  .confirm-button,
-  .back-button {
-    margin-top: 20px;
-    padding: 10px 20px;
-    cursor: pointer;
-  }
-  
-  .controls {
-    width: 80%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 20px;
-  }
-  
-  .instruction-text {
-    margin-top: 2px;
-    font-size: 1.2em;
-    text-align: center;
-  }
-  
-  .hex-mask-label {
-    margin-top: 10px;
-    font-size: 1.2em;
-  }
-  
+.map-title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  background-color: #a2d1e7;
+  border: 2px solid #132c3f;
+  border-radius: 15px;
+  box-shadow: 0 0 15px #132c3f;
+  padding-left: 10px;
+  padding-right: 10px;
+  font-size: 1.2em;
+  text-align: center;
+}
+
+.upload-image-container {
+  position: relative; /* Ensure this container is relative for child absolute positioning */
+  width: auto; /* Use auto to fit the content */
+  height: 70%; /* Maintain the height based on viewport */
+  margin-top: 20px;
+  background-color: #ececec;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #a2d1e7;
+  border: 2px solid #132c3f;
+  border-radius: 15px;
+  box-shadow: 0 0 15px #132c3f;
+}
+
+.uploaded-image {
+  width: 100%; /* Ensure the image scales properly */
+  height: 100%; /* Ensure the image scales properly */
+  object-fit: contain;
+  border-radius: 15px;
+  cursor: pointer;
+}
+
+.rnd-outline {
+  position: absolute; /* Ensure the RND element is positioned absolutely */
+  top: 0; /* Initial top position */
+  left: 0; /* Initial left position */
+}
+
+.map-details-container {
+  width: 80%;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #a2d1e7;
+  border: 2px solid #132c3f;
+  border-radius: 15px;
+  box-shadow: 0 0 15px #132c3f;
+  padding: 10px 20px;
+  box-sizing: border-box; /* Add box-sizing for better control over sizes */
+}
+
+.map-details-container label {
+  font-size: 1.2em;
+}
+
+.map-details-container input {
+  flex: 1;
+  padding: 10px;
+  font-size: 1em;
+  margin-left: 10px;
+}
+
+.confirm-button,
+.back-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.controls {
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.instruction-text {
+  margin-top: 2px;
+  font-size: 1.2em;
+  text-align: center;
+}
+
+.hex-mask-label {
+  margin-top: 10px;
+  font-size: 1.2em;
+}

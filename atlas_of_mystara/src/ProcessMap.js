@@ -1,4 +1,3 @@
-// ProcessMap.js
 import React, { useState, useRef } from 'react';
 import { Rnd } from 'react-rnd';
 import './ProcessMap.css';
@@ -32,19 +31,40 @@ const ProcessMap = ({ uploadedImage, mapName, onConfirm, onBack }) => {
     setSelectedColor(color);
   };
 
-  const handleConfirmUpload = () => {
-    let hexSize;
-    if (hexMaskType === 'flat') {
-      hexSize = hexGridWidth / 20;
-    } else if (hexMaskType === 'pointy') {
-      hexSize = hexGridHeight / 20;
-    } else {
-      // Default to pointy top if no type is selected
-      hexSize = hexGridHeight / 20;
-    }
+  const handleConfirmUpload = async () => {
+    try {
+      // Prepare data to send to the backend
+      const data = {
+        mapName,
+        uploadedImage,
+        selectedColor,
+        hexMaskType,
+        imageWidth: imageRef.current.width,
+        imageHeight: imageRef.current.height
+      };
 
-    // Call onConfirm function with necessary data
-    onConfirm(mapName, uploadedImage, hexSize, selectedColor);
+      // Create a combined image of map with grid overlay
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = imageRef.current.width;
+      canvas.height = imageRef.current.height;
+      ctx.drawImage(imageRef.current, 0, 0, canvas.width, canvas.height);
+
+      // Draw hex grid overlay
+      const hexGridImage = new Image();
+      hexGridImage.onload = () => {
+        ctx.drawImage(hexGridImage, hexGridX, hexGridY, hexGridWidth, hexGridHeight);
+        const combinedImage = canvas.toDataURL('image/png');
+
+        // Call onConfirm function with necessary data
+        onConfirm({ ...data, combinedImage });
+      };
+      hexGridImage.src = `/resources/hexmapMask${hexMaskType.charAt(0).toUpperCase() + hexMaskType.slice(1)}.png`;
+
+    } catch (error) {
+      console.error('Error confirming upload:', error);
+      alert('An error occurred during map upload');
+    }
   };
 
   const proceedToColorPicker = () => {
@@ -74,8 +94,8 @@ const ProcessMap = ({ uploadedImage, mapName, onConfirm, onBack }) => {
               setHexGridY(d.y);
             }}
             onResizeStop={(e, direction, ref, delta, position) => {
-              setHexGridWidth(ref.style.width);
-              setHexGridHeight(ref.style.height);
+              setHexGridWidth(parseInt(ref.style.width, 10));
+              setHexGridHeight(parseInt(ref.style.height, 10));
               setHexGridX(position.x);
               setHexGridY(position.y);
             }}
@@ -93,7 +113,7 @@ const ProcessMap = ({ uploadedImage, mapName, onConfirm, onBack }) => {
           <div className="instruction-text">
             {step === 1 
               ? 'Align the hex grid with the hexagons in your image. Place the first hexagon of the grid on the top left hexagon of your image.'
-              : 'Click on the ocean area in your image to select the sea/ocean color.'
+              : 'Click on a water section of your image to select the water color.'
             }
           </div>
           {step === 1 && (
