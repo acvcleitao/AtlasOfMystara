@@ -15,15 +15,14 @@ import sys
 import cv2
 import numpy as np
 from PIL import Image
-import matplotlib.pyplot as plt
 from config import create_app, configure_folders, configure_mongo
 from schemas import new_map_schema
 from data_utils import build_new_map_data
 import requests
 from bs4 import BeautifulSoup
 import pytesseract
+print(pytesseract.get_tesseract_version())
 
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 load_dotenv()
 app = create_app()
@@ -186,10 +185,18 @@ def processMap(title, image_data, hex_mask_type, selected_color, combined_image)
         result_path = isolate_ocean(image_data, selected_color_hsv)
         print(f"Isolated ocean image saved at: {result_path}")
 
-        # Example response
+        image = Image.open(BytesIO(base64.b64decode(image_data.split(',')[1])))
+        text_data = pytesseract.image_to_string(image)
+
         response = {
             'message': 'Map processed successfully',
+            'title': title,
+            'hexMaskType': hex_mask_type,
+            'selectedColor': selected_color,
+            'isolatedColorPath': result_path,  # Include isolated color path in response
+            'textData': text_data  # Include OCR text data
         }
+
         return jsonify(response), 200
     except ValueError as e:
         print(f"Error processing map: {str(e)}")
