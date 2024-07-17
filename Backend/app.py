@@ -21,7 +21,7 @@ from data_utils import build_new_map_data
 import requests
 from bs4 import BeautifulSoup
 import pytesseract
-print(pytesseract.get_tesseract_version())
+# print(pytesseract.get_tesseract_version())
 
 
 load_dotenv()
@@ -167,7 +167,7 @@ def upload_map():
         print(f"Error uploading map: {str(e)}")
         return jsonify({'message': 'Internal Server Error'}), 500
 
-# Process map function
+
 def processMap(title, image_data, hex_mask_type, selected_color, combined_image):
     try:
         if selected_color.startswith('#'):
@@ -186,7 +186,32 @@ def processMap(title, image_data, hex_mask_type, selected_color, combined_image)
         print(f"Isolated ocean image saved at: {result_path}")
 
         image = Image.open(BytesIO(base64.b64decode(image_data.split(',')[1])))
-        text_data = pytesseract.image_to_string(image)
+        # text_data = pytesseract.image_to_string(image)
+
+        # Convert the combined_image from base64 to a NumPy array
+        combined_image_data = base64.b64decode(combined_image.split(',')[1])
+        combined_image_array = np.frombuffer(combined_image_data, np.uint8)
+        combined_image = cv2.imdecode(combined_image_array, cv2.IMREAD_COLOR)
+        if combined_image is None:
+            raise ValueError("Failed to load the combined image")
+
+        # Hexagonal grid processing
+        # Grid color is BGR (160, 0, 0)
+        grid_color_bgr = [160, 0, 0]
+        
+        # Detect hexagonal grid in the combined image
+        mask = find_hexagonal_grid(combined_image, grid_color_bgr)
+        
+        # Automatically detect the radius of the hexagons
+        hexagon_radius = get_hexagon_radius(mask)
+        
+        # Extract hexagons from the image
+        hexagons = extract_hexagons(combined_image, mask)
+
+        processedHexagons = processHexagons(hexagons)
+        
+        # Save the hexagons
+        save_hexagons(hexagons)
 
         response = {
             'message': 'Map processed successfully',
@@ -194,13 +219,98 @@ def processMap(title, image_data, hex_mask_type, selected_color, combined_image)
             'hexMaskType': hex_mask_type,
             'selectedColor': selected_color,
             'isolatedColorPath': result_path,  # Include isolated color path in response
-            'textData': text_data  # Include OCR text data
+            # 'textData': text_data  # Include OCR text data
         }
 
         return jsonify(response), 200
     except ValueError as e:
         print(f"Error processing map: {str(e)}")
         return jsonify({'message': str(e)}), 400
+
+def find_hexagonal_grid(image, target_color):
+    # Convert the image to HSV color space
+    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    
+    # Convert target RGB color to HSV
+    target_color_hsv = cv2.cvtColor(np.uint8([[target_color]]), cv2.COLOR_BGR2HSV)[0][0]
+    
+    # Create a range for the target color
+    lower_color = np.array([target_color_hsv[0] - 10, 100, 100])
+    upper_color = np.array([target_color_hsv[0] + 10, 255, 255])
+    
+    # Create a binary mask where the colors within the range are white
+    mask = cv2.inRange(hsv, lower_color, upper_color)
+    
+    return mask
+
+def get_hexagon_radius(mask):
+    # Find contours of the hexagonal grid
+    contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    
+    # Create a copy of the mask image for visualization
+    mask_with_contours = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
+    
+    # Draw all contours on the mask image (for visualization)
+    cv2.drawContours(mask_with_contours, contours, -1, (0, 255, 0), 2)  # Draw all contours in green with thickness 2
+    
+    # Calculate the radius from the bounding boxes
+    radii = []
+    for contour in contours:
+        _, _, w, h = cv2.boundingRect(contour)
+        radius = min(w, h) / 2
+        radii.append(radius)
+    
+    # Find the most common radius
+    radius_counts = np.bincount(np.round(radii).astype(int))
+    most_common_radius = np.argmax(radius_counts)
+    
+    return most_common_radius
+
+def extract_hexagons(image, mask):
+    # Find contours of the hexagonal grid
+    contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    
+    hexagons = []
+    for contour in contours:
+        # Get the bounding box of the contour
+        x, y, w, h = cv2.boundingRect(contour)
+        
+        # Create a mask for the hexagon
+        hex_mask = np.zeros((h, w), dtype=np.uint8)
+        cv2.drawContours(hex_mask, [contour - [x, y]], -1, 1, -1)
+        
+        # Apply the hexagonal mask to the image
+        hex_image = cv2.bitwise_and(image[y:y+h, x:x+w], image[y:y+h, x:x+w], mask=hex_mask)
+        
+        # Make the background transparent
+        hex_image = cv2.cvtColor(hex_image, cv2.COLOR_BGR2BGRA)
+        hex_image[:, :, 3] = hex_mask * 255
+        
+        hexagons.append(hex_image)
+    
+    return hexagons
+
+def save_hexagons(hexagons):
+    save_directory = os.path.join(os.getcwd(), 'Hexagons', 'Temp')
+    os.makedirs(save_directory, exist_ok=True)  # Ensure the directory exists
+    
+    for i, hex_img in enumerate(hexagons):
+        file_path = os.path.join(save_directory, f'hexagon_{i}.png')
+        cv2.imwrite(file_path, hex_img)
+
+def hex_to_rgb(hex_color):
+    hex_color = hex_color.lstrip('#')
+    return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+
+def rgb_str_to_tuple(rgb_str):
+    rgb_str = rgb_str.strip('rgb() ')
+    return tuple(map(int, rgb_str.split(',')))
+
+
+def processHexagons(hexagon_images):
+    # Placeholder for processing logic
+    return
+
 
 # Route for getting the list of new maps
 @app.route('/getNewMaps', methods=['GET'])
