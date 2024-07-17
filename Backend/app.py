@@ -141,6 +141,7 @@ def upload_map():
         data = request.get_json()
 
         title = data.get('mapName')
+        author = data.get('mapAuthor')
         image_data = data.get('uploadedImage')
         hex_mask_type = data.get('hexMaskType')
         selected_color = data.get('selectedColor')
@@ -154,7 +155,7 @@ def upload_map():
         
 
         # Call the isolate_ocean function to isolate ocean color
-        processMap(title, image_data, hex_mask_type, selected_color, combined_image)
+        processMap(title, author, image_data, hex_mask_type, selected_color, combined_image)
 
         # Example response
         response = {
@@ -168,7 +169,7 @@ def upload_map():
         return jsonify({'message': 'Internal Server Error'}), 500
 
 
-def processMap(title, image_data, hex_mask_type, selected_color, combined_image):
+def processMap(title, author, image_data, hex_mask_type, selected_color, combined_image):
     try:
         if selected_color.startswith('#'):
             # Convert the selected_color from hex to RGB
@@ -208,10 +209,11 @@ def processMap(title, image_data, hex_mask_type, selected_color, combined_image)
         # Extract hexagons from the image
         hexagons = extract_hexagons(combined_image, mask)
 
-        processedHexagons = processHexagons(hexagons)
+        processedHexagons = processHexagons(hexagons, author)
         
         # Save the hexagons
-        save_hexagons(hexagons)
+        # TODO: delete this and the related function
+        # save_hexagons(hexagons)
 
         response = {
             'message': 'Map processed successfully',
@@ -307,9 +309,61 @@ def rgb_str_to_tuple(rgb_str):
     return tuple(map(int, rgb_str.split(',')))
 
 
-def processHexagons(hexagon_images):
-    # Placeholder for processing logic
-    return
+def processHexagons(hexagon_images, author):
+    # hexagon_images is a list of hexagons to be processed
+    # each author should, idealy have its own tile set which corresponds to a folder
+
+    # Normalize author name to lowercase for case insensitivity
+    author_lower = author.lower()
+    
+    # Path to the main "Hexagons" folder
+    hexagons_folder = os.path.join(os.getcwd(), 'Hexagons')
+    
+    # Flag to track if we found a matching folder directly
+    found_direct_match = False
+    
+    # Iterate over folders in the "Hexagons" directory
+    for folder_name in os.listdir(hexagons_folder):
+        folder_path = os.path.join(hexagons_folder, folder_name)
+        if os.path.isdir(folder_path):
+            # Check if the folder name matches the author directly
+            if folder_name.lower() == author_lower:
+                author_folder = folder_path
+                found_direct_match = True
+                break
+    
+    # If no direct match was found, check aliases
+    if not found_direct_match:
+        for folder_name in os.listdir(hexagons_folder):
+            folder_path = os.path.join(hexagons_folder, folder_name)
+            if os.path.isdir(folder_path):
+                # Check if the folder has an alias.txt file and if author matches any alias
+                if check_alias(folder_path, author_lower):
+                    author_folder = folder_path
+                    break
+        else:
+            # If no matching author folder or alias folder is found, create a new one
+            author_folder = os.path.join(hexagons_folder, author_lower)
+            os.makedirs(author_folder)
+    
+    # Save each hexagon image into the author's folder
+    for idx, hexagon_image in enumerate(hexagon_images):
+        image_path = os.path.join(author_folder, f'hexagon_{idx}.png')
+        cv2.imwrite(image_path, hexagon_image)
+        print(f"Saved hexagon image {idx} for author {author} at {image_path}")
+
+def check_alias(folder_path, author_lower):
+    # Check if alias.txt exists in the folder
+    alias_file = os.path.join(folder_path, 'alias.txt')
+    if not os.path.isfile(alias_file):
+        return False
+    
+    # Read aliases from alias.txt
+    with open(alias_file, 'r') as f:
+        aliases = [alias.strip().lower() for alias in f.readlines()]
+    
+    # Check if author_lower matches any alias
+    return author_lower in aliases
 
 
 # Route for getting the list of new maps

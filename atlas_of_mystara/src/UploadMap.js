@@ -5,6 +5,7 @@ import ProcessMap from './ProcessMap';
 const UploadMap = ({ onUpload }) => {
   const [uploadedImage, setUploadedImage] = useState(null);
   const [mapName, setMapName] = useState('');
+  const [mapAuthor, setMapAuthor] = useState('');
   const [showPreview, setShowPreview] = useState(false);
   const fileInputRef = useRef();
 
@@ -21,6 +22,10 @@ const UploadMap = ({ onUpload }) => {
 
   const handleMapNameChange = (e) => {
     setMapName(e.target.value);
+  };
+
+  const handleMapAuthorChange = (e) => {
+    setMapAuthor(e.target.value);
   };
 
   const handleProceedToPreview = () => {
@@ -73,6 +78,7 @@ const UploadMap = ({ onUpload }) => {
         <ProcessMap
           uploadedImage={uploadedImage}
           mapName={mapName}
+          mapAuthor={mapAuthor}
           onConfirm={handleUploadMap} // Pass the handleUploadMap function
           onBack={handleBack} // Pass the handleBack function
         />
@@ -101,6 +107,16 @@ const UploadMap = ({ onUpload }) => {
                 value={mapName}
                 onChange={handleMapNameChange}
                 placeholder="Enter map name"
+                disabled={!uploadedImage}
+              />
+            </label>
+            <label>
+              Map Author:
+              <input
+                type="text"
+                value={mapAuthor}
+                onChange={handleMapAuthorChange}
+                placeholder="Enter name of author"
                 disabled={!uploadedImage}
               />
             </label>

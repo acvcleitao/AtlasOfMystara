@@ -3,7 +3,7 @@ import { Rnd } from 'react-rnd';
 import './ProcessMap.css';
 import { ChromePicker } from 'react-color';
 
-const ProcessMap = ({ uploadedImage, mapName, onConfirm, onBack }) => {
+const ProcessMap = ({ uploadedImage, mapName, mapAuthor, onConfirm, onBack }) => {
   const [hexGridWidth, setHexGridWidth] = useState(200);
   const [hexGridHeight, setHexGridHeight] = useState(200);
   const [hexGridX, setHexGridX] = useState(100);
@@ -36,6 +36,7 @@ const ProcessMap = ({ uploadedImage, mapName, onConfirm, onBack }) => {
       // Prepare data to send to the backend
       const data = {
         mapName,
+        mapAuthor,
         uploadedImage,
         selectedColor,
         hexMaskType,
@@ -74,7 +75,7 @@ const ProcessMap = ({ uploadedImage, mapName, onConfirm, onBack }) => {
   return (
     <div className="process-map-container">
       <label className="map-title">
-        Map Name: {mapName}
+        {mapName}, by {mapAuthor}
       </label>
       <div className="upload-image-container" onClick={step === 2 ? handleImageClick : null}>
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
