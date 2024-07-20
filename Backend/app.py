@@ -382,7 +382,47 @@ def load_image(image_path):
     return image
 
 def processHexagonPSNR(hexagon_image, author):
-    return "Not Yet Implemented"
+    # Store the PSNR values for all images in the folder
+    psnr_values = []
+    author_folder = findAuthorFolder(author)
+    
+    # Iterate over all files in the folder
+    for filename in os.listdir(author_folder):
+        file_path = os.path.join(author_folder, filename)
+        
+        try:
+            # Load the current image
+            current_image = load_image(file_path)
+            
+            # Resize images if necessary to ensure they have the same dimensions
+            if hexagon_image.shape != current_image.shape:
+                current_image = cv2.resize(current_image, (hexagon_image.shape[1], hexagon_image.shape[0]))
+            
+            # Calculate the PSNR
+            similarity = psnr(hexagon_image, current_image)
+            
+            # Append the result
+            psnr_values.append((filename, similarity))
+        except Exception as e:
+            print(f"Could not process file {file_path}: {e}")
+    
+    # Sort the PSNR values in descending order (higher PSNR means more similar)
+    psnr_values.sort(key=lambda x: x[1], reverse=True)
+    
+    # Return the top 5 most similar images
+    return psnr_values[:5]
+
+def psnr(imageA, imageB):
+    # Ensure the images have the same dimensions
+    if imageA.shape != imageB.shape:
+        raise ValueError("Images must have the same dimensions for PSNR calculation")
+    
+    mse = np.mean((imageA - imageB) ** 2)
+    if mse == 0:
+        return float('inf')  # PSNR is infinite if there is no noise
+    
+    PIXEL_MAX = 255.0
+    return 20 * np.log10(PIXEL_MAX / np.sqrt(mse))
 
 def processHexagonSSIM(hexagon_image, author):
     return "Not Yet Implemented"
