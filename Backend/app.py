@@ -313,6 +313,84 @@ def processHexagons(hexagon_images, author):
     # hexagon_images is a list of hexagons to be processed
     # each author should, idealy have its own tile set which corresponds to a folder
 
+    author_folder = findAuthorFolder(author)
+
+    # Save each hexagon image into the author's folder
+    for idx, hexagon_image in enumerate(hexagon_images):
+        image_path = os.path.join(author_folder, f'hexagon_{idx}.png')
+        cv2.imwrite(image_path, hexagon_image)
+        print(f"Saved hexagon image {idx} for author {author} at {image_path}")
+        MSE_results = processHexagonMSE(hexagon_image, author)        # Mean Square Error approach
+        PSNR_results = processHexagonPSNR(hexagon_image, author)       # Peak Signal to Noise Ratio approach
+        SSIM_results = processHexagonSSIM(hexagon_image, author)       # Structural Similarity Index approach
+        NN_results = processHexagonNN(hexagon_image, author)         # Neural Network approach TODO: Implement this
+
+def processHexagonMSE(hexagon_image, author):
+    # Convert the reference image to grayscale
+    if hexagon_image.shape[2] == 4:  # Check if the image has an alpha channel
+        reference_image = cv2.cvtColor(hexagon_image, cv2.COLOR_BGRA2GRAY)
+    else:
+        reference_image = cv2.cvtColor(hexagon_image, cv2.COLOR_BGR2GRAY)
+    
+    # Store the MSE values for all images in the folder
+    mse_values = []
+    author_folder = findAuthorFolder(author)
+    
+    # Iterate over all files in the folder
+    for filename in os.listdir(author_folder):
+        file_path = os.path.join(author_folder, filename)
+        
+        try:
+            # Load the current image
+            current_image = load_image(file_path)
+            
+            # Resize images if necessary to ensure they have the same dimensions
+            if reference_image.shape != current_image.shape:
+                current_image = cv2.resize(current_image, (reference_image.shape[1], reference_image.shape[0]))
+            
+            # Calculate the MSE
+            error = mse(reference_image, current_image)
+            
+            # Append the result
+            mse_values.append((filename, error))
+        except Exception as e:
+            print(f"Could not process file {file_path}: {e}")
+    
+    # Sort the MSE values in ascending order (lower MSE means more similar)
+    mse_values.sort(key=lambda x: x[1])
+    
+    # Return the top 5 most similar images
+    return mse_values[:5]
+
+def mse(imageA, imageB):
+    # Ensure the images have the same dimensions
+    if imageA.shape != imageB.shape:
+        raise ValueError("Images must have the same dimensions for MSE calculation")
+    
+    # Calculate the Mean Squared Error between the two images
+    err = np.sum((imageA.astype("float") - imageB.astype("float")) ** 2)
+    err /= float(imageA.shape[0] * imageA.shape[1] * imageA.shape[2])
+    
+    return err
+
+def load_image(image_path):
+    # Load the image from the specified path
+    image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
+    if image is None:
+        raise FileNotFoundError(f"No image found at {image_path}")
+    
+    return image
+
+def processHexagonPSNR(hexagon_image, author):
+    return "Not Yet Implemented"
+
+def processHexagonSSIM(hexagon_image, author):
+    return "Not Yet Implemented"
+
+def processHexagonNN(hexagon_image, author):
+    return "Not Yet Implemented"
+
+def findAuthorFolder(author):
     # Normalize author name to lowercase for case insensitivity
     author_lower = author.lower()
     
@@ -345,12 +423,8 @@ def processHexagons(hexagon_images, author):
             # If no matching author folder or alias folder is found, create a new one
             author_folder = os.path.join(hexagons_folder, author_lower)
             os.makedirs(author_folder)
-    
-    # Save each hexagon image into the author's folder
-    for idx, hexagon_image in enumerate(hexagon_images):
-        image_path = os.path.join(author_folder, f'hexagon_{idx}.png')
-        cv2.imwrite(image_path, hexagon_image)
-        print(f"Saved hexagon image {idx} for author {author} at {image_path}")
+
+    return author_folder
 
 def check_alias(folder_path, author_lower):
     # Check if alias.txt exists in the folder
