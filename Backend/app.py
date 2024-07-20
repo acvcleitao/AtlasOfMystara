@@ -20,6 +20,7 @@ from schemas import new_map_schema
 from data_utils import build_new_map_data
 import requests
 from bs4 import BeautifulSoup
+from skimage.metrics import structural_similarity as ssim
 import pytesseract
 # print(pytesseract.get_tesseract_version())
 
@@ -326,12 +327,6 @@ def processHexagons(hexagon_images, author):
         NN_results = processHexagonNN(hexagon_image, author)         # Neural Network approach TODO: Implement this
 
 def processHexagonMSE(hexagon_image, author):
-    # Convert the reference image to grayscale
-    if hexagon_image.shape[2] == 4:  # Check if the image has an alpha channel
-        reference_image = cv2.cvtColor(hexagon_image, cv2.COLOR_BGRA2GRAY)
-    else:
-        reference_image = cv2.cvtColor(hexagon_image, cv2.COLOR_BGR2GRAY)
-    
     # Store the MSE values for all images in the folder
     mse_values = []
     author_folder = findAuthorFolder(author)
@@ -345,11 +340,11 @@ def processHexagonMSE(hexagon_image, author):
             current_image = load_image(file_path)
             
             # Resize images if necessary to ensure they have the same dimensions
-            if reference_image.shape != current_image.shape:
-                current_image = cv2.resize(current_image, (reference_image.shape[1], reference_image.shape[0]))
+            if hexagon_image.shape != current_image.shape:
+                current_image = cv2.resize(current_image, (hexagon_image.shape[1], hexagon_image.shape[0]))
             
             # Calculate the MSE
-            error = mse(reference_image, current_image)
+            error = mse(hexagon_image, current_image)
             
             # Append the result
             mse_values.append((filename, error))
@@ -425,7 +420,41 @@ def psnr(imageA, imageB):
     return 20 * np.log10(PIXEL_MAX / np.sqrt(mse))
 
 def processHexagonSSIM(hexagon_image, author):
-    return "Not Yet Implemented"
+    # Store the SSIM values for all images in the folder
+    ssim_values = []
+    author_folder = findAuthorFolder(author)
+
+    # Iterate over all files in the folder
+    for filename in os.listdir(author_folder):
+        file_path = os.path.join(author_folder, filename)
+        
+        try:
+            # Load the current image
+            current_image = load_image(file_path)
+            
+            # Convert the current image to grayscale if it's not already
+            if current_image.shape[2] == 4:  # Check if the image has an alpha channel
+                current_image_gray = cv2.cvtColor(current_image, cv2.COLOR_BGRA2GRAY)
+            else:
+                current_image_gray = cv2.cvtColor(current_image, cv2.COLOR_BGR2GRAY)
+            
+            # Resize images if necessary to ensure they have the same dimensions
+            if hexagon_image.shape != current_image_gray.shape:
+                current_image_gray = cv2.resize(current_image_gray, (hexagon_image.shape[1], hexagon_image.shape[0]))
+            
+            # Calculate the SSIM
+            similarity = ssim(hexagon_image, current_image_gray)
+            
+            # Append the result
+            ssim_values.append((filename, similarity))
+        except Exception as e:
+            print(f"Could not process file {file_path}: {e}")
+    
+    # Sort the SSIM values in descending order (higher SSIM means more similar)
+    ssim_values.sort(key=lambda x: x[1], reverse=True)
+    
+    # Return the top 5 most similar images
+    return ssim_values[:5]
 
 def processHexagonNN(hexagon_image, author):
     return "Not Yet Implemented"
