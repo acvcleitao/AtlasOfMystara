@@ -543,6 +543,20 @@ def compare_phash(image, folder_path):
     sorted_matches = sorted(matches_dict.items(), key=lambda x: x[1])
     return sorted_matches[:5]
 
+def template_matching_color(image, folder_path):
+    matches_dict = {}
+    
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+        current_image = cv2.imread(file_path)
+        
+        result = cv2.matchTemplate(current_image, image, cv2.TM_CCOEFF_NORMED)
+        _, max_val, _, _ = cv2.minMaxLoc(result)
+        matches_dict[filename] = max_val
+    
+    sorted_matches = sorted(matches_dict.items(), key=lambda x: x[1], reverse=True)
+    return sorted_matches[:5]
+
 
 
 def findAuthorFolder(author):
