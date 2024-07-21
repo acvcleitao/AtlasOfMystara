@@ -557,6 +557,27 @@ def template_matching_color(image, folder_path):
     sorted_matches = sorted(matches_dict.items(), key=lambda x: x[1], reverse=True)
     return sorted_matches[:5]
 
+def contour_matching(image, folder_path):
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    _, thresh_image = cv2.threshold(gray_image, 128, 255, cv2.THRESH_BINARY)
+    contours_ref, _ = cv2.findContours(thresh_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    
+    matches_dict = {}
+    
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+        current_image = cv2.imread(file_path)
+        gray_current_image = cv2.cvtColor(current_image, cv2.COLOR_BGR2GRAY)
+        _, thresh_current_image = cv2.threshold(gray_current_image, 128, 255, cv2.THRESH_BINARY)
+        contours_cur, _ = cv2.findContours(thresh_current_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        
+        if contours_ref and contours_cur:
+            match_score = cv2.matchShapes(contours_ref[0], contours_cur[0], cv2.CONTOURS_MATCH_I1, 0.0)
+            matches_dict[filename] = match_score
+    
+    sorted_matches = sorted(matches_dict.items(), key=lambda x: x[1])
+    return sorted_matches[:5]
+
 
 
 def findAuthorFolder(author):
