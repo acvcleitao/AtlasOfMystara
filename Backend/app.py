@@ -325,6 +325,15 @@ def processHexagons(hexagon_images, author):
         MSE_results = processHexagonMSE(hexagon_image, author)        # Mean Square Error approach
         PSNR_results = processHexagonPSNR(hexagon_image, author)       # Peak Signal to Noise Ratio approach
         SSIM_results = processHexagonSSIM(hexagon_image, author)       # Structural Similarity Index approach
+        SIFT_results = processHexagonSIFT(hexagon_image, author)
+        SURF_results = processHexagonSURF(hexagon_image, author)
+        ORB_results = processHexagonORB(hexagon_image, author)
+        PHash_results = processHexagonPHash(hexagon_image, author)
+        TemplateMatching_results = processHexagonTemplateMatching(hexagon_image, author)
+        ContourMatching_results = processHexagonContourMatching(hexagon_image, author)
+        ChiSquare_results = processHexagonChiSquare(hexagon_image, author)
+        Bhattacharyya_results = processHexagonBhattacharyya(hexagon_image, author)
+
         NN_results = processHexagonNN(hexagon_image, author)         # Neural Network approach TODO: Implement this
 
 def processHexagonMSE(hexagon_image, author):
@@ -466,13 +475,14 @@ def sift_features(image):
     keypoints, descriptors = sift.detectAndCompute(image, None)
     return keypoints, descriptors
 
-def compare_sift_color(image, folder_path):
-    kp1, des1 = sift_features(image)
+def processHexagonSIFT(hexagon_image, author):
+    kp1, des1 = sift_features(hexagon_image)
     bf = cv2.BFMatcher()
     matches_dict = {}
+    author_folder = findAuthorFolder(author)
     
-    for filename in os.listdir(folder_path):
-        file_path = os.path.join(folder_path, filename)
+    for filename in os.listdir(author_folder):
+        file_path = os.path.join(author_folder, filename)
         current_image = cv2.imread(file_path)
         kp2, des2 = sift_features(current_image)
         
@@ -489,13 +499,14 @@ def surf_features(image):
     keypoints, descriptors = surf.detectAndCompute(image, None)
     return keypoints, descriptors
 
-def compare_surf_color(image, folder_path):
-    kp1, des1 = surf_features(image)
+def processHexagonSURF(hexagon_image, author):
+    kp1, des1 = surf_features(hexagon_image)
     bf = cv2.BFMatcher()
     matches_dict = {}
+    author_folder = findAuthorFolder(author)
     
-    for filename in os.listdir(folder_path):
-        file_path = os.path.join(folder_path, filename)
+    for filename in os.listdir(author_folder):
+        file_path = os.path.join(author_folder, filename)
         current_image = cv2.imread(file_path)
         kp2, des2 = surf_features(current_image)
         
@@ -512,13 +523,14 @@ def orb_features(image):
     keypoints, descriptors = orb.detectAndCompute(image, None)
     return keypoints, descriptors
 
-def compare_orb_color(image, folder_path):
-    kp1, des1 = orb_features(image)
+def processHexagonORB(hexagon_image, author):
+    kp1, des1 = orb_features(hexagon_image)
     bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
     matches_dict = {}
+    author_folder = findAuthorFolder(author)
     
-    for filename in os.listdir(folder_path):
-        file_path = os.path.join(folder_path, filename)
+    for filename in os.listdir(author_folder):
+        file_path = os.path.join(author_folder, filename)
         current_image = cv2.imread(file_path)
         kp2, des2 = orb_features(current_image)
         
@@ -530,12 +542,13 @@ def compare_orb_color(image, folder_path):
     sorted_matches = sorted(matches_dict.items(), key=lambda x: x[1], reverse=True)
     return sorted_matches[:5]
 
-def compare_phash(image, folder_path):
-    ref_hash = phash(Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB)))
+def processHexagonPHash(hexagon_image, author):
+    ref_hash = phash(Image.fromarray(cv2.cvtColor(hexagon_image, cv2.COLOR_BGR2RGB)))
     matches_dict = {}
+    author_folder = findAuthorFolder(author)
     
-    for filename in os.listdir(folder_path):
-        file_path = os.path.join(folder_path, filename)
+    for filename in os.listdir(author_folder):
+        file_path = os.path.join(author_folder, filename)
         current_image = cv2.imread(file_path)
         curr_hash = phash(Image.fromarray(cv2.cvtColor(current_image, cv2.COLOR_BGR2RGB)))
         matches_dict[filename] = ref_hash - curr_hash
@@ -543,29 +556,31 @@ def compare_phash(image, folder_path):
     sorted_matches = sorted(matches_dict.items(), key=lambda x: x[1])
     return sorted_matches[:5]
 
-def template_matching_color(image, folder_path):
+def processHexagonTemplateMatching(hexagon_image, author):
     matches_dict = {}
+    author_folder = findAuthorFolder(author)
     
-    for filename in os.listdir(folder_path):
-        file_path = os.path.join(folder_path, filename)
+    for filename in os.listdir(author_folder):
+        file_path = os.path.join(author_folder, filename)
         current_image = cv2.imread(file_path)
         
-        result = cv2.matchTemplate(current_image, image, cv2.TM_CCOEFF_NORMED)
+        result = cv2.matchTemplate(current_image, hexagon_image, cv2.TM_CCOEFF_NORMED)
         _, max_val, _, _ = cv2.minMaxLoc(result)
         matches_dict[filename] = max_val
     
     sorted_matches = sorted(matches_dict.items(), key=lambda x: x[1], reverse=True)
     return sorted_matches[:5]
 
-def contour_matching(image, folder_path):
-    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+def processHexagonContourMatching(hexagon_image, author):
+    gray_image = cv2.cvtColor(hexagon_image, cv2.COLOR_BGR2GRAY)
     _, thresh_image = cv2.threshold(gray_image, 128, 255, cv2.THRESH_BINARY)
     contours_ref, _ = cv2.findContours(thresh_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    author_folder = findAuthorFolder(author)
     
     matches_dict = {}
     
-    for filename in os.listdir(folder_path):
-        file_path = os.path.join(folder_path, filename)
+    for filename in os.listdir(author_folder):
+        file_path = os.path.join(author_folder, filename)
         current_image = cv2.imread(file_path)
         gray_current_image = cv2.cvtColor(current_image, cv2.COLOR_BGR2GRAY)
         _, thresh_current_image = cv2.threshold(gray_current_image, 128, 255, cv2.THRESH_BINARY)
@@ -578,15 +593,16 @@ def contour_matching(image, folder_path):
     sorted_matches = sorted(matches_dict.items(), key=lambda x: x[1])
     return sorted_matches[:5]
 
-def compare_histograms_chisquare(image, folder_path):
-    hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+def processHexagonChiSquare(hexagon_image, author):
+    hsv_image = cv2.cvtColor(hexagon_image, cv2.COLOR_BGR2HSV)
     hist_image = cv2.calcHist([hsv_image], [0, 1, 2], None, [8, 8, 8], [0, 180, 0, 256, 0, 256])
     cv2.normalize(hist_image, hist_image)
+    author_folder = findAuthorFolder(author)
     
     matches_dict = {}
     
-    for filename in os.listdir(folder_path):
-        file_path = os.path.join(folder_path, filename)
+    for filename in os.listdir(author_folder):
+        file_path = os.path.join(author_folder, filename)
         current_image = cv2.imread(file_path)
         hsv_current_image = cv2.cvtColor(current_image, cv2.COLOR_BGR2HSV)
         hist_current_image = cv2.calcHist([hsv_current_image], [0, 1, 2], None, [8, 8, 8], [0, 180, 0, 256, 0, 256])
@@ -598,15 +614,16 @@ def compare_histograms_chisquare(image, folder_path):
     sorted_matches = sorted(matches_dict.items(), key=lambda x: x[1])
     return sorted_matches[:5]
 
-def compare_histograms_bhattacharyya(image, folder_path):
-    hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+def processHexagonBhattacharyya(hexagon_image, author):
+    hsv_image = cv2.cvtColor(hexagon_image, cv2.COLOR_BGR2HSV)
     hist_image = cv2.calcHist([hsv_image], [0, 1, 2], None, [8, 8, 8], [0, 180, 0, 256, 0, 256])
     cv2.normalize(hist_image, hist_image)
+    author_folder = findAuthorFolder(author)
     
     matches_dict = {}
     
-    for filename in os.listdir(folder_path):
-        file_path = os.path.join(folder_path, filename)
+    for filename in os.listdir(author_folder):
+        file_path = os.path.join(author_folder, filename)
         current_image = cv2.imread(file_path)
         hsv_current_image = cv2.cvtColor(current_image, cv2.COLOR_BGR2HSV)
         hist_current_image = cv2.calcHist([hsv_current_image], [0, 1, 2], None, [8, 8, 8], [0, 180, 0, 256, 0, 256])
