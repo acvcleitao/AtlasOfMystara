@@ -483,6 +483,31 @@ def compare_sift_color(image, folder_path):
     sorted_matches = sorted(matches_dict.items(), key=lambda x: x[1], reverse=True)
     return sorted_matches[:5]
 
+def surf_features(image):
+    surf = cv2.xfeatures2d.SURF_create()
+    keypoints, descriptors = surf.detectAndCompute(image, None)
+    return keypoints, descriptors
+
+def compare_surf_color(image, folder_path):
+    kp1, des1 = surf_features(image)
+    bf = cv2.BFMatcher()
+    matches_dict = {}
+    
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+        current_image = cv2.imread(file_path)
+        kp2, des2 = surf_features(current_image)
+        
+        if des2 is not None and des1 is not None:
+            matches = bf.knnMatch(des1, des2, k=2)
+            good_matches = [m for m, n in matches if m.distance < 0.75 * n.distance]
+            matches_dict[filename] = len(good_matches)
+    
+    sorted_matches = sorted(matches_dict.items(), key=lambda x: x[1], reverse=True)
+    return sorted_matches[:5]
+
+
+
 def findAuthorFolder(author):
     # Normalize author name to lowercase for case insensitivity
     author_lower = author.lower()
