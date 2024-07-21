@@ -20,7 +20,7 @@ from schemas import new_map_schema
 from data_utils import build_new_map_data
 import requests
 from bs4 import BeautifulSoup
-from skimage.metrics import structural_similarity as ssim
+from skimage.metrics import structural_similarity as ssim # type: ignore
 import pytesseract
 # print(pytesseract.get_tesseract_version())
 
@@ -458,6 +458,30 @@ def processHexagonSSIM(hexagon_image, author):
 
 def processHexagonNN(hexagon_image, author):
     return "Not Yet Implemented"
+
+
+def sift_features(image):
+    sift = cv2.SIFT_create()
+    keypoints, descriptors = sift.detectAndCompute(image, None)
+    return keypoints, descriptors
+
+def compare_sift_color(image, folder_path):
+    kp1, des1 = sift_features(image)
+    bf = cv2.BFMatcher()
+    matches_dict = {}
+    
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+        current_image = cv2.imread(file_path)
+        kp2, des2 = sift_features(current_image)
+        
+        if des2 is not None and des1 is not None:
+            matches = bf.knnMatch(des1, des2, k=2)
+            good_matches = [m for m, n in matches if m.distance < 0.75 * n.distance]
+            matches_dict[filename] = len(good_matches)
+    
+    sorted_matches = sorted(matches_dict.items(), key=lambda x: x[1], reverse=True)
+    return sorted_matches[:5]
 
 def findAuthorFolder(author):
     # Normalize author name to lowercase for case insensitivity
