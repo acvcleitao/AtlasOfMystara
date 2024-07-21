@@ -506,6 +506,29 @@ def compare_surf_color(image, folder_path):
     sorted_matches = sorted(matches_dict.items(), key=lambda x: x[1], reverse=True)
     return sorted_matches[:5]
 
+def orb_features(image):
+    orb = cv2.ORB_create()
+    keypoints, descriptors = orb.detectAndCompute(image, None)
+    return keypoints, descriptors
+
+def compare_orb_color(image, folder_path):
+    kp1, des1 = orb_features(image)
+    bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+    matches_dict = {}
+    
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+        current_image = cv2.imread(file_path)
+        kp2, des2 = orb_features(current_image)
+        
+        if des2 is not None and des1 is not None:
+            matches = bf.match(des1, des2)
+            matches = sorted(matches, key=lambda x: x.distance)
+            matches_dict[filename] = len(matches)
+    
+    sorted_matches = sorted(matches_dict.items(), key=lambda x: x[1], reverse=True)
+    return sorted_matches[:5]
+
 
 
 def findAuthorFolder(author):
