@@ -21,6 +21,7 @@ from data_utils import build_new_map_data
 import requests
 from bs4 import BeautifulSoup
 from skimage.metrics import structural_similarity as ssim # type: ignore
+from imagehash import phash
 import pytesseract
 # print(pytesseract.get_tesseract_version())
 
@@ -527,6 +528,19 @@ def compare_orb_color(image, folder_path):
             matches_dict[filename] = len(matches)
     
     sorted_matches = sorted(matches_dict.items(), key=lambda x: x[1], reverse=True)
+    return sorted_matches[:5]
+
+def compare_phash(image, folder_path):
+    ref_hash = phash(Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB)))
+    matches_dict = {}
+    
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+        current_image = cv2.imread(file_path)
+        curr_hash = phash(Image.fromarray(cv2.cvtColor(current_image, cv2.COLOR_BGR2RGB)))
+        matches_dict[filename] = ref_hash - curr_hash
+    
+    sorted_matches = sorted(matches_dict.items(), key=lambda x: x[1])
     return sorted_matches[:5]
 
 
