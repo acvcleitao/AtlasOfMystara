@@ -21,7 +21,7 @@ from data_utils import build_new_map_data
 import requests
 from bs4 import BeautifulSoup
 from skimage.metrics import structural_similarity as ssim # type: ignore
-from imagehash import phash
+from imagehash import phash # type: ignore
 import pytesseract
 # print(pytesseract.get_tesseract_version())
 
@@ -578,7 +578,45 @@ def contour_matching(image, folder_path):
     sorted_matches = sorted(matches_dict.items(), key=lambda x: x[1])
     return sorted_matches[:5]
 
+def compare_histograms_chisquare(image, folder_path):
+    hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    hist_image = cv2.calcHist([hsv_image], [0, 1, 2], None, [8, 8, 8], [0, 180, 0, 256, 0, 256])
+    cv2.normalize(hist_image, hist_image)
+    
+    matches_dict = {}
+    
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+        current_image = cv2.imread(file_path)
+        hsv_current_image = cv2.cvtColor(current_image, cv2.COLOR_BGR2HSV)
+        hist_current_image = cv2.calcHist([hsv_current_image], [0, 1, 2], None, [8, 8, 8], [0, 180, 0, 256, 0, 256])
+        cv2.normalize(hist_current_image, hist_current_image)
+        
+        similarity = cv2.compareHist(hist_image, hist_current_image, cv2.HISTCMP_CHISQR)
+        matches_dict[filename] = similarity
+    
+    sorted_matches = sorted(matches_dict.items(), key=lambda x: x[1])
+    return sorted_matches[:5]
 
+def compare_histograms_bhattacharyya(image, folder_path):
+    hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    hist_image = cv2.calcHist([hsv_image], [0, 1, 2], None, [8, 8, 8], [0, 180, 0, 256, 0, 256])
+    cv2.normalize(hist_image, hist_image)
+    
+    matches_dict = {}
+    
+    for filename in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, filename)
+        current_image = cv2.imread(file_path)
+        hsv_current_image = cv2.cvtColor(current_image, cv2.COLOR_BGR2HSV)
+        hist_current_image = cv2.calcHist([hsv_current_image], [0, 1, 2], None, [8, 8, 8], [0, 180, 0, 256, 0, 256])
+        cv2.normalize(hist_current_image, hist_current_image)
+        
+        similarity = cv2.compareHist(hist_image, hist_current_image, cv2.HISTCMP_BHATTACHARYYA)
+        matches_dict[filename] = similarity
+    
+    sorted_matches = sorted(matches_dict.items(), key=lambda x: x[1])
+    return sorted_matches[:5]
 
 def findAuthorFolder(author):
     # Normalize author name to lowercase for case insensitivity
