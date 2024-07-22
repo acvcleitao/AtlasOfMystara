@@ -1,3 +1,4 @@
+import imghdr
 from io import BytesIO
 import os
 import uuid
@@ -20,8 +21,8 @@ from schemas import new_map_schema
 from data_utils import build_new_map_data
 import requests
 from bs4 import BeautifulSoup
-from skimage.metrics import structural_similarity as ssim
-from imagehash import phash
+from skimage.metrics import structural_similarity as ssim # type: ignore
+from imagehash import phash # type: ignore
 from matplotlib import pyplot as plt
 import pytesseract
 # print(pytesseract.get_tesseract_version())
@@ -212,6 +213,16 @@ def processMap(title, author, image_data, hex_mask_type, selected_color, combine
         # Extract hexagons from the image
         hexagons = extract_hexagons(combined_image, mask)
 
+        """
+        for hexagon in hexagons:
+            display_image(hexagon)
+            label = str(input('What kind of hexagon is this?\nwrite "n" or "no" if it is not a hexagon and "exit" or "quit" to stop\nlabel: ')).lower()
+            if label == "exit" or label == "quit":
+                break
+            if label != "no" or label != "n":
+                save_new_hexagon(hexagon, label, author)
+        """
+
         processedHexagons = processHexagons(hexagons, author)
         
         # Save the hexagons
@@ -315,26 +326,26 @@ def rgb_str_to_tuple(rgb_str):
 def processHexagons(hexagon_images, author):
     # hexagon_images is a list of hexagons to be processed
     # each author should, idealy have its own tile set which corresponds to a folder
-
-    author_folder = findAuthorFolder(author)
-
+    temp_path = r"C:\Users\acvcl\Documents\GitHub\AtlasOfMystara\Backend\Hexagons\Temp"
     # Save each hexagon image into the author's folder
     for idx, hexagon_image in enumerate(hexagon_images):
-        image_path = os.path.join(author_folder, f'hexagon_{idx}.png')
+        if idx == 0:
+            continue
+        image_path = os.path.join(temp_path, f'hexagon_{idx}.png')
         cv2.imwrite(image_path, hexagon_image)
         print(f"Saved hexagon image {idx} for author {author} at {image_path}")
         MSE_results = processHexagonMSE(hexagon_image, author)         # Mean Square Error approach
         PSNR_results = processHexagonPSNR(hexagon_image, author)       # Peak Signal to Noise Ratio approach
         SSIM_results = processHexagonSSIM(hexagon_image, author)       # Structural Similarity Index approach
-        SIFT_results = processHexagonSIFT(hexagon_image, author)
-        SURF_results = processHexagonSURF(hexagon_image, author)
+        # SIFT_results = processHexagonSIFT(hexagon_image, author)     # Unfortunately SIFT is a proprietary licensed algorythm it can be used if the required licence is aquired
+        #SURF_results = processHexagonSURF(hexagon_image, author)      # Unfortunately SIFT is a proprietary licensed algorythm it can be used if the required licence is aquired
         ORB_results = processHexagonORB(hexagon_image, author)
         PHash_results = processHexagonPHash(hexagon_image, author)
         TemplateMatching_results = processHexagonTemplateMatching(hexagon_image, author)
         ContourMatching_results = processHexagonContourMatching(hexagon_image, author)
         ChiSquare_results = processHexagonChiSquare(hexagon_image, author)
         Bhattacharyya_results = processHexagonBhattacharyya(hexagon_image, author)
-        print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, SIFT_results, SURF_results, ORB_results, PHash_results, TemplateMatching_results, ContourMatching_results, ChiSquare_results, Bhattacharyya_results)
+        print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, "SIFT_results", "SURF_results", ORB_results, PHash_results, TemplateMatching_results, ContourMatching_results, ChiSquare_results, Bhattacharyya_results)
 
         NN_results = processHexagonNN(hexagon_image, author)         # Neural Network approach TODO: Implement this
 
@@ -353,13 +364,13 @@ def print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, SIFT_r
     for filename, score in SSIM_results:
         print(f"  {filename}: {score:.4f}")
 
-    print("\nSIFT Results:")
-    for filename, score in SIFT_results:
-        print(f"  {filename}: {score}")
+    print("\nSIFT Results: not implemented due to licencing")
+    """for filename, score in SIFT_results:
+        print(f"  {filename}: {score}")"""
 
-    print("\nSURF Results:")
-    for filename, score in SURF_results:
-        print(f"  {filename}: {score}")
+    print("\nSURF Results: not implemented due to licencing")
+    """for filename, score in SURF_results:
+        print(f"  {filename}: {score}")"""
 
     print("\nORB Results:")
     for filename, score in ORB_results:
@@ -405,18 +416,15 @@ def processHexagonMSE(hexagon_image, author):
         try:
             # Load the current image
             current_image = load_image(file_path)
+            if current_image is not None:
             
-            # Resize images if necessary to ensure they have the same dimensions
-            if hexagon_image.shape != current_image.shape:
-                current_image = cv2.resize(current_image, (hexagon_image.shape[1], hexagon_image.shape[0]))
-            
-            # Calculate the MSE
-            error = mse(hexagon_image, current_image)
-            
-            # Append the result
-            mse_values.append((filename, error))
+                # Calculate the MSE
+                error = mse(hexagon_image, current_image)
+                
+                # Append the result
+                mse_values.append((filename, error))
         except Exception as e:
-            print(f"Could not process file {file_path}: {e}")
+            print(f"Could not process file using MSE {file_path}: {e}")
     
     # Sort the MSE values in ascending order (lower MSE means more similar)
     mse_values.sort(key=lambda x: x[1])
@@ -427,7 +435,7 @@ def processHexagonMSE(hexagon_image, author):
 def mse(imageA, imageB):
     # Ensure the images have the same dimensions
     if imageA.shape != imageB.shape:
-        raise ValueError("Images must have the same dimensions for MSE calculation")
+        imageA = cv2.resize(imageA, (imageB.shape[1], imageB.shape[0]))
     
     # Calculate the Mean Squared Error between the two images
     err = np.sum((imageA.astype("float") - imageB.astype("float")) ** 2)
@@ -437,11 +445,13 @@ def mse(imageA, imageB):
 
 def load_image(image_path):
     # Load the image from the specified path
-    image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
-    if image is None:
-        raise FileNotFoundError(f"No image found at {image_path}")
-    
-    return image
+    if imghdr.what(image_path) is not None:     # Checks if it is an image
+        image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
+        if image is None:
+            raise FileNotFoundError(f"No image found at {image_path}")
+        
+        return image
+    return None
 
 def processHexagonPSNR(hexagon_image, author):
     # Store the PSNR values for all images in the folder
@@ -455,18 +465,15 @@ def processHexagonPSNR(hexagon_image, author):
         try:
             # Load the current image
             current_image = load_image(file_path)
+            if current_image is not None:
             
-            # Resize images if necessary to ensure they have the same dimensions
-            if hexagon_image.shape != current_image.shape:
-                current_image = cv2.resize(current_image, (hexagon_image.shape[1], hexagon_image.shape[0]))
-            
-            # Calculate the PSNR
-            similarity = psnr(hexagon_image, current_image)
-            
-            # Append the result
-            psnr_values.append((filename, similarity))
+                # Calculate the PSNR
+                similarity = psnr(hexagon_image, current_image)
+                
+                # Append the result
+                psnr_values.append((filename, similarity))
         except Exception as e:
-            print(f"Could not process file {file_path}: {e}")
+            print(f"Could not process file using PSNR {file_path}: {e}")
     
     # Sort the PSNR values in descending order (higher PSNR means more similar)
     psnr_values.sort(key=lambda x: x[1], reverse=True)
@@ -477,7 +484,7 @@ def processHexagonPSNR(hexagon_image, author):
 def psnr(imageA, imageB):
     # Ensure the images have the same dimensions
     if imageA.shape != imageB.shape:
-        raise ValueError("Images must have the same dimensions for PSNR calculation")
+        imageA = cv2.resize(imageA, (imageB.shape[1], imageB.shape[0]))
     
     mse = np.mean((imageA - imageB) ** 2)
     if mse == 0:
@@ -487,6 +494,12 @@ def psnr(imageA, imageB):
     return 20 * np.log10(PIXEL_MAX / np.sqrt(mse))
 
 def processHexagonSSIM(hexagon_image, author):
+    # Convert hexagon_image to grayscale if it's not already
+    if hexagon_image.shape[2] == 4:  # Check if the image has an alpha channel
+        hexagon_image_gray = cv2.cvtColor(hexagon_image, cv2.COLOR_BGRA2GRAY)
+    else:
+        hexagon_image_gray = cv2.cvtColor(hexagon_image, cv2.COLOR_BGR2GRAY)
+
     # Store the SSIM values for all images in the folder
     ssim_values = []
     author_folder = findAuthorFolder(author)
@@ -494,28 +507,28 @@ def processHexagonSSIM(hexagon_image, author):
     # Iterate over all files in the folder
     for filename in os.listdir(author_folder):
         file_path = os.path.join(author_folder, filename)
-        
         try:
             # Load the current image
             current_image = load_image(file_path)
+            if current_image is not None:
             
-            # Convert the current image to grayscale if it's not already
-            if current_image.shape[2] == 4:  # Check if the image has an alpha channel
-                current_image_gray = cv2.cvtColor(current_image, cv2.COLOR_BGRA2GRAY)
-            else:
-                current_image_gray = cv2.cvtColor(current_image, cv2.COLOR_BGR2GRAY)
-            
-            # Resize images if necessary to ensure they have the same dimensions
-            if hexagon_image.shape != current_image_gray.shape:
-                current_image_gray = cv2.resize(current_image_gray, (hexagon_image.shape[1], hexagon_image.shape[0]))
-            
-            # Calculate the SSIM
-            similarity = ssim(hexagon_image, current_image_gray)
-            
-            # Append the result
-            ssim_values.append((filename, similarity))
+                # Convert the current image to grayscale if it's not already
+                if current_image.shape[2] == 4:  # Check if the image has an alpha channel
+                    current_image_gray = cv2.cvtColor(current_image, cv2.COLOR_BGRA2GRAY)
+                else:
+                    current_image_gray = cv2.cvtColor(current_image, cv2.COLOR_BGR2GRAY)
+                
+                # Resize images if necessary to ensure they have the same dimensions
+                if hexagon_image_gray.shape != current_image_gray.shape:
+                    current_image_gray = cv2.resize(current_image_gray, (hexagon_image_gray.shape[1], hexagon_image_gray.shape[0]))
+                
+                # Calculate the SSIM
+                similarity = ssim(hexagon_image_gray, current_image_gray)
+                
+                # Append the result
+                ssim_values.append((filename, similarity))
         except Exception as e:
-            print(f"Could not process file {file_path}: {e}")
+            print(f"Could not process file using SSIM {file_path}: {e}")
     
     # Sort the SSIM values in descending order (higher SSIM means more similar)
     ssim_values.sort(key=lambda x: x[1], reverse=True)
@@ -526,22 +539,39 @@ def processHexagonSSIM(hexagon_image, author):
 def processHexagonNN(hexagon_image, author):
     return "Not Yet Implemented"
 
-
+"""
 def sift_features(image):
     sift = cv2.SIFT_create()
     keypoints, descriptors = sift.detectAndCompute(image, None)
     return keypoints, descriptors
 
 def processHexagonSIFT(hexagon_image, author):
-    kp1, des1 = sift_features(hexagon_image)
+    # Ensure hexagon_image is in the correct format
+    if hexagon_image.shape[2] == 4:
+        hexagon_image_gray = cv2.cvtColor(hexagon_image, cv2.COLOR_BGRA2GRAY)
+    else:
+        hexagon_image_gray = cv2.cvtColor(hexagon_image, cv2.COLOR_BGR2GRAY)
+
+    kp1, des1 = sift_features(hexagon_image_gray)
     bf = cv2.BFMatcher()
     matches_dict = {}
     author_folder = findAuthorFolder(author)
     
     for filename in os.listdir(author_folder):
         file_path = os.path.join(author_folder, filename)
-        current_image = cv2.imread(file_path)
-        kp2, des2 = sift_features(current_image)
+        current_image = load_image(file_path)
+        if current_image is None:
+            continue
+        
+        if current_image.shape[2] == 4:
+            current_image_gray = cv2.cvtColor(current_image, cv2.COLOR_BGRA2GRAY)
+        else:
+            current_image_gray = cv2.cvtColor(current_image, cv2.COLOR_BGR2GRAY)
+        
+        if hexagon_image_gray.shape != current_image_gray.shape:
+            current_image_gray = cv2.resize(current_image_gray, (hexagon_image_gray.shape[1], hexagon_image_gray.shape[0]))
+        
+        kp2, des2 = sift_features(current_image_gray)
         
         if des2 is not None and des1 is not None:
             matches = bf.knnMatch(des1, des2, k=2)
@@ -564,17 +594,19 @@ def processHexagonSURF(hexagon_image, author):
     
     for filename in os.listdir(author_folder):
         file_path = os.path.join(author_folder, filename)
-        current_image = cv2.imread(file_path)
-        kp2, des2 = surf_features(current_image)
-        
-        if des2 is not None and des1 is not None:
-            matches = bf.knnMatch(des1, des2, k=2)
-            good_matches = [m for m, n in matches if m.distance < 0.75 * n.distance]
-            matches_dict[filename] = len(good_matches)
+        current_image = load_image(file_path)
+
+        if current_image is not None:
+            kp2, des2 = surf_features(current_image)
+            
+            if des2 is not None and des1 is not None:
+                matches = bf.knnMatch(des1, des2, k=2)
+                good_matches = [m for m, n in matches if m.distance < 0.75 * n.distance]
+                matches_dict[filename] = len(good_matches)
     
     sorted_matches = sorted(matches_dict.items(), key=lambda x: x[1], reverse=True)
     return sorted_matches[:5]
-
+"""
 def orb_features(image):
     orb = cv2.ORB_create()
     keypoints, descriptors = orb.detectAndCompute(image, None)
@@ -588,13 +620,15 @@ def processHexagonORB(hexagon_image, author):
     
     for filename in os.listdir(author_folder):
         file_path = os.path.join(author_folder, filename)
-        current_image = cv2.imread(file_path)
-        kp2, des2 = orb_features(current_image)
+        current_image = load_image(file_path)
         
-        if des2 is not None and des1 is not None:
-            matches = bf.match(des1, des2)
-            matches = sorted(matches, key=lambda x: x.distance)
-            matches_dict[filename] = len(matches)
+        if current_image is not None:
+            kp2, des2 = orb_features(current_image)
+            
+            if des2 is not None and des1 is not None:
+                matches = bf.match(des1, des2)
+                matches = sorted(matches, key=lambda x: x.distance)
+                matches_dict[filename] = len(matches)
     
     sorted_matches = sorted(matches_dict.items(), key=lambda x: x[1], reverse=True)
     return sorted_matches[:5]
@@ -606,27 +640,45 @@ def processHexagonPHash(hexagon_image, author):
     
     for filename in os.listdir(author_folder):
         file_path = os.path.join(author_folder, filename)
-        current_image = cv2.imread(file_path)
-        curr_hash = phash(Image.fromarray(cv2.cvtColor(current_image, cv2.COLOR_BGR2RGB)))
-        matches_dict[filename] = ref_hash - curr_hash
+        current_image = load_image(file_path)
+    
+        if current_image is not None:
+            curr_hash = phash(Image.fromarray(cv2.cvtColor(current_image, cv2.COLOR_BGR2RGB)))
+            matches_dict[filename] = ref_hash - curr_hash
     
     sorted_matches = sorted(matches_dict.items(), key=lambda x: x[1])
     return sorted_matches[:5]
 
 def processHexagonTemplateMatching(hexagon_image, author):
-    matches_dict = {}
+    template_matching_values = []
     author_folder = findAuthorFolder(author)
-    
+
     for filename in os.listdir(author_folder):
         file_path = os.path.join(author_folder, filename)
-        current_image = cv2.imread(file_path)
-        
-        result = cv2.matchTemplate(current_image, hexagon_image, cv2.TM_CCOEFF_NORMED)
-        _, max_val, _, _ = cv2.minMaxLoc(result)
-        matches_dict[filename] = max_val
-    
-    sorted_matches = sorted(matches_dict.items(), key=lambda x: x[1], reverse=True)
-    return sorted_matches[:5]
+        try:
+            current_image = cv2.imread(file_path)
+            if current_image is None:
+                continue
+
+            # Resize template if necessary
+            if hexagon_image.shape[0] > current_image.shape[0] or hexagon_image.shape[1] > current_image.shape[1]:
+                scale_x = current_image.shape[1] / hexagon_image.shape[1]
+                scale_y = current_image.shape[0] / hexagon_image.shape[0]
+                scale = min(scale_x, scale_y)
+                new_width = int(hexagon_image.shape[1] * scale)
+                new_height = int(hexagon_image.shape[0] * scale)
+                hexagon_image = cv2.resize(hexagon_image, (new_width, new_height))
+
+            # Perform template matching
+            result = cv2.matchTemplate(current_image, hexagon_image, cv2.TM_CCOEFF_NORMED)
+            min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+            template_matching_values.append((filename, max_val))
+        except Exception as e:
+            print(f"Could not process file using Template Matching {file_path}: {e}")
+
+    # Sort by the similarity value (higher is better)
+    template_matching_values.sort(key=lambda x: x[1], reverse=True)
+    return template_matching_values[:5]
 
 def processHexagonContourMatching(hexagon_image, author):
     gray_image = cv2.cvtColor(hexagon_image, cv2.COLOR_BGR2GRAY)
@@ -638,15 +690,17 @@ def processHexagonContourMatching(hexagon_image, author):
     
     for filename in os.listdir(author_folder):
         file_path = os.path.join(author_folder, filename)
-        current_image = cv2.imread(file_path)
-        gray_current_image = cv2.cvtColor(current_image, cv2.COLOR_BGR2GRAY)
-        _, thresh_current_image = cv2.threshold(gray_current_image, 128, 255, cv2.THRESH_BINARY)
-        contours_cur, _ = cv2.findContours(thresh_current_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        current_image = load_image(file_path)
         
-        if contours_ref and contours_cur:
-            match_score = cv2.matchShapes(contours_ref[0], contours_cur[0], cv2.CONTOURS_MATCH_I1, 0.0)
-            matches_dict[filename] = match_score
-    
+        if current_image is not None:
+            gray_current_image = cv2.cvtColor(current_image, cv2.COLOR_BGR2GRAY)
+            _, thresh_current_image = cv2.threshold(gray_current_image, 128, 255, cv2.THRESH_BINARY)
+            contours_cur, _ = cv2.findContours(thresh_current_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+            
+            if contours_ref and contours_cur:
+                match_score = cv2.matchShapes(contours_ref[0], contours_cur[0], cv2.CONTOURS_MATCH_I1, 0.0)
+                matches_dict[filename] = match_score
+        
     sorted_matches = sorted(matches_dict.items(), key=lambda x: x[1])
     return sorted_matches[:5]
 
@@ -660,13 +714,15 @@ def processHexagonChiSquare(hexagon_image, author):
     
     for filename in os.listdir(author_folder):
         file_path = os.path.join(author_folder, filename)
-        current_image = cv2.imread(file_path)
-        hsv_current_image = cv2.cvtColor(current_image, cv2.COLOR_BGR2HSV)
-        hist_current_image = cv2.calcHist([hsv_current_image], [0, 1, 2], None, [8, 8, 8], [0, 180, 0, 256, 0, 256])
-        cv2.normalize(hist_current_image, hist_current_image)
+        current_image = load_image(file_path)
         
-        similarity = cv2.compareHist(hist_image, hist_current_image, cv2.HISTCMP_CHISQR)
-        matches_dict[filename] = similarity
+        if current_image is not None:
+            hsv_current_image = cv2.cvtColor(current_image, cv2.COLOR_BGR2HSV)
+            hist_current_image = cv2.calcHist([hsv_current_image], [0, 1, 2], None, [8, 8, 8], [0, 180, 0, 256, 0, 256])
+            cv2.normalize(hist_current_image, hist_current_image)
+            
+            similarity = cv2.compareHist(hist_image, hist_current_image, cv2.HISTCMP_CHISQR)
+            matches_dict[filename] = similarity
     
     sorted_matches = sorted(matches_dict.items(), key=lambda x: x[1])
     return sorted_matches[:5]
@@ -681,13 +737,16 @@ def processHexagonBhattacharyya(hexagon_image, author):
     
     for filename in os.listdir(author_folder):
         file_path = os.path.join(author_folder, filename)
-        current_image = cv2.imread(file_path)
-        hsv_current_image = cv2.cvtColor(current_image, cv2.COLOR_BGR2HSV)
-        hist_current_image = cv2.calcHist([hsv_current_image], [0, 1, 2], None, [8, 8, 8], [0, 180, 0, 256, 0, 256])
-        cv2.normalize(hist_current_image, hist_current_image)
+        current_image = load_image(file_path)
         
-        similarity = cv2.compareHist(hist_image, hist_current_image, cv2.HISTCMP_BHATTACHARYYA)
-        matches_dict[filename] = similarity
+        if current_image is not None:
+
+            hsv_current_image = cv2.cvtColor(current_image, cv2.COLOR_BGR2HSV)
+            hist_current_image = cv2.calcHist([hsv_current_image], [0, 1, 2], None, [8, 8, 8], [0, 180, 0, 256, 0, 256])
+            cv2.normalize(hist_current_image, hist_current_image)
+            
+            similarity = cv2.compareHist(hist_image, hist_current_image, cv2.HISTCMP_BHATTACHARYYA)
+            matches_dict[filename] = similarity
     
     sorted_matches = sorted(matches_dict.items(), key=lambda x: x[1])
     return sorted_matches[:5]
@@ -727,6 +786,12 @@ def findAuthorFolder(author):
             os.makedirs(author_folder)
 
     return author_folder
+
+def save_new_hexagon(hexagon_image, hexagon_label, author):
+    author_folder = findAuthorFolder(author)
+    file_path = os.path.join(author_folder, f'{hexagon_label}.png')
+    cv2.imwrite(file_path, hexagon_image)
+
 
 def check_alias(folder_path, author_lower):
     # Check if alias.txt exists in the folder
