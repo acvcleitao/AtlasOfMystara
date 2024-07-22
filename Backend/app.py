@@ -20,8 +20,9 @@ from schemas import new_map_schema
 from data_utils import build_new_map_data
 import requests
 from bs4 import BeautifulSoup
-from skimage.metrics import structural_similarity as ssim # type: ignore
-from imagehash import phash # type: ignore
+from skimage.metrics import structural_similarity as ssim
+from imagehash import phash
+from matplotlib import pyplot as plt
 import pytesseract
 # print(pytesseract.get_tesseract_version())
 
@@ -322,7 +323,7 @@ def processHexagons(hexagon_images, author):
         image_path = os.path.join(author_folder, f'hexagon_{idx}.png')
         cv2.imwrite(image_path, hexagon_image)
         print(f"Saved hexagon image {idx} for author {author} at {image_path}")
-        MSE_results = processHexagonMSE(hexagon_image, author)        # Mean Square Error approach
+        MSE_results = processHexagonMSE(hexagon_image, author)         # Mean Square Error approach
         PSNR_results = processHexagonPSNR(hexagon_image, author)       # Peak Signal to Noise Ratio approach
         SSIM_results = processHexagonSSIM(hexagon_image, author)       # Structural Similarity Index approach
         SIFT_results = processHexagonSIFT(hexagon_image, author)
@@ -333,8 +334,64 @@ def processHexagons(hexagon_images, author):
         ContourMatching_results = processHexagonContourMatching(hexagon_image, author)
         ChiSquare_results = processHexagonChiSquare(hexagon_image, author)
         Bhattacharyya_results = processHexagonBhattacharyya(hexagon_image, author)
+        print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, SIFT_results, SURF_results, ORB_results, PHash_results, TemplateMatching_results, ContourMatching_results, ChiSquare_results, Bhattacharyya_results)
 
         NN_results = processHexagonNN(hexagon_image, author)         # Neural Network approach TODO: Implement this
+
+
+def print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, SIFT_results, SURF_results, ORB_results, PHash_results, TemplateMatching_results, ContourMatching_results, ChiSquare_results, Bhattacharyya_results):
+    print("Top 5 Matches for the Hexagon for each of the algorythms:\n")
+    print("Mean Square Error (MSE) Results:")
+    for filename, score in MSE_results:
+        print(f"  {filename}: {score:.4f}")
+
+    print("\nPeak Signal to Noise Ratio (PSNR) Results:")
+    for filename, score in PSNR_results:
+        print(f"  {filename}: {score:.4f}")
+
+    print("\nStructural Similarity Index (SSIM) Results:")
+    for filename, score in SSIM_results:
+        print(f"  {filename}: {score:.4f}")
+
+    print("\nSIFT Results:")
+    for filename, score in SIFT_results:
+        print(f"  {filename}: {score}")
+
+    print("\nSURF Results:")
+    for filename, score in SURF_results:
+        print(f"  {filename}: {score}")
+
+    print("\nORB Results:")
+    for filename, score in ORB_results:
+        print(f"  {filename}: {score}")
+
+    print("\nPerceptual Hashing (pHash) Results:")
+    for filename, score in PHash_results:
+        print(f"  {filename}: {score}")
+
+    print("\nTemplate Matching Results:")
+    for filename, score in TemplateMatching_results:
+        print(f"  {filename}: {score:.4f}")
+
+    print("\nContour Matching Results:")
+    for filename, score in ContourMatching_results:
+        print(f"  {filename}: {score:.4f}")
+
+    print("\nChi-Square Histogram Comparison Results:")
+    for filename, score in ChiSquare_results:
+        print(f"  {filename}: {score:.4f}")
+
+    print("\nBhattacharyya Distance Histogram Comparison Results:")
+    for filename, score in Bhattacharyya_results:
+        print(f"  {filename}: {score:.4f}")
+
+    display_image(hexagon_image, title="Hexagon Image Used for Comparison")
+
+def display_image(image, title="Hexagon Image"):
+    plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+    plt.title(title)
+    plt.axis('off')
+    plt.show()
 
 def processHexagonMSE(hexagon_image, author):
     # Store the MSE values for all images in the folder
