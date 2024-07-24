@@ -24,6 +24,68 @@ Step 2 will probably imply some image processing to identify hex types etc. but 
 Step 3 will use all this information to create the map, using whatever information is available, in a way In which if Thorf or some other cartographer creates a new map, we can just "drop it in there"
 
 
+## How to run
+The Atlas of Mystara consists of three essential parts:
+- The frontend made using react
+- The backend made in python
+- The NoSQL database using MongoDB Atlas as its host
+
+To run the Atlas locally you first need to locate to the backend directory, activate the virtual environment within and run the backend using `python app.py`. The virtual environment comes pre-installed with all the necessary libraries, so no need to worry about dependencies other than python itself. The second step is to, on a new terminal window, navigate to the frontend directory titled "atlas_of_mystara" and simply running the command `npm start`. This should open a new tab in your browser with the Atlas ready to explore. The database is currently configured to allow access from any IP so all the avaliable features should be working as intended.
+
+
+## How to Run the Project
+
+The Atlas of Mystara comprises three essential components:
+- **Frontend**: Built with React
+- **Backend**: Developed in Python
+- **Database**: NoSQL database hosted on MongoDB Atlas
+
+### Prerequisites
+Ensure you have the following installed on your machine:
+- Python
+- Node.js and npm
+
+### Running the Project Locally
+
+#### Backend
+1. Navigate to the backend directory:
+   ```sh
+   cd path/to/project/Backend
+   ```
+
+2. Activate the virtual environment:
+
+   ```sh
+   source venv/bin/activate  # For macOS/Linux
+   .\venv\Scripts\activate  # For Windows
+   ```
+3. Run the backend server:
+   ```sh
+    python app.py
+   ```
+
+    The virtual environment includes all necessary libraries, so no additional dependency installation is required.
+
+#### Frontend
+1. Open a new terminal window and navigate to the frontend directory:
+   ```sh
+   cd path/to/project/atlas_of_mystara
+   ```
+2. Start the frontend application:
+   ```sh
+    npm start
+   ```
+    This command will launch the application in your default web browser.
+
+#### Database
+The MongoDB Atlas database is configured to allow access from any IP address, ensuring all features are fully functional out-of-the-box.
+Accessing the Application
+
+Once both the backend and frontend are running, the Atlas of Mystara will be accessible via your web browser, ready for you to explore.
+
+
+
+
 ## Valuable Links
 
 - 1st Contact -> https://docs.google.com/document/d/1X3xuly5_aY4tdo8RlVtbUTseC1qCqhgOm8x9EP0cXI0/edit
