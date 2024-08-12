@@ -416,6 +416,38 @@ def print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, SIFT_r
     ranking_filename = ranking_approach(*algorithms_results)
     print(f"Ranking approach result: {ranking_filename}")
 
+    algorithms_results = [
+        ("MSE", MSE_results), 
+        ("PSNR", PSNR_results), 
+        ("SSIM", SSIM_results),
+        ("ORB", ORB_results), 
+        ("pHash", PHash_results), 
+        ("TemplateMatching", TemplateMatching_results),
+        ("ContourMatching", ContourMatching_results), 
+        ("ChiSquare", ChiSquare_results), 
+        ("Bhattacharyya", Bhattacharyya_results)
+    ]
+    
+    # Determine the best filename using Confidence Scoring
+    confidence_filename = confidence_scoring(*algorithms_results)
+    print(f"Confidence Scoring result: {confidence_filename}")
+
+    # Determine the best filename using Weighted Voting
+    # Example weights and methods assignment based on analysis of the algorythms
+    weights = [
+        0.5,  # MSE
+        0.5,  # PSNR
+        1.0,  # SSIM
+        1.0,  # ORB
+        0.8,  # PHash
+        1.0,  # Template Matching
+        1.0,  # Contour Matching
+        0.3,  # Chi-Square
+        0.3   # Bhattacharyya
+    ]
+    weighted_filename = weighted_voting(weights, *algorithms_results)
+    print(f"Weighted Voting result: {weighted_filename}")
+
     display_image(hexagon_image, title="Hexagon Image Used for Comparison")
 
 def display_image(image, title="Hexagon Image"):
@@ -424,6 +456,49 @@ def display_image(image, title="Hexagon Image"):
     plt.axis('off')
     plt.show()
 
+def confidence_scoring(*results):
+    confidence_dict = {}
+    
+    for method, result in results:
+        normalized_result = normalize_scores(result, method)
+        for filename, normalized_score in normalized_result:
+            if filename not in confidence_dict:
+                confidence_dict[filename] = 0
+            confidence_dict[filename] += normalized_score
+    
+    # Return the filename with the highest confidence score
+    best_filename = max(confidence_dict, key=confidence_dict.get) if confidence_dict else None
+    return best_filename
+
+def normalize_scores(results, method):
+    normalized_results = []
+    for filename, score in results:
+        if method == "MSE" or method == "pHash" or method == "ChiSquare" or method == "Bhattacharyya":
+            normalized_score = 1 / (1 + score)
+        elif method == "PSNR":
+            normalized_score = (score - 20) / (50 - 20)
+        elif method == "SSIM" or method == "TemplateMatching" or method == "ContourMatching":
+            normalized_score = score  # Already normalized in [0, 1]
+        elif method == "ORB":
+            normalized_score = score / 100  # Assuming 100 is the max number of matches
+        else:
+            normalized_score = score  # Default case
+        normalized_results.append((filename, normalized_score))
+    return normalized_results
+
+def weighted_voting(weights, *results):
+    score_dict = {}
+    # Iterate through each algorithm's results and apply the corresponding weight
+    for weight, (method, result) in zip(weights, results):
+        normalized_result = normalize_scores(result, method)
+        for filename, normalized_score in normalized_result:
+            if filename not in score_dict:
+                score_dict[filename] = 0
+            score_dict[filename] += weight * normalized_score
+    
+    # Return the filename with the highest weighted score
+    best_filename = max(score_dict, key=score_dict.get) if score_dict else None
+    return best_filename
 
 def majority_voting(*results):
     # Collect all filenames from the results of different algorithms
