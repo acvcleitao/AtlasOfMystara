@@ -1,3 +1,4 @@
+from collections import Counter
 import imghdr
 from io import BytesIO
 import os
@@ -338,7 +339,7 @@ def processHexagons(hexagon_images, author):
         PSNR_results = processHexagonPSNR(hexagon_image, author)       # Peak Signal to Noise Ratio approach
         SSIM_results = processHexagonSSIM(hexagon_image, author)       # Structural Similarity Index approach
         # SIFT_results = processHexagonSIFT(hexagon_image, author)     # Unfortunately SIFT is a proprietary licensed algorythm it can be used if the required licence is aquired
-        #SURF_results = processHexagonSURF(hexagon_image, author)      # Unfortunately SIFT is a proprietary licensed algorythm it can be used if the required licence is aquired
+        # SURF_results = processHexagonSURF(hexagon_image, author)     # Unfortunately SURF is a proprietary licensed algorythm it can be used if the required licence is aquired
         ORB_results = processHexagonORB(hexagon_image, author)
         PHash_results = processHexagonPHash(hexagon_image, author)
         TemplateMatching_results = processHexagonTemplateMatching(hexagon_image, author)
@@ -395,6 +396,25 @@ def print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, SIFT_r
     print("\nBhattacharyya Distance Histogram Comparison Results:")
     for filename, score in Bhattacharyya_results:
         print(f"  {filename}: {score:.4f}")
+    
+    # Aggregating results from the available algorithms
+    algorithms_results = [
+        MSE_results, PSNR_results, SSIM_results, 
+        ORB_results, PHash_results, TemplateMatching_results, 
+        ContourMatching_results, ChiSquare_results, Bhattacharyya_results
+    ]
+    
+    # Determine the best filename using Majority Voting
+    majority_filename = majority_voting(*algorithms_results)
+    print(f"\nMajority Voting result: {majority_filename}")
+    
+    # Determine the best filename using Intersection
+    intersection_filename = intersection_approach(*algorithms_results)
+    print(f"Intersection approach result: {intersection_filename}")
+    
+    # Determine the best filename using Ranking
+    ranking_filename = ranking_approach(*algorithms_results)
+    print(f"Ranking approach result: {ranking_filename}")
 
     display_image(hexagon_image, title="Hexagon Image Used for Comparison")
 
@@ -403,6 +423,42 @@ def display_image(image, title="Hexagon Image"):
     plt.title(title)
     plt.axis('off')
     plt.show()
+
+
+def majority_voting(*results):
+    # Collect all filenames from the results of different algorithms
+    all_filenames = []
+    for result in results:
+        all_filenames.extend([filename for filename, _ in result])
+    
+    # Use Counter to find the most common filename
+    most_common = Counter(all_filenames).most_common(1)
+    return most_common[0][0] if most_common else None
+
+def intersection_approach(*results):
+    # Start with the set of filenames from the first algorithm
+    intersected_filenames = set([filename for filename, _ in results[0]])
+    
+    # Intersect with the sets from the other algorithms
+    for result in results[1:]:
+        intersected_filenames.intersection_update([filename for filename, _ in result])
+    
+    # Return one of the filenames from the intersection if available
+    return list(intersected_filenames)[0] if intersected_filenames else None
+
+def ranking_approach(*results):
+    # Create a dictionary to accumulate ranks for each filename
+    rank_dict = {}
+    
+    for result in results:
+        for rank, (filename, _) in enumerate(result):
+            if filename not in rank_dict:
+                rank_dict[filename] = 0
+            rank_dict[filename] += rank
+    
+    # Find the filename with the smallest cumulative rank
+    best_filename = min(rank_dict, key=rank_dict.get) if rank_dict else None
+    return best_filename
 
 def processHexagonMSE(hexagon_image, author):
     # Store the MSE values for all images in the folder
