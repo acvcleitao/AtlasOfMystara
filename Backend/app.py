@@ -188,8 +188,8 @@ def processMap(title, author, image_data, hex_mask_type, selected_color, combine
         # Convert the RGB color to HSV
         selected_color_hsv = cv2.cvtColor(np.uint8([[selected_color_rgb]]), cv2.COLOR_RGB2HSV)[0][0]
 
-        result_path = isolate_ocean(image_data, selected_color_hsv)
-        print(f"Isolated ocean image saved at: {result_path}")
+        ocean_layer = isolate_ocean(image_data, selected_color_hsv)
+        print(f"Isolated ocean image saved at: {ocean_layer}")
 
         image = Image.open(BytesIO(base64.b64decode(image_data.split(',')[1])))
         # text_data = pytesseract.image_to_string(image)
@@ -212,9 +212,10 @@ def processMap(title, author, image_data, hex_mask_type, selected_color, combine
         hexagon_radius = get_hexagon_radius(mask)
         
         # Extract hexagons from the image
-        hexagons = extract_hexagons(combined_image, mask)
+        hexagons, row_counts = extract_hexagons(combined_image, mask)
 
         """
+        # Uncoment to add new hexagons to its corresponding folder
         for hexagon in hexagons:
             display_image(hexagon)
             label = str(input('What kind of hexagon is this?\nwrite "n" or "no" if it is not a hexagon and "exit" or "quit" to stop\nlabel: ')).lower()
@@ -226,16 +227,15 @@ def processMap(title, author, image_data, hex_mask_type, selected_color, combine
 
         processedHexagons = processHexagons(hexagons, author)
         
-        # Save the hexagons
-        # TODO: delete this and the related function
-        # save_hexagons(hexagons)
+        # TODO: Save the hexagons
+        # save_map(processedHexagons, row_counts, ocean_layer)
 
         response = {
             'message': 'Map processed successfully',
             'title': title,
             'hexMaskType': hex_mask_type,
             'selectedColor': selected_color,
-            'isolatedColorPath': result_path,  # Include isolated color path in response
+            'isolatedColorPath': ocean_layer,  # Include isolated color path in response
             # 'textData': text_data  # Include OCR text data
         }
 
@@ -283,15 +283,25 @@ def get_hexagon_radius(mask):
     
     return most_common_radius
 
-def extract_hexagons(image, mask):
+def extract_hexagons(image, mask, hex_side_length):
     # Find contours of the hexagonal grid
     contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     
     hexagons = []
+    hexagon_data = []  # Store both hexagon images and centroids
+    
     for contour in contours:
         # Get the bounding box of the contour
         x, y, w, h = cv2.boundingRect(contour)
         
+        # Calculate the centroid of the contour
+        M = cv2.moments(contour)
+        if M["m00"] != 0:
+            cx = int(M["m10"] / M["m00"])
+            cy = int(M["m01"] / M["m00"])
+        else:
+            cx, cy = 0, 0  # Avoid division by zero
+
         # Create a mask for the hexagon
         hex_mask = np.zeros((h, w), dtype=np.uint8)
         cv2.drawContours(hex_mask, [contour - [x, y]], -1, 1, -1)
@@ -303,17 +313,41 @@ def extract_hexagons(image, mask):
         hex_image = cv2.cvtColor(hex_image, cv2.COLOR_BGR2BGRA)
         hex_image[:, :, 3] = hex_mask * 255
         
-        hexagons.append(hex_image)
+        # Store the hexagon image along with its centroid
+        hexagon_data.append((hex_image, (cx, cy)))
     
-    return hexagons
+    # Error tolerance as half of the hexagon's side length
+    tolerance = hex_side_length / 2
+    
+    # Sort the hexagons by their centroids' y-coordinate first, then x-coordinate
+    def sort_key(item):
+        return (round(item[1][1] / tolerance) * tolerance, item[1][0])
 
-def save_hexagons(hexagons):
-    save_directory = os.path.join(os.getcwd(), 'Hexagons', 'Temp')
-    os.makedirs(save_directory, exist_ok=True)  # Ensure the directory exists
+    hexagon_data.sort(key=sort_key)
     
-    for i, hex_img in enumerate(hexagons):
-        file_path = os.path.join(save_directory, f'hexagon_{i}.png')
-        cv2.imwrite(file_path, hex_img)
+    # Extract the sorted hexagons and group by rows
+    sorted_hexagons = []
+    row_counts = []
+    current_row_y = None
+    current_row_count = 0
+
+    for hex_image, (cx, cy) in hexagon_data:
+        # Check if we're still in the same row or have moved to a new one
+        if current_row_y is None or abs(cy - current_row_y) > tolerance:
+            if current_row_y is not None:
+                row_counts.append(current_row_count)
+            current_row_y = cy
+            current_row_count = 0
+        
+        current_row_count += 1
+        sorted_hexagons.append(hex_image)
+    
+    # Append the count for the last row
+    if current_row_count > 0:
+        row_counts.append(current_row_count)
+    
+    return sorted_hexagons, row_counts
+
 
 def hex_to_rgb(hex_color):
     hex_color = hex_color.lstrip('#')
@@ -328,7 +362,8 @@ def processHexagons(hexagon_images, author):
     # hexagon_images is a list of hexagons to be processed
     # each author should, idealy have its own tile set which corresponds to a folder
     temp_path = r"C:\Users\acvcl\Documents\GitHub\AtlasOfMystara\Backend\Hexagons\Temp"
-    # Save each hexagon image into the author's folder
+    processedHexagons = []
+    # Save each hexagon image into the temporary folder
     for idx, hexagon_image in enumerate(hexagon_images):
         if idx == 0:
             continue
@@ -346,10 +381,10 @@ def processHexagons(hexagon_images, author):
         ContourMatching_results = processHexagonContourMatching(hexagon_image, author)
         ChiSquare_results = processHexagonChiSquare(hexagon_image, author)
         Bhattacharyya_results = processHexagonBhattacharyya(hexagon_image, author)
-        print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, "SIFT_results", "SURF_results", ORB_results, PHash_results, TemplateMatching_results, ContourMatching_results, ChiSquare_results, Bhattacharyya_results)
+        processedHexagons.append(print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, "SIFT_results", "SURF_results", ORB_results, PHash_results, TemplateMatching_results, ContourMatching_results, ChiSquare_results, Bhattacharyya_results))
 
-        NN_results = processHexagonNN(hexagon_image, author)         # Neural Network approach TODO: Implement this
-
+        NN_results = processHexagonNN(hexagon_image, author)           # Neural Network approach TODO: Implement this after more data is gathered
+    return processedHexagons
 
 def print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, SIFT_results, SURF_results, ORB_results, PHash_results, TemplateMatching_results, ContourMatching_results, ChiSquare_results, Bhattacharyya_results):
     print("Top 5 Matches for the Hexagon for each of the algorythms:\n")
@@ -449,6 +484,7 @@ def print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, SIFT_r
     print(f"Weighted Voting result: {weighted_filename}")
 
     display_image(hexagon_image, title="Hexagon Image Used for Comparison")
+    return majority_filename
 
 def display_image(image, title="Hexagon Image"):
     plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
