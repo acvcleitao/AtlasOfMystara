@@ -213,7 +213,7 @@ def processMap(title, author, image_data, hex_mask_type, selected_color, combine
         hexagon_radius = get_hexagon_radius(mask)
         
         # Extract hexagons from the image
-        hexagons, row_counts = extract_hexagons(combined_image, mask)
+        hexagons, row_counts = extract_hexagons(combined_image, mask, hexagon_radius)
 
         """
         # Uncoment to add new hexagons to its corresponding folder
@@ -252,6 +252,9 @@ def save_map(processedHexagons, row_counts, ocean_layer, title, author):
     
     for row_count in row_counts:
         for x in range(row_count):
+            if hexagon_index >= len(processedHexagons):
+                return  # Exit the function to avoid further errors
+            
             # Calculate the coordinate for the current hexagon
             coordinate = (x, current_y)
             
@@ -288,7 +291,7 @@ def create_map(title, author):
     }
     
     # Insert the new map document into the maps collection in the database
-    result = mongo.db.maps.insert_one(map_document)
+    result = mongo.db.hex_maps.insert_one(map_document)
     
     # Return the ID of the inserted document as confirmation
     return result.inserted_id
@@ -302,7 +305,7 @@ def create_hexagon(map_id, processedHexagon, coordinate, metadata):
     }
 
     # Update the map document to append the structured hexagon to the hexagon layer
-    mongo.db.maps.update_one(
+    mongo.db.hex_maps.update_one(
         {"_id": map_id},  # Find the map by its ID
         {"$push": {"layers.$[layer].hexagons": hexagon}},  # Append the structured hexagon
         array_filters=[{"layer.type": "hexagon_layer"}]  # Ensure we target the hexagon layer
@@ -454,12 +457,12 @@ def processHexagons(hexagon_images, author):
         ContourMatching_results = processHexagonContourMatching(hexagon_image, author)
         ChiSquare_results = processHexagonChiSquare(hexagon_image, author)
         Bhattacharyya_results = processHexagonBhattacharyya(hexagon_image, author)
-        processedHexagons.append(print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, "SIFT_results", "SURF_results", ORB_results, PHash_results, TemplateMatching_results, ContourMatching_results, ChiSquare_results, Bhattacharyya_results))
+        processedHexagons.append(print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, "SIFT_results", "SURF_results", ORB_results, PHash_results, TemplateMatching_results, ContourMatching_results, ChiSquare_results, Bhattacharyya_results, author))
 
         NN_results = processHexagonNN(hexagon_image, author)           # Neural Network approach TODO: Implement this after more data is gathered
     return processedHexagons
 
-def print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, SIFT_results, SURF_results, ORB_results, PHash_results, TemplateMatching_results, ContourMatching_results, ChiSquare_results, Bhattacharyya_results):
+def print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, SIFT_results, SURF_results, ORB_results, PHash_results, TemplateMatching_results, ContourMatching_results, ChiSquare_results, Bhattacharyya_results, author):
     print("Top 5 Matches for the Hexagon for each of the algorythms:\n")
     print("Mean Square Error (MSE) Results:")
     for filename, score in MSE_results:
@@ -517,7 +520,7 @@ def print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, SIFT_r
     print(f"\nMajority Voting result: {majority_filename}")
     
     # Determine the best filename using Intersection
-    intersection_filename = intersection_approach(*algorithms_results)
+    intersection_filename = intersection_approach(*algorithms_results)      # TODO: FIXME (returns None every time)
     print(f"Intersection approach result: {intersection_filename}")
     
     # Determine the best filename using Ranking
@@ -556,9 +559,42 @@ def print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, SIFT_r
     weighted_filename = weighted_voting(weights, *algorithms_results)
     print(f"Weighted Voting result: {weighted_filename}")
 
-    display_image(hexagon_image, title="Hexagon Image Used for Comparison")
+    # Collect all results to check for variation
+    results = {
+        "Majority Voting": majority_filename,
+        "Intersection Approach": intersection_filename,
+        "Ranking Approach": ranking_filename,
+        "Confidence Scoring": confidence_filename,
+        "Weighted Voting": weighted_filename
+    }
+
+    # Filter out None values and find the unique results
+    filtered_results = [result for result in results.values() if result is not None]
+    unique_results = set(filtered_results)
+
+    # Display image only if there's more than one unique result
+    if len(unique_results) > 1:
+        display_image(hexagon_image, title="Hexagon Image Used for Comparison")
+        # Ask the user if they want to add the hexagon to the database
+        while True:
+            label = input('What kind of hexagon is this?\nWrite "n" or "no" if it is not a hexagon and "exit" or "quit" to stop\nLabel: ').lower()
+            
+            if label in ["exit", "quit"]:
+                print("Exiting without saving the hexagon.")
+                break
+            
+            if label in ["no", "n"]:
+                print("Not adding the hexagon to the database.")
+                break
+            
+            # Assuming `hexagon` and `author` are defined and `save_new_hexagon` is a function that takes these arguments
+            save_new_hexagon(hexagon_image, label, author)
+            print(f"Hexagon labeled as '{label}' has been added to the database.")
+            break
+    else:
+        print("All results are the same or only one result available; image not displayed.")
     # TODO: Change this after finding out the best algorythm
-    return majority_filename
+    return ranking_filename
 
 def display_image(image, title="Hexagon Image"):
     plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
@@ -1096,6 +1132,17 @@ def serve_hexagon(image_filename):
         return send_from_directory(HEXAGONS_FOLDER, image_filename)
     except FileNotFoundError:
         return 'Image not found', 404
+    
+@app.route('/get_hexmap/<map_name>', methods=['GET'])
+def get_hexmap_route(map_name):
+    # Query the database to find all maps with the specified name
+    maps = mongo.db.hex_maps.find({"title": map_name})
+    
+    # Convert the cursor to a list
+    map_list = list(maps)
+    
+    # Return the list of maps as a JSON response
+    return jsonify(map_list)
 
 # Route for getting details of a specific map
 @app.route('/getMapDetails/<id>', methods=['GET'])
