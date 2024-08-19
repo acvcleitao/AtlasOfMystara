@@ -27,6 +27,7 @@ from imagehash import phash # type: ignore
 from matplotlib import pyplot as plt
 import pytesseract
 # print(pytesseract.get_tesseract_version())
+Test = True             # Use this flag to ennable or disable testing
 
 
 load_dotenv()
@@ -226,9 +227,8 @@ def processMap(title, author, image_data, hex_mask_type, selected_color, combine
         """
 
         processedHexagons = processHexagons(hexagons, author)
-        
-        # TODO: Save the hexagons
-        # save_map(processedHexagons, row_counts, ocean_layer)
+
+        save_map(processedHexagons, row_counts, ocean_layer, title, author)
 
         response = {
             'message': 'Map processed successfully',
@@ -243,6 +243,71 @@ def processMap(title, author, image_data, hex_mask_type, selected_color, combine
     except ValueError as e:
         print(f"Error processing map: {str(e)}")
         return jsonify({'message': str(e)}), 400
+    
+def save_map(processedHexagons, row_counts, ocean_layer, title, author):
+    current_y = 0
+    hexagon_index = 0
+
+    map_id = create_map(title, author)
+    
+    for row_count in row_counts:
+        for x in range(row_count):
+            # Calculate the coordinate for the current hexagon
+            coordinate = (x, current_y)
+            
+            # Assuming create_hexagon is a function that takes hex_type and coordinate as arguments
+            # TODO: Add information to the hexagon
+            create_hexagon(map_id, processedHexagons[hexagon_index], coordinate, None)
+            
+            # Move to the next hexagon in the sorted list
+            hexagon_index += 1
+        
+        # Move to the next row (increment the y-coordinate)
+        current_y += 1
+
+
+def create_map(title, author):
+    # Create the map document with an empty hexagon layer
+    map_document = {
+        "title": title,
+        "author": author,
+        "layers": [
+            { 
+                "type": "hexagon_layer", 
+                "hexagons": []  # Initially empty hexagon layer
+            },
+            { 
+                "type": "ocean_layer", 
+                "image": None 
+            },
+            { 
+                "type": "layer_3",  # Placeholder for the third layer
+                "content": None 
+            }
+        ]
+    }
+    
+    # Insert the new map document into the maps collection in the database
+    result = mongo.db.maps.insert_one(map_document)
+    
+    # Return the ID of the inserted document as confirmation
+    return result.inserted_id
+
+def create_hexagon(map_id, processedHexagon, coordinate, metadata):
+    # Ensure the hexagon has the required structure
+    hexagon = {
+        "type": processedHexagon,  # Use "default_type" if no type is provided
+        "coordinate": coordinate,  # Use (0,0) if no coordinate is provided
+        "metadata": metadata  # Use an empty dictionary if no metadata is provided
+    }
+
+    # Update the map document to append the structured hexagon to the hexagon layer
+    mongo.db.maps.update_one(
+        {"_id": map_id},  # Find the map by its ID
+        {"$push": {"layers.$[layer].hexagons": hexagon}},  # Append the structured hexagon
+        array_filters=[{"layer.type": "hexagon_layer"}]  # Ensure we target the hexagon layer
+    )
+
 
 def find_hexagonal_grid(image, target_color):
     # Convert the image to HSV color space
@@ -316,33 +381,41 @@ def extract_hexagons(image, mask, hex_side_length):
         # Store the hexagon image along with its centroid
         hexagon_data.append((hex_image, (cx, cy)))
     
-    # Error tolerance as half of the hexagon's side length
-    tolerance = hex_side_length / 2
+    # Adjust the sorting to group close coordinates
+    def rounded_sort_key(item):
+        # Round coordinates to the nearest group based on hexagon_side_size/2
+        rounded_cx = round(item[1][0] / (hex_side_length / 2))
+        rounded_cy = round(item[1][1] / (hex_side_length / 2))
+        return (rounded_cy, rounded_cx)
     
-    # Sort the hexagons by their centroids' y-coordinate first, then x-coordinate
-    def sort_key(item):
-        return (round(item[1][1] / tolerance) * tolerance, item[1][0])
-
-    hexagon_data.sort(key=sort_key)
+    # Sort the hexagons by the adjusted centroids' y-coordinate first, then x-coordinate
+    hexagon_data.sort(key=rounded_sort_key)
     
-    # Extract the sorted hexagons and group by rows
+    # Extract the sorted hexagons and determine the row counts
     sorted_hexagons = []
     row_counts = []
-    current_row_y = None
     current_row_count = 0
-
+    previous_y = None
+    
+    # Iterate over the sorted hexagon data to count hexagons per row
     for hex_image, (cx, cy) in hexagon_data:
-        # Check if we're still in the same row or have moved to a new one
-        if current_row_y is None or abs(cy - current_row_y) > tolerance:
-            if current_row_y is not None:
-                row_counts.append(current_row_count)
-            current_row_y = cy
-            current_row_count = 0
+        # Calculate the rounded y-coordinate for comparison
+        rounded_cy = round(cy / (hex_side_length / 2))
         
+        if previous_y is None:
+            # First hexagon, initialize the previous_y
+            previous_y = rounded_cy
+        elif abs(rounded_cy - previous_y) > 0:
+            # Change in the rounded y-coordinate indicates a new row
+            row_counts.append(current_row_count)
+            current_row_count = 0
+            previous_y = rounded_cy
+        
+        # Increment the current row's hexagon count
         current_row_count += 1
         sorted_hexagons.append(hex_image)
     
-    # Append the count for the last row
+    # Append the last row count
     if current_row_count > 0:
         row_counts.append(current_row_count)
     
@@ -484,6 +557,7 @@ def print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, SIFT_r
     print(f"Weighted Voting result: {weighted_filename}")
 
     display_image(hexagon_image, title="Hexagon Image Used for Comparison")
+    # TODO: Change this after finding out the best algorythm
     return majority_filename
 
 def display_image(image, title="Hexagon Image"):
