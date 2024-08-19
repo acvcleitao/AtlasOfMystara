@@ -2,6 +2,7 @@ from collections import Counter
 import imghdr
 from io import BytesIO
 import os
+import shutil
 import uuid
 import base64
 from bson import ObjectId
@@ -460,6 +461,22 @@ def processHexagons(hexagon_images, author):
         processedHexagons.append(print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, "SIFT_results", "SURF_results", ORB_results, PHash_results, TemplateMatching_results, ContourMatching_results, ChiSquare_results, Bhattacharyya_results, author))
 
         NN_results = processHexagonNN(hexagon_image, author)           # Neural Network approach TODO: Implement this after more data is gathered
+    
+    # empty the temp folder
+    # Check if the provided path is a directory
+    if not os.path.isdir(temp_path):
+        raise ValueError(f"The path '{temp_path}' is not a valid directory.")
+    
+    # Iterate over all files and directories in the specified path
+    for filename in os.listdir(temp_path):
+        file_path = os.path.join(temp_path, filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.remove(file_path)  # Remove file or symbolic link
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)  # Recursively remove directory and its contents
+        except Exception as e:
+            print(f"Error deleting {file_path}: {e}")
     return processedHexagons
 
 def print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, SIFT_results, SURF_results, ORB_results, PHash_results, TemplateMatching_results, ContourMatching_results, ChiSquare_results, Bhattacharyya_results, author):
@@ -564,8 +581,8 @@ def print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, SIFT_r
         "Majority Voting": majority_filename,
         "Intersection Approach": intersection_filename,
         "Ranking Approach": ranking_filename,
-        "Confidence Scoring": confidence_filename,
-        "Weighted Voting": weighted_filename
+        "Confidence Approach": confidence_filename,
+        "weighted Approach": weighted_filename
     }
 
     # Filter out None values and find the unique results
