@@ -139,12 +139,12 @@ def rgb_str_to_tuple(rgb_str):
         raise ValueError(f"Invalid RGB color: {rgb_str}")
     return rgb_tuple
 
-def save_request(title, author, image_data, hex_mask_type, selected_color, combined_image, file_path="requests.txt"):
+def save_request(title, author, image_data, hex_mask_type, selected_color, combined_image):
     # Prepare the string to be saved
-    request_data = f"{title} {author} {image_data} {hex_mask_type} {selected_color} {combined_image}\n"
+    request_data = f'{title.replace(" ", "")} {author.replace(" ", "")} {image_data.replace(" ", "")} {hex_mask_type.replace(" ", "")} {selected_color.replace(" ", "")} {combined_image.replace(" ", "")}\n'
     
     # Open the file in append mode and write the request data
-    with open(file_path, "a") as file:
+    with open(r"C:\Users\acvcl\Documents\GitHub\AtlasOfMystara\Backend\tests\request_history.txt", "a") as file:
         file.write(request_data)
 
 # Route for uploading a new map
@@ -237,9 +237,10 @@ def processMap(title, author, image_data, hex_mask_type, selected_color, combine
         """
 
         processedHexagons = processHexagons(hexagons, author)
-
+        if Testing:
+            return save_map(processedHexagons, row_counts, ocean_layer, title, author, Testing)
+        
         save_map(processedHexagons, row_counts, ocean_layer, title, author, Testing)
-
         response = {
             'message': 'Map processed successfully',
             'title': title,
@@ -293,6 +294,7 @@ def save_map(processedHexagons, row_counts, ocean_layer, title, author, Testing)
         output_for_testing.append(row)
         row=[]
     print(output_for_testing)
+    return output_for_testing
 
 def create_map(title, author):
     # Create the map document with an empty hexagon layer
@@ -1423,8 +1425,8 @@ def get_authors():
 if __name__ == '__main__':
     # For development with Flask's built-in server
     app.run(debug=True)
-else:
+"""else:
     # For Gunicorn deployment
     gunicorn_cmd = f"gunicorn -c gunicorn_config.py AtlasBackend:app"
     os.system(gunicorn_cmd)
-
+"""
