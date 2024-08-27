@@ -28,7 +28,6 @@ from imagehash import phash # type: ignore
 from matplotlib import pyplot as plt
 import pytesseract
 # print(pytesseract.get_tesseract_version())
-Test = True             # Use this flag to ennable or disable testing
 
 
 load_dotenv()
@@ -140,6 +139,14 @@ def rgb_str_to_tuple(rgb_str):
         raise ValueError(f"Invalid RGB color: {rgb_str}")
     return rgb_tuple
 
+def save_request(title, author, image_data, hex_mask_type, selected_color, combined_image, file_path="requests.txt"):
+    # Prepare the string to be saved
+    request_data = f"{title} {author} {image_data} {hex_mask_type} {selected_color} {combined_image}\n"
+    
+    # Open the file in append mode and write the request data
+    with open(file_path, "a") as file:
+        file.write(request_data)
+
 # Route for uploading a new map
 @app.route('/uploadMap', methods=['POST'])
 def upload_map():
@@ -153,6 +160,8 @@ def upload_map():
         hex_mask_type = data.get('hexMaskType')
         selected_color = data.get('selectedColor')
         combined_image = data.get('combinedImage')
+
+        save_request(title, author, image_data, hex_mask_type, selected_color, combined_image)
 
         # Save or process the combined image as needed
         # For now, we'll just save it
@@ -176,7 +185,7 @@ def upload_map():
         return jsonify({'message': 'Internal Server Error'}), 500
 
 
-def processMap(title, author, image_data, hex_mask_type, selected_color, combined_image):
+def processMap(title, author, image_data, hex_mask_type, selected_color, combined_image, Testing = False):
     try:
         if selected_color.startswith('#'):
             # Convert the selected_color from hex to RGB
@@ -214,7 +223,7 @@ def processMap(title, author, image_data, hex_mask_type, selected_color, combine
         hexagon_radius = get_hexagon_radius(mask)
         
         # Extract hexagons from the image
-        hexagons, row_counts = extract_hexagons(combined_image, mask, hexagon_radius)
+        hexagons, row_counts, coordinates = extract_hexagons(combined_image, mask, hexagon_radius)
 
         """
         # Uncoment to add new hexagons to its corresponding folder
@@ -229,7 +238,7 @@ def processMap(title, author, image_data, hex_mask_type, selected_color, combine
 
         processedHexagons = processHexagons(hexagons, author)
 
-        save_map(processedHexagons, row_counts, ocean_layer, title, author)
+        save_map(processedHexagons, row_counts, ocean_layer, title, author, Testing)
 
         response = {
             'message': 'Map processed successfully',
@@ -245,30 +254,45 @@ def processMap(title, author, image_data, hex_mask_type, selected_color, combine
         print(f"Error processing map: {str(e)}")
         return jsonify({'message': str(e)}), 400
     
-def save_map(processedHexagons, row_counts, ocean_layer, title, author):
-    current_y = 0
-    hexagon_index = 0
+def save_map(processedHexagons, row_counts, ocean_layer, title, author, Testing):
+    if not Testing:
+        current_y = 0
+        hexagon_index = 0
 
-    map_id = create_map(title, author)
+        map_id = create_map(title, author)
+        
+        for row_count in row_counts:
+            for x in range(row_count):
+                if hexagon_index >= len(processedHexagons):
+                    # print(coordinate + "error")
+                    return  # Exit the function to avoid further errors
+                
+                # Calculate the coordinate for the current hexagon
+                coordinate = (x, current_y)
+                
+                # Assuming create_hexagon is a function that takes hex_type and coordinate as arguments
+                # TODO: Add information to the hexagon
+                create_hexagon(map_id, processedHexagons[hexagon_index], coordinate, None)
+                print("hex_type: " + processedHexagons[hexagon_index] + "\ncoordinate: " + str(coordinate))
+                # Move to the next hexagon in the sorted list
+                hexagon_index += 1
+            
+            # Move to the next row (increment the y-coordinate)
+            current_y += 1
+        # print(coordinate + "error2")
+        return
     
+    output_for_testing = []
+    hexagon_index = 0
+    row=[]
+
     for row_count in row_counts:
         for x in range(row_count):
-            if hexagon_index >= len(processedHexagons):
-                return  # Exit the function to avoid further errors
-            
-            # Calculate the coordinate for the current hexagon
-            coordinate = (x, current_y)
-            
-            # Assuming create_hexagon is a function that takes hex_type and coordinate as arguments
-            # TODO: Add information to the hexagon
-            create_hexagon(map_id, processedHexagons[hexagon_index], coordinate, None)
-            
-            # Move to the next hexagon in the sorted list
+            row.append(os.path.splitext(processedHexagons[hexagon_index])[0])
             hexagon_index += 1
-        
-        # Move to the next row (increment the y-coordinate)
-        current_y += 1
-
+        output_for_testing.append(row)
+        row=[]
+    print(output_for_testing)
 
 def create_map(title, author):
     # Create the map document with an empty hexagon layer
@@ -298,6 +322,7 @@ def create_map(title, author):
     return result.inserted_id
 
 def create_hexagon(map_id, processedHexagon, coordinate, metadata):
+
     # Ensure the hexagon has the required structure
     hexagon = {
         "type": processedHexagon,  # Use "default_type" if no type is provided
@@ -358,8 +383,16 @@ def extract_hexagons(image, mask, hex_side_length):
     
     hexagons = []
     hexagon_data = []  # Store both hexagon images and centroids
+
+    # Used to exclude the map itself as a contour
+    threshold = max(cv2.contourArea(contour) for contour in contours) * 0.75
     
     for contour in contours:
+        contour_area = cv2.contourArea(contour)
+    
+        # If the contour's area is larger than the threshold, skip it
+        if contour_area > threshold:
+            continue
         # Get the bounding box of the contour
         x, y, w, h = cv2.boundingRect(contour)
         
@@ -386,44 +419,49 @@ def extract_hexagons(image, mask, hex_side_length):
         hexagon_data.append((hex_image, (cx, cy)))
     
     # Adjust the sorting to group close coordinates
-    def rounded_sort_key(item):
-        # Round coordinates to the nearest group based on hexagon_side_size/2
-        rounded_cx = round(item[1][0] / (hex_side_length / 2))
-        rounded_cy = round(item[1][1] / (hex_side_length / 2))
-        return (rounded_cy, rounded_cx)
+    def adjusted_sort_key(item):
+        # Extract the centroid coordinates
+        cx, cy = item[1]
+        
+        # Use the y-coordinate first to sort by row, then the x-coordinate to sort within the row
+        return (cy, cx)  # Directly use cy and cx to avoid issues with rounding
     
     # Sort the hexagons by the adjusted centroids' y-coordinate first, then x-coordinate
-    hexagon_data.sort(key=rounded_sort_key)
+    hexagon_data.sort(key=adjusted_sort_key)
     
     # Extract the sorted hexagons and determine the row counts
     sorted_hexagons = []
     row_counts = []
     current_row_count = 0
     previous_y = None
-    
+    y_threshold = hex_side_length * 0.75  # Use 75% of the hex side length as a threshold for row change
+    y = 0
+    x = 0
+    sorted_coordinates = []
     # Iterate over the sorted hexagon data to count hexagons per row
     for hex_image, (cx, cy) in hexagon_data:
-        # Calculate the rounded y-coordinate for comparison
-        rounded_cy = round(cy / (hex_side_length / 2))
-        
         if previous_y is None:
             # First hexagon, initialize the previous_y
-            previous_y = rounded_cy
-        elif abs(rounded_cy - previous_y) > 0:
-            # Change in the rounded y-coordinate indicates a new row
+            previous_y = cy
+        elif abs(cy - previous_y) > y_threshold:
+            # Significant change in the y-coordinate indicates a new row
             row_counts.append(current_row_count)
             current_row_count = 0
-            previous_y = rounded_cy
-        
+            previous_y = cy
+            y += 1
+            x = 0
         # Increment the current row's hexagon count
         current_row_count += 1
+
         sorted_hexagons.append(hex_image)
+        sorted_coordinates.append((x,y),)
+        x += 1
     
     # Append the last row count
     if current_row_count > 0:
         row_counts.append(current_row_count)
-    
-    return sorted_hexagons, row_counts
+
+    return sorted_hexagons, row_counts, sorted_coordinates
 
 
 def hex_to_rgb(hex_color):
@@ -440,10 +478,9 @@ def processHexagons(hexagon_images, author):
     # each author should, idealy have its own tile set which corresponds to a folder
     temp_path = r"C:\Users\acvcl\Documents\GitHub\AtlasOfMystara\Backend\Hexagons\Temp"
     processedHexagons = []
+
     # Save each hexagon image into the temporary folder
     for idx, hexagon_image in enumerate(hexagon_images):
-        if idx == 0:
-            continue
         image_path = os.path.join(temp_path, f'hexagon_{idx}.png')
         cv2.imwrite(image_path, hexagon_image)
         print(f"Saved hexagon image {idx} for author {author} at {image_path}")
@@ -462,7 +499,13 @@ def processHexagons(hexagon_images, author):
 
         NN_results = processHexagonNN(hexagon_image, author)           # Neural Network approach TODO: Implement this after more data is gathered
     
+    clear_temp()
+    return processedHexagons
+
+def clear_temp():
     # empty the temp folder
+    temp_path = r"C:\Users\acvcl\Documents\GitHub\AtlasOfMystara\Backend\Hexagons\Temp"
+    
     # Check if the provided path is a directory
     if not os.path.isdir(temp_path):
         raise ValueError(f"The path '{temp_path}' is not a valid directory.")
@@ -477,7 +520,6 @@ def processHexagons(hexagon_images, author):
                 shutil.rmtree(file_path)  # Recursively remove directory and its contents
         except Exception as e:
             print(f"Error deleting {file_path}: {e}")
-    return processedHexagons
 
 def print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, SIFT_results, SURF_results, ORB_results, PHash_results, TemplateMatching_results, ContourMatching_results, ChiSquare_results, Bhattacharyya_results, author):
     print("Top 5 Matches for the Hexagon for each of the algorythms:\n")
@@ -575,7 +617,7 @@ def print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, SIFT_r
     ]
     weighted_filename = weighted_voting(weights, *algorithms_results)
     print(f"Weighted Voting result: {weighted_filename}")
-
+    
     # Collect all results to check for variation
     results = {
         "Majority Voting": majority_filename,
@@ -588,7 +630,7 @@ def print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, SIFT_r
     # Filter out None values and find the unique results
     filtered_results = [result for result in results.values() if result is not None]
     unique_results = set(filtered_results)
-
+    """
     # Display image only if there's more than one unique result
     if len(unique_results) > 1:
         display_image(hexagon_image, title="Hexagon Image Used for Comparison")
@@ -610,8 +652,10 @@ def print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, SIFT_r
             break
     else:
         print("All results are the same or only one result available; image not displayed.")
+    """
+
     # TODO: Change this after finding out the best algorythm
-    return ranking_filename
+    return confidence_filename
 
 def display_image(image, title="Hexagon Image"):
     plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
