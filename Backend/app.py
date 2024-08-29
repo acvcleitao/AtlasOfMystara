@@ -236,10 +236,24 @@ def processMap(title, author, image_data, hex_mask_type, selected_color, combine
                 save_new_hexagon(hexagon, label, author)
         """
 
-        processedHexagons = processHexagons(hexagons, author)
         if Testing:
-            return save_map(processedHexagons, row_counts, ocean_layer, title, author, Testing)
+            print("Processing...")
+            combined_results = processHexagons(hexagons, author, Testing)
+            print("Hexagons processed!")
+            """
+            [MSE, PSNR, SSIM, ORB, PHash, Template Matching, Contour Matching, ChiSquare, Bhattacharyya Distance, 
+            majority, intersection, ranking, confidence, weighted, combined]
+            """
+            testing_results = []
+            print("Saving results for testing")
+            i=0
+            for result in combined_results[0]:
+                print(i)
+                i+=1
+                testing_results.append(save_map(result, row_counts, ocean_layer, title, author, Testing))
+            return testing_results
         
+        processedHexagons = processHexagons(hexagons, author, Testing)
         save_map(processedHexagons, row_counts, ocean_layer, title, author, Testing)
         response = {
             'message': 'Map processed successfully',
@@ -289,11 +303,11 @@ def save_map(processedHexagons, row_counts, ocean_layer, title, author, Testing)
 
     for row_count in row_counts:
         for x in range(row_count):
-            row.append(os.path.splitext(processedHexagons[hexagon_index])[0])
+            row.append(os.path.splitext(str(processedHexagons[hexagon_index]))[0])
             hexagon_index += 1
         output_for_testing.append(row)
         row=[]
-    print(output_for_testing)
+    
     return output_for_testing
 
 def create_map(title, author):
@@ -475,17 +489,32 @@ def rgb_str_to_tuple(rgb_str):
     return tuple(map(int, rgb_str.split(',')))
 
 
-def processHexagons(hexagon_images, author):
+def processHexagons(hexagon_images, author, Testing = False):
     # hexagon_images is a list of hexagons to be processed
     # each author should, idealy have its own tile set which corresponds to a folder
     temp_path = r"C:\Users\acvcl\Documents\GitHub\AtlasOfMystara\Backend\Hexagons\Temp"
     processedHexagons = []
+    MSE_results_best = []
+    PSNR_results_best = []
+    SSIM_results_best = []
+    ORB_results_best = []
+    PHash_results_best = []
+    Template_results_best = []
+    Contour_results_best = []
+    ChiSquare_results_best = []
+    Bhattacharyya_results_best = []
+    majority_results = []
+    intersection_results = []
+    ranking_results = []
+    confidence_results = []
+    weighted_results = []
 
     # Save each hexagon image into the temporary folder
     for idx, hexagon_image in enumerate(hexagon_images):
         image_path = os.path.join(temp_path, f'hexagon_{idx}.png')
         cv2.imwrite(image_path, hexagon_image)
         print(f"Saved hexagon image {idx} for author {author} at {image_path}")
+
         MSE_results = processHexagonMSE(hexagon_image, author)         # Mean Square Error approach
         PSNR_results = processHexagonPSNR(hexagon_image, author)       # Peak Signal to Noise Ratio approach
         SSIM_results = processHexagonSSIM(hexagon_image, author)       # Structural Similarity Index approach
@@ -497,11 +526,34 @@ def processHexagons(hexagon_images, author):
         ContourMatching_results = processHexagonContourMatching(hexagon_image, author)
         ChiSquare_results = processHexagonChiSquare(hexagon_image, author)
         Bhattacharyya_results = processHexagonBhattacharyya(hexagon_image, author)
-        processedHexagons.append(print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, "SIFT_results", "SURF_results", ORB_results, PHash_results, TemplateMatching_results, ContourMatching_results, ChiSquare_results, Bhattacharyya_results, author))
-
         NN_results = processHexagonNN(hexagon_image, author)           # Neural Network approach TODO: Implement this after more data is gathered
+
+        if Testing:
+            
+            MSE_results_best.append(MSE_results[0][0])
+            PSNR_results_best.append(PSNR_results[0][0])
+            SSIM_results_best.append(SSIM_results[0][0])
+            ORB_results_best.append(ORB_results[0][0])
+            PHash_results_best.append(PHash_results[0][0])
+            Template_results_best.append(PHash_results[0][0])
+            Contour_results_best.append(ContourMatching_results[0][0])
+            ChiSquare_results_best.append(ChiSquare_results[0][0])
+            Bhattacharyya_results_best.append(Bhattacharyya_results[0][0])
+            
+
+            majority_result, intersection_result, ranking_result, confidence_result, weighted_result = print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, "SIFT_results", "SURF_results", ORB_results, PHash_results, TemplateMatching_results, ContourMatching_results, ChiSquare_results, Bhattacharyya_results, author, Testing)
+            majority_results.append(majority_result)
+            intersection_results.append(intersection_result)
+            ranking_results.append(ranking_result)
+            confidence_results.append(confidence_result)
+            weighted_results.append(weighted_result)
+        else:
+            # When not testing, return only the most relevant result
+            processedHexagons.append(print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, "SIFT_results", "SURF_results", ORB_results, PHash_results, TemplateMatching_results, ContourMatching_results, ChiSquare_results, Bhattacharyya_results, author, Testing))
     
     clear_temp()
+    if Testing:
+        return (MSE_results_best, PSNR_results_best, SSIM_results_best, ORB_results_best, PHash_results_best, Template_results_best, Contour_results_best, ChiSquare_results_best, Bhattacharyya_results_best, majority_results, intersection_results, ranking_results, confidence_results, weighted_results),
     return processedHexagons
 
 def clear_temp():
@@ -523,7 +575,9 @@ def clear_temp():
         except Exception as e:
             print(f"Error deleting {file_path}: {e}")
 
-def print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, SIFT_results, SURF_results, ORB_results, PHash_results, TemplateMatching_results, ContourMatching_results, ChiSquare_results, Bhattacharyya_results, author):
+def print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, SIFT_results, SURF_results, ORB_results, PHash_results, TemplateMatching_results, ContourMatching_results, ChiSquare_results, Bhattacharyya_results, author, Testing = False):
+    test_results_path = r"tests\test_results"
+
     print("Top 5 Matches for the Hexagon for each of the algorythms:\n")
     print("Mean Square Error (MSE) Results:")
     for filename, score in MSE_results:
@@ -656,6 +710,8 @@ def print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, SIFT_r
         print("All results are the same or only one result available; image not displayed.")
     """
 
+    if Testing:
+        return majority_filename, intersection_filename, ranking_filename, confidence_filename, weighted_filename
     # TODO: Change this after finding out the best algorythm
     return confidence_filename
 
@@ -957,7 +1013,6 @@ def processHexagonORB(hexagon_image, author):
     bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
     matches_dict = {}
     author_folder = findAuthorFolder(author)
-    
     for filename in os.listdir(author_folder):
         file_path = os.path.join(author_folder, filename)
         current_image = load_image(file_path)
@@ -969,9 +1024,9 @@ def processHexagonORB(hexagon_image, author):
                 matches = bf.match(des1, des2)
                 matches = sorted(matches, key=lambda x: x.distance)
                 matches_dict[filename] = len(matches)
-    
+
     sorted_matches = sorted(matches_dict.items(), key=lambda x: x[1], reverse=True)
-    return sorted_matches[:5]
+    return sorted_matches[:5] if sorted_matches else [("?", 0)]
 
 def processHexagonPHash(hexagon_image, author):
     ref_hash = phash(Image.fromarray(cv2.cvtColor(hexagon_image, cv2.COLOR_BGR2RGB)))
