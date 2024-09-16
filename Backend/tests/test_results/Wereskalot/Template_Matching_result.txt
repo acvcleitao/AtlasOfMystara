@@ -1,0 +1,61 @@
+Mismatch in line 1:
+  File:   ['mountain', 'hills', 'hills', 'farmlands', 'farmlands']
+  Result: ['mountain', 'farmlands', 'farmlands', 'farmlands', 'farmlands']
+Mismatch in line 2:
+  File:   ['mountain', 'hills', 'hills', 'farmlands', 'farmlands']
+  Result: ['mountain', 'farmlands', 'farmlands', 'farmlands', 'farmlands']
+Mismatch in line 3:
+  File:   ['hills', 'mountain', 'hills', 'farmlands', 'farmlands']
+  Result: ['farmlands', 'farmlands', 'farmlands', 'farmlands', 'farmlands']
+Mismatch in line 4:
+  File:   ['mountain', 'hills', 'hills', 'farmlands', 'farmlands']
+  Result: ['hills', 'mountain', 'farmlands', 'farmlands', 'farmlands']
+Mismatch in line 5:
+  File:   ['hills', 'hills', 'hills', 'farmlands', 'farmlands']
+  Result: ['farmlands', 'farmlands', 'farmlands', 'farmlands', 'farmlands']
+Mismatch in line 6:
+  File:   ['hills', 'hills', 'hills', 'farmlands', 'forest']
+  Result: ['hills', 'hills', 'hills', 'hills', 'farmlands']
+Mismatch in line 7:
+  File:   ['hills', 'hills', 'hills', 'hills', 'forest']
+  Result: ['hills', 'mountain', 'forest', 'forest', 'forest']
+Mismatch in line 8:
+  File:   ['hills', 'hills', 'hills', 'forest', 'forest']
+  Result: ['hills', 'ocean', 'hills', 'mountain', 'farmlands']
+Mismatch in line 9:
+  File:   ['hills', 'hills', 'farmlands', 'farmlands', 'forest']
+  Result: ['farmlands', 'hills', 'farmlands', 'farmlands', 'forest']
+Mismatch in line 10:
+  File:   ['hills', 'farmlands', 'farmlands', 'forest', 'forest']
+  Result: ['hills', 'farmlands', 'farmlands', 'farmlands', 'farmlands']
+Mismatch in line 11:
+  File:   ['hills', 'farmlands', 'farmlands', 'farmlands', 'forest']
+  Result: ['forest', 'farmlands', 'farmlands', 'farmlands', 'forest']
+Mismatch in line 12:
+  File:   ['hills', 'farmlands', 'farmlands', 'farmlands', 'forest']
+  Result: ['hills', 'forest', 'hills', 'farmlands', 'hills']
+Mismatch in line 13:
+  File:   ['hills', 'farmlands', 'farmlands', 'farmlands', 'marsh']
+  Result: ['hills', 'hills', 'farmlands', 'hills', 'marsh']
+Mismatch in line 14:
+  File:   ['hills', 'farmlands', 'farmlands', 'farmlands', 'marsh']
+  Result: ['hills', 'forest', 'farmlands', 'hills', 'marsh']
+Mismatch in line 15:
+  File:   ['hills', 'hills', 'farmlands', 'farmlands', 'marsh']
+  Result: ['hills', 'hills', 'hills', 'hills', 'marsh']
+Mismatch in line 16:
+  File:   ['hills', 'farmlands', 'farmlands', 'marsh', 'marsh']
+  Result: ['hills', 'forest', 'forest', 'marsh', 'marsh']
+Mismatch in line 17:
+  File:   ['farmlands', 'farmlands', 'farmlands', 'farmlands', 'marsh']
+  Result: ['hills', 'hills', 'hills', 'forest', 'marsh']
+Mismatch in line 18:
+  File:   ['farmlands', 'farmlands', 'farmlands', 'marsh', 'marsh']
+  Result: ['forest', 'forest', 'forest', 'marsh', 'marsh']
+Line 19: Match
+Mismatch in line 20:
+  File:   ['farmlands', 'farmlands', 'farmlands', 'marsh', 'marsh']
+  Result: ['forest', 'farmlands', 'marsh']
+Total Elements: 100
+Matching Elements: 53
+Match Percentage: 53.00%

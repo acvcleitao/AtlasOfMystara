@@ -49,7 +49,7 @@ def login():
     username = data.get('username')
     password = data.get('password')
 
-    # Use 'users_collection' instead of 'User'
+    # find user based on username
     user = mongo.db.users.find_one({'username': username})
 
     if user:
@@ -161,7 +161,7 @@ def upload_map():
         selected_color = data.get('selectedColor')
         combined_image = data.get('combinedImage')
 
-        save_request(title, author, image_data, hex_mask_type, selected_color, combined_image)
+        # save_request(title, author, image_data, hex_mask_type, selected_color, combined_image)
 
         # Save or process the combined image as needed
         # For now, we'll just save it
@@ -171,12 +171,13 @@ def upload_map():
         
 
         # Call the isolate_ocean function to isolate ocean color
-        processMap(title, author, image_data, hex_mask_type, selected_color, combined_image)
+        map_Json = processMap(title, author, image_data, hex_mask_type, selected_color, combined_image)
 
         # Example response
         response = {
             'message': 'Map uploaded successfully',
             'title': title,
+            'map_id': map_Json['map_id'],
         }
         return jsonify(response), 200
 
@@ -254,9 +255,10 @@ def processMap(title, author, image_data, hex_mask_type, selected_color, combine
             return testing_results
         
         processedHexagons = processHexagons(hexagons, author, Testing)
-        save_map(processedHexagons, row_counts, ocean_layer, title, author, Testing)
+        map_id = save_map(processedHexagons, row_counts, ocean_layer, title, author, Testing)
         response = {
             'message': 'Map processed successfully',
+            'map_id': str(map_id),
             'title': title,
             'hexMaskType': hex_mask_type,
             'selectedColor': selected_color,
@@ -264,7 +266,7 @@ def processMap(title, author, image_data, hex_mask_type, selected_color, combine
             # 'textData': text_data  # Include OCR text data
         }
 
-        return jsonify(response), 200
+        return response
     except ValueError as e:
         print(f"Error processing map: {str(e)}")
         return jsonify({'message': str(e)}), 400
@@ -280,7 +282,7 @@ def save_map(processedHexagons, row_counts, ocean_layer, title, author, Testing)
             for x in range(row_count):
                 if hexagon_index >= len(processedHexagons):
                     # print(coordinate + "error")
-                    return  # Exit the function to avoid further errors
+                    return  map_id # Exit the function to avoid further errors
                 
                 # Calculate the coordinate for the current hexagon
                 coordinate = (x, current_y)
@@ -288,14 +290,14 @@ def save_map(processedHexagons, row_counts, ocean_layer, title, author, Testing)
                 # Assuming create_hexagon is a function that takes hex_type and coordinate as arguments
                 # TODO: Add information to the hexagon
                 create_hexagon(map_id, processedHexagons[hexagon_index], coordinate, None)
-                print("hex_type: " + processedHexagons[hexagon_index] + "\ncoordinate: " + str(coordinate))
+                '''print("hex_type: " + processedHexagons[hexagon_index] + "\ncoordinate: " + str(coordinate))'''
                 # Move to the next hexagon in the sorted list
                 hexagon_index += 1
             
             # Move to the next row (increment the y-coordinate)
             current_y += 1
         # print(coordinate + "error2")
-        return
+        return map_id
     
     output_for_testing = []
     hexagon_index = 0
@@ -325,7 +327,7 @@ def create_map(title, author):
                 "image": None 
             },
             { 
-                "type": "layer_3",  # Placeholder for the third layer
+                "type": "layer_3",  # Placeholder for the information layer
                 "content": None 
             }
         ]
@@ -577,7 +579,7 @@ def clear_temp():
 
 def print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, SIFT_results, SURF_results, ORB_results, PHash_results, TemplateMatching_results, ContourMatching_results, ChiSquare_results, Bhattacharyya_results, author, Testing = False):
     test_results_path = r"tests\test_results"
-
+    '''
     print("Top 5 Matches for the Hexagon for each of the algorythms:\n")
     print("Mean Square Error (MSE) Results:")
     for filename, score in MSE_results:
@@ -622,7 +624,7 @@ def print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, SIFT_r
     print("\nBhattacharyya Distance Histogram Comparison Results:")
     for filename, score in Bhattacharyya_results:
         print(f"  {filename}: {score:.4f}")
-    
+    '''
     # Aggregating results from the available algorithms
     algorithms_results = [
         MSE_results, PSNR_results, SSIM_results, 
@@ -632,15 +634,15 @@ def print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, SIFT_r
     
     # Determine the best filename using Majority Voting
     majority_filename = majority_voting(*algorithms_results)
-    print(f"\nMajority Voting result: {majority_filename}")
-    
+    '''print(f"\nMajority Voting result: {majority_filename}")'''
+
     # Determine the best filename using Intersection
     intersection_filename = intersection_approach(*algorithms_results)      # TODO: FIXME (returns None every time)
-    print(f"Intersection approach result: {intersection_filename}")
-    
+    '''print(f"Intersection approach result: {intersection_filename}")'''
+
     # Determine the best filename using Ranking
     ranking_filename = ranking_approach(*algorithms_results)
-    print(f"Ranking approach result: {ranking_filename}")
+    '''print(f"Ranking approach result: {ranking_filename}")'''
 
     algorithms_results = [
         ("MSE", MSE_results), 
@@ -656,7 +658,7 @@ def print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, SIFT_r
     
     # Determine the best filename using Confidence Scoring
     confidence_filename = confidence_scoring(*algorithms_results)
-    print(f"Confidence Scoring result: {confidence_filename}")
+    '''print(f"Confidence Scoring result: {confidence_filename}")'''
 
     # Determine the best filename using Weighted Voting
     # Example weights and methods assignment based on analysis of the algorythms
@@ -672,7 +674,7 @@ def print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, SIFT_r
         0.3   # Bhattacharyya
     ]
     weighted_filename = weighted_voting(weights, *algorithms_results)
-    print(f"Weighted Voting result: {weighted_filename}")
+    '''print(f"Weighted Voting result: {weighted_filename}")'''
     
     # Collect all results to check for variation
     results = {
@@ -1379,6 +1381,24 @@ def update_hex_type():
     except Exception as e:
         print(f"Error updating hexagon type: {str(e)}")
         return jsonify({'message': 'Internal Server Error'}), 500
+
+@app.route('/getMap/<map_id>', methods=['GET'])
+def get_map(map_id):
+    try:
+        # Convert map_id to ObjectId
+        map_id = ObjectId(map_id)
+    except Exception as e:
+        return jsonify({'message': 'Invalid map_id format'}), 400
+
+    # Find the document with the given ObjectId
+    map_document = mongo.db.hex_maps.find_one({'_id': map_id})  # Replace 'maps' with your collection name
+
+    if map_document:
+        # Remove '_id' from response if you don't want to expose it
+        map_document['_id'] = str(map_document['_id'])
+        return jsonify(map_document), 200
+    else:
+        return jsonify({'message': 'Map not found'}), 404
 
 # Find map information for a place in Mystara
 def find_mystara_info(place):

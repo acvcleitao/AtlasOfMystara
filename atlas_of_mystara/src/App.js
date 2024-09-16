@@ -7,6 +7,7 @@ import UploadMap from './UploadMap';
 import NewMaps from './NewMaps';
 import { UserProvider } from './UserContext';
 import MapDetails from './MapDetails';
+import EditAtlas from './EditMap';
 
 const App = () => {
   return (
@@ -19,6 +20,7 @@ const App = () => {
             <Route path="/new_maps" element={<NewMaps />} />
             <Route path="/explore" element={<ExploreAtlas />} />
             <Route path="/map/:id" element={<MapDetails />} />
+            <Route path="/edit_map/:mapId" element={<EditAtlas/>} />
           </Routes>
         </div>
       </Router>

@@ -1,13 +1,17 @@
 import React, { useState, useRef } from 'react';
 import './UploadMap.css';
 import ProcessMap from './ProcessMap';
-
+import EditAtlas from './EditMap'; // Import EditAtlas component
+import { useNavigate } from 'react-router-dom';
+ 
 const UploadMap = ({ onUpload }) => {
   const [uploadedImage, setUploadedImage] = useState(null);
   const [mapName, setMapName] = useState('');
   const [mapAuthor, setMapAuthor] = useState('');
   const [showPreview, setShowPreview] = useState(false);
+  const [showEditAtlas, setShowEditAtlas] = useState(false); // New state to control EditAtlas display
   const fileInputRef = useRef();
+  const navigate = useNavigate();
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -38,7 +42,6 @@ const UploadMap = ({ onUpload }) => {
 
   const handleUploadMap = async (data) => {
     try {
-      // Make a request to the backend to upload the map
       const response = await fetch('http://127.0.0.1:5000/uploadMap', {
         method: 'POST',
         body: JSON.stringify(data),
@@ -48,13 +51,19 @@ const UploadMap = ({ onUpload }) => {
       });
 
       if (response.ok) {
-        const responseData = await response.json();
-        alert(responseData.message);  // Display the upload message
+        const data = await response.json();
+        const mapId = data.map_id; // Access the map_id from the response
+        console.log('Map ID:', mapId);
+        alert(data.message);  // Display the upload message
+        
+        // Navigate to editAtlas component and pass mapId
+        navigate(`/edit_map/${mapId}`);
 
         // Reset state
         setUploadedImage(null);
         setMapName('');
         setShowPreview(false);
+        setShowEditAtlas(true);  // Show EditAtlas after successful upload
 
       } else {
         const errorData = await response.json();
@@ -74,13 +83,15 @@ const UploadMap = ({ onUpload }) => {
 
   return (
     <div className="upload-map-container">
-      {showPreview ? (
+      {showEditAtlas ? ( // Show EditAtlas if the upload is successful
+        <EditAtlas />
+      ) : showPreview ? (
         <ProcessMap
           uploadedImage={uploadedImage}
           mapName={mapName}
           mapAuthor={mapAuthor}
-          onConfirm={handleUploadMap} // Pass the handleUploadMap function
-          onBack={handleBack} // Pass the handleBack function
+          onConfirm={handleUploadMap}
+          onBack={handleBack}
         />
       ) : (
         <>

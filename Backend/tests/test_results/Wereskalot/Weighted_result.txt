@@ -1,0 +1,47 @@
+Mismatch in line 1:
+  File:   ['mountain', 'hills', 'hills', 'farmlands', 'farmlands']
+  Result: ['farmlands', 'farmlands', 'farmlands', 'farmlands', 'farmlands']
+Mismatch in line 2:
+  File:   ['mountain', 'hills', 'hills', 'farmlands', 'farmlands']
+  Result: ['farmlands', 'farmlands', 'farmlands', 'farmlands', 'farmlands']
+Mismatch in line 3:
+  File:   ['hills', 'mountain', 'hills', 'farmlands', 'farmlands']
+  Result: ['farmlands', 'farmlands', 'farmlands', 'farmlands', 'farmlands']
+Mismatch in line 4:
+  File:   ['mountain', 'hills', 'hills', 'farmlands', 'farmlands']
+  Result: ['farmlands', 'mountain', 'farmlands', 'farmlands', 'farmlands']
+Mismatch in line 5:
+  File:   ['hills', 'hills', 'hills', 'farmlands', 'farmlands']
+  Result: ['farmlands', 'farmlands', 'farmlands', 'farmlands', 'farmlands']
+Line 6: Match
+Mismatch in line 7:
+  File:   ['hills', 'hills', 'hills', 'hills', 'forest']
+  Result: ['hills', 'forest', 'farmlands', 'forest', 'forest']
+Mismatch in line 8:
+  File:   ['hills', 'hills', 'hills', 'forest', 'forest']
+  Result: ['hills', 'hills', 'farmlands', 'forest', 'forest']
+Line 9: Match
+Line 10: Match
+Mismatch in line 11:
+  File:   ['hills', 'farmlands', 'farmlands', 'farmlands', 'forest']
+  Result: ['farmlands', 'farmlands', 'farmlands', 'farmlands', 'forest']
+Line 12: Match
+Mismatch in line 13:
+  File:   ['hills', 'farmlands', 'farmlands', 'farmlands', 'marsh']
+  Result: ['ocean', 'farmlands', 'farmlands', 'farmlands', 'marsh']
+Line 14: Match
+Line 15: Match
+Mismatch in line 16:
+  File:   ['hills', 'farmlands', 'farmlands', 'marsh', 'marsh']
+  Result: ['ocean', 'farmlands', 'farmlands', 'marsh', 'marsh']
+Line 17: Match
+Line 18: Match
+Mismatch in line 19:
+  File:   ['farmlands', 'farmlands', 'farmlands', 'marsh', 'marsh']
+  Result: ['farmlands', 'farmlands', 'farmlands', 'marsh', 'ocean']
+Mismatch in line 20:
+  File:   ['farmlands', 'farmlands', 'farmlands', 'marsh', 'marsh']
+  Result: ['farmlands', 'ocean', 'marsh']
+Total Elements: 100
+Matching Elements: 73
+Match Percentage: 73.00%
