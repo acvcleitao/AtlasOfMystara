@@ -134,20 +134,47 @@ const EditMap = () => {
     setHexType(event.target.value);
   };
 
-  const saveHexType = () => {
-    fetch(`http://127.0.0.1:5000/updateHexType`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ hexId: Array.from(selectedHex), hexType: hexType }),
-    }).then(response => response.json())
-      .then(data => {
-        console.log(data);
-      })
-      .catch(error => {
-        console.error('Error updating hex type:', error);
-      });
+  const saveHexType = async () => {
+    // Check if the hexType has a corresponding image in the hexImages map
+    if (!hexImages[hexType]) {
+      // Fetch the image if not already in hexImages
+      try {
+        const response = await fetch('http://127.0.0.1:5000/getImage', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            hexTypes: [hexType],
+            author: author,
+          }),
+        });
+        const imagesDict = await response.json();
+        // Update hexImages with the new image
+        setHexImages(prevImages => ({
+          ...prevImages,
+          ...imagesDict,
+        }));
+      } catch (error) {
+        console.error('Error fetching image:', error);
+        return; // Exit function if fetching fails
+      }
+    }
+  
+    // Create new hexagons with updated type and image
+    const updatedHexagons = hexagons.map(hex => {
+      if (selectedHex.has(`${author}_${hex.coordinate[0]}_${hex.coordinate[1]}`)) {
+        return {
+          ...hex,
+          type: hexType,
+          imageBase64: hexImages[hexType] || hex.imageBase64, // Use new image or keep old
+        };
+      }
+      return hex;
+    });
+  
+    // Update hexagons list with the new hexagons
+    setHexagons(updatedHexagons);
   };
 
   const toggleBaseImageVisibility = () => {
@@ -205,7 +232,7 @@ const EditMap = () => {
             className='base-image-overlay'
             src={baseImage ? `data:image/png;base64,${baseImage}` : 'https://archive.org/download/placeholder-image/placeholder-image.jpg'}
             alt="Base Image"
-            style={{ width: '100%', height: '100%', opacity: 0.9 }}
+            style={{ width: '100%', height: '100%', opacity: 0.5 }}
           />
         </Rnd>
       )}

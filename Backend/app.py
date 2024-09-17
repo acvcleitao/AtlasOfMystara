@@ -1304,7 +1304,6 @@ def get_hexagon_image(author, hex_type):
     # If none of the extensions exist, return 404
     return 'Image not found', 404
 
-# Endpoint to get base64 images based on hexagon types and author
 @app.route('/getImage', methods=['POST'])
 def get_image_base64():
     data = request.json
@@ -1322,17 +1321,25 @@ def get_image_base64():
     # Dictionary to store the base64 images
     images_base64 = {}
 
+    # Function to find the image file without considering extension
+    def find_image_file(base_name, folder):
+        for ext in ['.jpg', '.jpeg', '.png', '.gif']:
+            image_path = os.path.join(folder, base_name + ext)
+            if os.path.exists(image_path):
+                return image_path
+        return None
+
     # Iterate through each hex type and retrieve the corresponding image
     for hex_type in hex_types:
-        image_path = os.path.join(author_folder, hex_type)
+        image_path = find_image_file(hex_type, author_folder)
 
-        if os.path.exists(image_path):
+        if image_path:
             with open(image_path, 'rb') as image_file:
                 # Convert image to base64 and store it in the dictionary
                 base64_image = base64.b64encode(image_file.read()).decode('utf-8')
                 images_base64[hex_type] = base64_image
         else:
-            print(f"Image {image_path} not found.")
+            print(f"Image for hex type '{hex_type}' not found.")
             images_base64[hex_type] = None
 
     # Return the dictionary of images in base64 format
