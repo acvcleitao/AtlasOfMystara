@@ -26,19 +26,21 @@ const EditMap = () => {
   useEffect(() => {
     const fetchHexagonTypes = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:5000/getHexagonTypes');
+        const response = await fetch(`http://127.0.0.1:5000/getAuthorHexes/${author}`);
         if (!response.ok) {
           throw new Error('Failed to fetch hexagon types');
         }
         const data = await response.json();
         setHexagonTypes(data.hexagonTypes);
+        console.log("Got Types", data.hexagonTypes);
       } catch (error) {
         console.error('Error fetching hexagon types:', error);
       }
     };
-
-    fetchHexagonTypes();
-  }, []);
+    if (author) {
+      fetchHexagonTypes();
+    }
+  }, [author]);
 
   useEffect(() => {
     const fetchMapHexagons = async () => {
@@ -53,6 +55,7 @@ const EditMap = () => {
 
         // Set the base image from the map document
         setBaseImage(data.baseImage);
+        
 
         const hexagonLayer = data.layers.find(layer => layer.type === 'hexagon_layer');
         if (hexagonLayer) {
@@ -161,12 +164,8 @@ const EditMap = () => {
         <div className="edit-tools">
           <label htmlFor="hex-type">Hex Type: </label>
           <select id="hex-type" value={hexType} onChange={handleHexTypeChange}>
-            {hexagonTypes.map((authorGroup) => (
-              <optgroup key={authorGroup.author} label={authorGroup.author}>
-                {authorGroup.hexTypes.map((type) => (
-                  <option key={type} value={type}>{type}</option>
-                ))}
-              </optgroup>
+            {hexagonTypes.map((type) => (
+              <option key={type} value={type}>{type}</option>
             ))}
           </select>
           <button onClick={saveHexType}>Save</button>
@@ -195,7 +194,7 @@ const EditMap = () => {
             className='base-image-overlay'
             src={baseImage ? `data:image/png;base64,${baseImage}` : 'https://archive.org/download/placeholder-image/placeholder-image.jpg'}
             alt="Base Image"
-            style={{ width: '100%', height: '100%', opacity: 0.7 }}
+            style={{ width: '100%', height: '100%', opacity: 0.9 }}
           />
         </Rnd>
       )}

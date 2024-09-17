@@ -1389,6 +1389,26 @@ def get_hexagons():
         print(f"Error fetching hexagons: {str(e)}")
         return jsonify({'message': 'Internal Server Error'}), 500
 
+@app.route('/getAuthorHexes/<author>', methods=['GET'])
+def get_author_hexes(author):
+    try:
+        folder_path = findAuthorFolder(author)
+        
+        # Check if folder exists
+        if not os.path.isdir(folder_path):
+            return jsonify({'error': 'Author folder not found'}), 404
+
+        # List all files in the directory (excluding extensions)
+        hexagon_types = [os.path.splitext(filename)[0] for filename in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, filename))]
+        hexagon_types = [x for x in hexagon_types if x != "alias"]
+        
+        return jsonify({'hexagonTypes': hexagon_types})
+
+    except Exception as e:
+        print(f'Error fetching hexagon types: {e}')
+        return jsonify({'error': 'Failed to fetch hexagon types'}), 500
+
+
 @app.route('/updateHexType', methods=['POST'])
 def update_hex_type():
     try:
