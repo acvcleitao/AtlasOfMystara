@@ -58,8 +58,18 @@
 }
 .hexagonalGrid {
   padding: 10px;
+  position: relative;
   overflow: visible;
 }
+
+.hexagons-layer {
+  z-index: 1;
+}
+
+.selected-hexagon-layer {
+  z-index: 2; /* Make sure the selected hexagon is on top */
+}
+
 
 .hexagonProp {
   width: 100px;

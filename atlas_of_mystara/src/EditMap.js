@@ -4,7 +4,7 @@ import './EditMap.css';
 
 const EditMap = () => {
   const { mapId } = useParams(); 
-  const [selectedHex, setSelectedHex] = useState(null);
+  const [selectedHex, setSelectedHex] = useState(new Set()); // Initialize as a Set
   const [hexType, setHexType] = useState('');
   const [hexagonTypes, setHexagonTypes] = useState([]);
   const [hexagons, setHexagons] = useState([]); 
@@ -84,8 +84,27 @@ const EditMap = () => {
     }
   }, [mapId]);
 
-  const handleHexClick = (hexId) => {
-    setSelectedHex(hexId);
+  const handleHexClick = (hexId, event) => {
+    const isCtrlPressed = event.ctrlKey; // Check if CTRL key is pressed
+    if (isCtrlPressed) {
+      setSelectedHex(prevSelectedHex => {
+        const newSelectedHex = new Set(prevSelectedHex);
+        if (newSelectedHex.has(hexId)) {
+          newSelectedHex.delete(hexId); // Deselect if already selected
+        } else {
+          newSelectedHex.add(hexId); // Select if not already selected
+        }
+        return newSelectedHex;
+      });
+    } else {
+      setSelectedHex(prevSelectedHex => {
+        const newSelectedHex = new Set();
+        if (!prevSelectedHex.has(hexId)) {
+          newSelectedHex.add(hexId); // Select if not already selected
+        }
+        return newSelectedHex;
+      });
+    }
   };
 
   const handleHexTypeChange = (event) => {
@@ -98,7 +117,7 @@ const EditMap = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ hexId: selectedHex, hexType: hexType }),
+      body: JSON.stringify({ hexId: Array.from(selectedHex), hexType: hexType }),
     }).then(response => response.json())
       .then(data => {
         console.log(data);
@@ -117,9 +136,10 @@ const EditMap = () => {
         zoomLevel={1} 
         author={author} 
         onHexClick={handleHexClick} 
-        hexImages={hexImages} 
+        hexImages={hexImages}
+        selectedHex={selectedHex} // Pass selectedHex as a Set
       />
-      {selectedHex && (
+      {selectedHex.size > 0 && (
         <div className="edit-tools">
           <label htmlFor="hex-type">Hex Type: </label>
           <select id="hex-type" value={hexType} onChange={handleHexTypeChange}>
@@ -138,20 +158,20 @@ const EditMap = () => {
   );
 };
 
-const HexGrid = ({ hexagonsData, centerX, centerY, zoomLevel, author, onHexClick, hexImages }) => {
+const HexGrid = ({ hexagonsData, centerX, centerY, zoomLevel, author, onHexClick, hexImages, selectedHex }) => {
   const hexSize = 50;
 
-  // Find the bottom-right hexagon to determine the grid size
   const maxX = Math.max(...hexagonsData.map(h => h.coordinate[0]));
   const maxY = Math.max(...hexagonsData.map(h => h.coordinate[1]));
 
-  const numRows = maxY + 1; // since coordinates are zero-indexed
+  const numRows = maxY + 1;
   const numCols = maxX + 1;
 
   const horizSpacing = 3 / 2 * hexSize;
   const vertSpacing = hexSize * Math.sqrt(3);
 
   let hexagons = [];
+  let selectedHexagons = [];
 
   if (hexagonsData && hexagonsData.length > 0) {
     const hexagonsMap = {};
@@ -165,36 +185,48 @@ const HexGrid = ({ hexagonsData, centerX, centerY, zoomLevel, author, onHexClick
         const y = (row - centerY) * vertSpacing + (col % 2) * (vertSpacing / 2);
         const key = `${row}-${col}`;
         const hexagonData = hexagonsMap[`${col}-${row}`];
+        const hexId = `${author}_${zoomLevel}_${col}_${row}`;
+        const isSelected = selectedHex.has(hexId);
 
-        hexagons.push(
+        const hexagon = (
           <Hexagon
             key={key}
-            id={`${author}_${zoomLevel}_${col}_${row}`}
+            id={hexId}
             x={x}
             y={y}
             size={hexSize}
             hexagonData={hexagonData}
             onHexClick={onHexClick}
-            coordinate={hexagonData ? hexagonData.coordinate : null} // Pass the coordinate here
+            coordinate={hexagonData ? hexagonData.coordinate : null}
+            isSelected={isSelected}
           />
         );
+
+        if (isSelected) {
+          selectedHexagons.push(hexagon); // Capture selected hexagons
+        } else {
+          hexagons.push(hexagon);
+        }
       }
     }
   }
 
   const svgWidth = horizSpacing * numCols;
-  const svgHeight = vertSpacing * numRows
+  const svgHeight = vertSpacing * numRows;
 
   return (
     <svg width={svgWidth} height={svgHeight} className='hexagonalGrid'>
-      {hexagons}
+      <g className="hexagons-layer">
+        {hexagons}
+      </g>
+      <g className="selected-hexagon-layer">
+        {selectedHexagons} {/* Render selected hexagons above all others */}
+      </g>
     </svg>
   );
 };
 
-
-
-const Hexagon = ({ id, x, y, size, hexagonData, onHexClick, coordinate }) => {
+const Hexagon = ({ id, x, y, size, hexagonData, onHexClick, coordinate, isSelected }) => {
   const points = [
     [x + size * Math.cos(0), y + size * Math.sin(0)],
     [x + size * Math.cos(Math.PI / 3), y + size * Math.sin(Math.PI / 3)],
@@ -204,17 +236,11 @@ const Hexagon = ({ id, x, y, size, hexagonData, onHexClick, coordinate }) => {
     [x + size * Math.cos(5 * Math.PI / 3), y + size * Math.sin(5 * Math.PI / 3)],
   ].map((point) => point.join(',')).join(' ');
 
-  const handleClick = () => {
-    if (hexagonData) {
-      console.log("Hexagon coordinate:", coordinate);
-      console.log("Hexagon type:", hexagonData.type);
-    }
-    onHexClick(id);
+  const handleClick = (event) => {
+    onHexClick(id, event); // Pass the event to handleHexClick
   };
 
   return (
-    
-  <svg className='hexagonalGrid'>
     <g className='hexagonProp'
       data-coordinate={coordinate ? `${coordinate}` : 'N/A'}
       data-type={hexagonData ? hexagonData.type : 'N/A'}
@@ -223,13 +249,28 @@ const Hexagon = ({ id, x, y, size, hexagonData, onHexClick, coordinate }) => {
         <image
           className='hexagonProp'
           href={`data:image/png;base64,${hexagonData.imageBase64}`}
-          x={x - size} 
+          x={x - size}
           y={y - size}
         />
       )}
-      <polygon points={points} fill="transparent" stroke="#000" strokeWidth="5" onClick={handleClick} />
+      {/* Draw the border on top */}
+      {isSelected && (
+        <polygon
+          points={points}
+          fill="transparent"
+          stroke="red"
+          strokeWidth="10"
+          pointerEvents="none" // Prevent click events on this layer
+        />
+      )}
+      <polygon
+        points={points}
+        fill="transparent"
+        stroke="#000"
+        strokeWidth="5"
+        onClick={handleClick}
+      />
     </g>
-  </svg>
   );
 };
 
