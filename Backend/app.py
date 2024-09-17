@@ -515,7 +515,7 @@ def processHexagons(hexagon_images, author, Testing = False):
     for idx, hexagon_image in enumerate(hexagon_images):
         image_path = os.path.join(temp_path, f'hexagon_{idx}.png')
         cv2.imwrite(image_path, hexagon_image)
-        print(f"Saved hexagon image {idx} for author {author} at {image_path}")
+        '''print(f"Saved hexagon image {idx} for author {author} at {image_path}")'''
 
         MSE_results = processHexagonMSE(hexagon_image, author)         # Mean Square Error approach
         PSNR_results = processHexagonPSNR(hexagon_image, author)       # Peak Signal to Noise Ratio approach
@@ -1301,6 +1301,40 @@ def get_hexagon_image(author, hex_type):
             return send_from_directory(hexagon_path, filename)
     # If none of the extensions exist, return 404
     return 'Image not found', 404
+
+# Endpoint to get base64 images based on hexagon types and author
+@app.route('/getImage', methods=['POST'])
+def get_image_base64():
+    data = request.json
+    
+    # Extract hexagon types and author from the request
+    hex_types = data.get('hexTypes', [])
+    author = data.get('author', '')
+
+    if not hex_types or not author:
+        return jsonify({'error': 'Missing hexTypes or author'}), 400
+
+    # Get the author's folder
+    author_folder = findAuthorFolder(author)
+
+    # Dictionary to store the base64 images
+    images_base64 = {}
+
+    # Iterate through each hex type and retrieve the corresponding image
+    for hex_type in hex_types:
+        image_path = os.path.join(author_folder, hex_type)
+
+        if os.path.exists(image_path):
+            with open(image_path, 'rb') as image_file:
+                # Convert image to base64 and store it in the dictionary
+                base64_image = base64.b64encode(image_file.read()).decode('utf-8')
+                images_base64[hex_type] = base64_image
+        else:
+            print(f"Image {image_path} not found.")
+            images_base64[hex_type] = None
+
+    # Return the dictionary of images in base64 format
+    return jsonify(images_base64)
 
 # Route for getting hexagons based on zoom level, author, and coordinates
 @app.route('/getHexagons', methods=['GET'])

@@ -57,25 +57,29 @@
   justify-content: center; /* Ensure contents are centered */
 }
 
-/* Hexagon styling */
 .hexagon {
   width: 100px;
   height: 100px;
-  background-color: #e0e0e0;
   border-radius: 5px;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
+  background-color: transparent; /* Remove any background color */
 }
 
 .hexagon:hover {
-  background-color: #d0d0d0;
+  background-color: rgba(0, 0, 0, 0.1); /* Add a slight hover effect */
 }
 
-/* Make sure the SVG takes up full width and height */
 .hex-grid {
   width: 100%;
-  height: 100%; /* Ensure the grid expands fully */
+  height: 100%;
   display: block;
+}
+
+/* Make sure the images are styled properly */
+.hex-grid image {
+  pointer-events: none; /* Ensure the image doesn't capture the click events */
+  object-fit: cover; /* Ensure the image fits within the hexagon */
 }
