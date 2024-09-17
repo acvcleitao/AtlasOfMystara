@@ -203,7 +203,7 @@ def processMap(title, author, image_data, hex_mask_type, selected_color, combine
         ocean_layer = isolate_ocean(image_data, selected_color_hsv)
         print(f"Isolated ocean image saved at: {ocean_layer}")
 
-        image = Image.open(BytesIO(base64.b64decode(image_data.split(',')[1])))
+        Base64Image = combined_image.split(',')[1]
         # text_data = pytesseract.image_to_string(image)
 
         # Convert the combined_image from base64 to a NumPy array
@@ -251,11 +251,11 @@ def processMap(title, author, image_data, hex_mask_type, selected_color, combine
             for result in combined_results[0]:
                 print(i)
                 i+=1
-                testing_results.append(save_map(result, row_counts, ocean_layer, title, author, Testing))
+                testing_results.append(save_map(result, row_counts, ocean_layer, title, author, Base64Image, Testing))
             return testing_results
         
         processedHexagons = processHexagons(hexagons, author, Testing)
-        map_id = save_map(processedHexagons, row_counts, ocean_layer, title, author, Testing)
+        map_id = save_map(processedHexagons, row_counts, ocean_layer, title, author, Base64Image, Testing)
         response = {
             'message': 'Map processed successfully',
             'map_id': str(map_id),
@@ -271,12 +271,12 @@ def processMap(title, author, image_data, hex_mask_type, selected_color, combine
         print(f"Error processing map: {str(e)}")
         return jsonify({'message': str(e)}), 400
     
-def save_map(processedHexagons, row_counts, ocean_layer, title, author, Testing):
+def save_map(processedHexagons, row_counts, ocean_layer, title, author, Base64Image, Testing):
     if not Testing:
         current_y = 0
         hexagon_index = 0
 
-        map_id = create_map(title, author)
+        map_id = create_map(title, author, Base64Image)
         for row_count in row_counts:
             for x in range(row_count):
                 if hexagon_index >= len(processedHexagons):
@@ -285,7 +285,6 @@ def save_map(processedHexagons, row_counts, ocean_layer, title, author, Testing)
                 
                 # Calculate the coordinate for the current hexagon
                 coordinate = (x, current_y)
-                print(coordinate)                
                 # Assuming create_hexagon is a function that takes hex_type and coordinate as arguments
                 # TODO: Add information to the hexagon
                 create_hexagon(map_id, processedHexagons[hexagon_index], coordinate, None)
@@ -311,11 +310,12 @@ def save_map(processedHexagons, row_counts, ocean_layer, title, author, Testing)
     
     return output_for_testing
 
-def create_map(title, author):
+def create_map(title, author, Base64Image):
     # Create the map document with an empty hexagon layer
     map_document = {
         "title": title,
         "author": author,
+        "baseImage": Base64Image,
         "layers": [
             { 
                 "type": "hexagon_layer", 
@@ -1382,7 +1382,6 @@ def get_hexagons():
 
         # Format the grouped hexagons into the desired structure
         formatted_hexagons = [{'type': hex_type, 'coordinates': group['coordinates'], 'imageURL': group['imageURL']} for hex_type, group in grouped_hexagons.items()]
-        print(formatted_hexagons)
         # Return the formatted hexagons as a JSON response
         return jsonify({'hexagons': formatted_hexagons}), 200
 

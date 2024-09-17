@@ -1,18 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom'; 
 import './EditMap.css';
+import { Rnd } from "react-rnd";
+
 
 const EditMap = () => {
   const { mapId } = useParams(); 
-  const [selectedHex, setSelectedHex] = useState(new Set()); // Initialize as a Set
+  const [selectedHex, setSelectedHex] = useState(new Set()); 
   const [hexType, setHexType] = useState('');
   const [hexagonTypes, setHexagonTypes] = useState([]);
   const [hexagons, setHexagons] = useState([]); 
   const [hexImages, setHexImages] = useState({}); 
   const [author, setAuthor] = useState('');
   const [title, setTitle] = useState('');
+  const [baseImage, setBaseImage] = useState(''); // State for the base image
+  const [baseImageWidth, setBaseImageWidth] = useState(600); // Initial width
+  const [baseImageHeight, setBaseImageHeight] = useState(400); // Initial height
+  const [baseImageX, setBaseImageX] = useState(0); // Initial X position
+  const [baseImageY, setBaseImageY] = useState(0); // Initial Y position
+  const [isBaseImageVisible, setIsBaseImageVisible] = useState(false); // Toggle visibility
   const [loading, setLoading] = useState(true); 
   const [error, setError] = useState(null);
+  
 
   useEffect(() => {
     const fetchHexagonTypes = async () => {
@@ -41,6 +50,9 @@ const EditMap = () => {
         const data = await response.json();
         setAuthor(data.author);
         setTitle(data.title);
+
+        // Set the base image from the map document
+        setBaseImage(data.baseImage);
 
         const hexagonLayer = data.layers.find(layer => layer.type === 'hexagon_layer');
         if (hexagonLayer) {
@@ -85,14 +97,14 @@ const EditMap = () => {
   }, [mapId]);
 
   const handleHexClick = (hexId, event) => {
-    const isCtrlPressed = event.ctrlKey; // Check if CTRL key is pressed
+    const isCtrlPressed = event.ctrlKey;
     if (isCtrlPressed) {
       setSelectedHex(prevSelectedHex => {
         const newSelectedHex = new Set(prevSelectedHex);
         if (newSelectedHex.has(hexId)) {
-          newSelectedHex.delete(hexId); // Deselect if already selected
+          newSelectedHex.delete(hexId); 
         } else {
-          newSelectedHex.add(hexId); // Select if not already selected
+          newSelectedHex.add(hexId); 
         }
         return newSelectedHex;
       });
@@ -100,7 +112,7 @@ const EditMap = () => {
       setSelectedHex(prevSelectedHex => {
         const newSelectedHex = new Set();
         if (!prevSelectedHex.has(hexId)) {
-          newSelectedHex.add(hexId); // Select if not already selected
+          newSelectedHex.add(hexId); 
         }
         return newSelectedHex;
       });
@@ -127,8 +139,13 @@ const EditMap = () => {
       });
   };
 
+  const toggleBaseImageVisibility = () => {
+    setIsBaseImageVisible(!isBaseImageVisible);
+  };
+
   return (
     <div className="edit-atlas-container">
+      
       <HexGrid 
         hexagonsData={hexagons} 
         centerX={0} 
@@ -137,8 +154,9 @@ const EditMap = () => {
         author={author} 
         onHexClick={handleHexClick} 
         hexImages={hexImages}
-        selectedHex={selectedHex} // Pass selectedHex as a Set
+        selectedHex={selectedHex} 
       />
+
       {selectedHex.size > 0 && (
         <div className="edit-tools">
           <label htmlFor="hex-type">Hex Type: </label>
@@ -154,6 +172,34 @@ const EditMap = () => {
           <button onClick={saveHexType}>Save</button>
         </div>
       )}
+      <button className='base-image-toggle-button' onClick={toggleBaseImageVisibility}>
+        {isBaseImageVisible ? 'Hide Base Image' : 'Show Base Image'}
+      </button>
+      {isBaseImageVisible && (
+        <Rnd
+          className="rnd-outline"
+          size={{ width: baseImageWidth, height: baseImageHeight }}
+          position={{ x: baseImageX, y: baseImageY }}
+          onDragStop={(e, d) => {
+            setBaseImageX(d.x);
+            setBaseImageY(d.y);
+          }}
+          onResizeStop={(e, direction, ref, delta, position) => {
+            setBaseImageWidth(parseInt(ref.style.width, 10));
+            setBaseImageHeight(parseInt(ref.style.height, 10));
+            setBaseImageX(position.x);
+            setBaseImageY(position.y);
+          }}
+        >
+          <img
+            className='base-image-overlay'
+            src={baseImage ? `data:image/png;base64,${baseImage}` : 'https://archive.org/download/placeholder-image/placeholder-image.jpg'}
+            alt="Base Image"
+            style={{ width: '100%', height: '100%', opacity: 0.7 }}
+          />
+        </Rnd>
+      )}
+    
     </div>
   );
 };
