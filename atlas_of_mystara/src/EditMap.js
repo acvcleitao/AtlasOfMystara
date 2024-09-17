@@ -9,6 +9,7 @@ const EditMap = () => {
   const [selectedHex, setSelectedHex] = useState(new Set()); 
   const [hexType, setHexType] = useState('');
   const [hexagonTypes, setHexagonTypes] = useState([]);
+  const [selectedHexType, setSelectedHexType] = useState('');
   const [hexagons, setHexagons] = useState([]); 
   const [hexImages, setHexImages] = useState({}); 
   const [author, setAuthor] = useState('');
@@ -119,6 +120,13 @@ const EditMap = () => {
         }
         return newSelectedHex;
       });
+      // Update hexType to the type of the clicked hexagon
+      const hex = hexagons.find(hex => `${author}_${hex.coordinate[0]}_${hex.coordinate[1]}` === hexId);
+      if (hex) {
+        setHexType(hex.type.split('.')[0]);
+      } else {
+        setHexType('');
+      }
     }
   };
 
@@ -164,8 +172,11 @@ const EditMap = () => {
         <div className="edit-tools">
           <label htmlFor="hex-type">Hex Type: </label>
           <select id="hex-type" value={hexType} onChange={handleHexTypeChange}>
+            <option key={hexType} value={hexType}>{hexType}</option>
             {hexagonTypes.map((type) => (
-              <option key={type} value={type}>{type}</option>
+              type !== hexType ? (
+                <option key={type} value={type}>{type}</option>
+              ) : null
             ))}
           </select>
           <button onClick={saveHexType}>Save</button>
@@ -230,7 +241,7 @@ const HexGrid = ({ hexagonsData, centerX, centerY, zoomLevel, author, onHexClick
         const y = (row - centerY) * vertSpacing + (col % 2) * (vertSpacing / 2);
         const key = `${row}-${col}`;
         const hexagonData = hexagonsMap[`${col}-${row}`];
-        const hexId = `${author}_${zoomLevel}_${col}_${row}`;
+        const hexId = `${author}_${col}_${row}`;
         const isSelected = selectedHex.has(hexId);
 
         const hexagon = (
