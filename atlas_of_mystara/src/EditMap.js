@@ -156,7 +156,7 @@ const HexGrid = ({ hexagonsData, centerX, centerY, zoomLevel, author, onHexClick
   if (hexagonsData && hexagonsData.length > 0) {
     const hexagonsMap = {};
     hexagonsData.forEach(({ type, coordinate: [x, y] }) => {
-      hexagonsMap[`${x}-${y}`] = { type, coordinate: [x, y], imageURL: hexImages[type] };
+      hexagonsMap[`${x}-${y}`] = { type, coordinate: [x, y], imageBase64: hexImages[type] };
     });
 
     for (let row = centerY; row < numRows + centerY; row++) {
@@ -213,22 +213,23 @@ const Hexagon = ({ id, x, y, size, hexagonData, onHexClick, coordinate }) => {
   };
 
   return (
-    <g
+    
+  <svg>
+    <g className='hexagonProp'
       data-coordinate={coordinate ? `${coordinate}` : 'N/A'}
       data-type={hexagonData ? hexagonData.type : 'N/A'}
     >
-      <polygon points={points} fill="#555" stroke="#000" strokeWidth="2" onClick={handleClick} />
-      {hexagonData && hexagonData.imageURL && (
-        <image 
-          href={hexagonData.imageURL}
+      {hexagonData && hexagonData.imageBase64 && (
+        <image
+          className='hexagonProp'
+          href={`data:image/png;base64,${hexagonData.imageBase64}`}
           x={x - size} 
-          y={y - size} 
-          width={size * 2} 
-          height={size * 2}
-          preserveAspectRatio="xMidYMid slice" /* Ensure the image scales properly */
+          y={y - size}
         />
       )}
+      <polygon points={points} fill="transparent" stroke="#000" strokeWidth="5" onClick={handleClick} />
     </g>
+  </svg>
   );
 };
 
