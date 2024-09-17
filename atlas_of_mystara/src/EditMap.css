@@ -56,6 +56,10 @@
   gap: 10px;
   justify-content: center; /* Ensure contents are centered */
 }
+.hexagonalGrid {
+  padding: 10px;
+  overflow: visible;
+}
 
 .hexagonProp {
   width: 100px;

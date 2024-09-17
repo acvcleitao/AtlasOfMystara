@@ -277,7 +277,6 @@ def save_map(processedHexagons, row_counts, ocean_layer, title, author, Testing)
         hexagon_index = 0
 
         map_id = create_map(title, author)
-        
         for row_count in row_counts:
             for x in range(row_count):
                 if hexagon_index >= len(processedHexagons):
@@ -286,7 +285,7 @@ def save_map(processedHexagons, row_counts, ocean_layer, title, author, Testing)
                 
                 # Calculate the coordinate for the current hexagon
                 coordinate = (x, current_y)
-                
+                print(coordinate)                
                 # Assuming create_hexagon is a function that takes hex_type and coordinate as arguments
                 # TODO: Add information to the hexagon
                 create_hexagon(map_id, processedHexagons[hexagon_index], coordinate, None)
@@ -479,7 +478,10 @@ def extract_hexagons(image, mask, hex_side_length):
     if current_row_count > 0:
         row_counts.append(current_row_count)
 
-    return sorted_hexagons, row_counts, sorted_coordinates
+    # Turns coordinates into doubled coordinates for easier hexagon manipulation ((col + row) % 2 == 0)
+    pairwise_sum = lambda lst: [lst[i] + lst[i + 1] for i in range(0, len(lst) - 1, 2)]
+
+    return sorted_hexagons, pairwise_sum(row_counts), sorted_coordinates
 
 
 def hex_to_rgb(hex_color):

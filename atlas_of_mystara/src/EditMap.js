@@ -183,10 +183,10 @@ const HexGrid = ({ hexagonsData, centerX, centerY, zoomLevel, author, onHexClick
   }
 
   const svgWidth = horizSpacing * numCols;
-  const svgHeight = vertSpacing * numRows;
+  const svgHeight = vertSpacing * numRows
 
   return (
-    <svg width={svgWidth} height={svgHeight}>
+    <svg width={svgWidth} height={svgHeight} className='hexagonalGrid'>
       {hexagons}
     </svg>
   );
@@ -214,7 +214,7 @@ const Hexagon = ({ id, x, y, size, hexagonData, onHexClick, coordinate }) => {
 
   return (
     
-  <svg>
+  <svg className='hexagonalGrid'>
     <g className='hexagonProp'
       data-coordinate={coordinate ? `${coordinate}` : 'N/A'}
       data-type={hexagonData ? hexagonData.type : 'N/A'}
