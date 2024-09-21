@@ -8,9 +8,12 @@ const ProcessMap = ({ uploadedImage, mapName, mapAuthor, onConfirm, onBack }) =>
   const [hexGridHeight, setHexGridHeight] = useState(200);
   const [hexGridX, setHexGridX] = useState(100);
   const [hexGridY, setHexGridY] = useState(100);
-  const [hexMaskType, setHexMaskType] = useState('pointy');
+  const [hexMaskType, setHexMaskType] = useState('flat');
   const [selectedColor, setSelectedColor] = useState('#ffffff');
   const [step, setStep] = useState(1);
+  const [columns, setColumns] = useState(5);
+  const [lines, setLines] = useState(5);
+
 
   const imageRef = useRef(null);
 
@@ -60,7 +63,7 @@ const ProcessMap = ({ uploadedImage, mapName, mapAuthor, onConfirm, onBack }) =>
         // Call onConfirm function with necessary data
         onConfirm({ ...data, combinedImage });
       };
-      hexGridImage.src = `/resources/hexmapMask${hexMaskType.charAt(0).toUpperCase() + hexMaskType.slice(1)}.png`;
+      hexGridImage.src = `/resources/hexmapMask_${hexMaskType.charAt(0).toUpperCase() + hexMaskType.slice(1)}_${columns}_${lines}.png`;
 
     } catch (error) {
       console.error('Error confirming upload:', error);
@@ -102,8 +105,8 @@ const ProcessMap = ({ uploadedImage, mapName, mapAuthor, onConfirm, onBack }) =>
             }}
           >
             <img
-              src={`/resources/hexmapMask${hexMaskType.charAt(0).toUpperCase() + hexMaskType.slice(1)}.png`}
-              alt={`Hex Grid Mask ${hexMaskType}`}
+              src={`/resources/hexmapMask_${hexMaskType.charAt(0).toUpperCase() + hexMaskType.slice(1)}_${columns}_${lines}.png`}
+              alt={`Hex Grid Mask ${hexMaskType} x:${columns} y:${lines} not found`}
               style={{ width: '100%', height: '100%' }}
             />
           </Rnd>
@@ -145,6 +148,26 @@ const ProcessMap = ({ uploadedImage, mapName, mapAuthor, onConfirm, onBack }) =>
               </button>
             </>
           )}
+        </div>
+        <div className="dynamic-grid-controls">
+          <label>
+            Columns:
+            <input
+              type="number"
+              min="1"
+              value={columns}
+              onChange={(e) => setColumns(Number(e.target.value))}
+            />
+          </label>
+          <label>
+            Lines:
+            <input
+              type="number"
+              min="1"
+              value={lines}
+              onChange={(e) => setLines(Number(e.target.value))}
+            />
+          </label>
         </div>
       </div>
     </div>
