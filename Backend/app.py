@@ -1,6 +1,8 @@
 from collections import Counter
 import imghdr
 from io import BytesIO
+import re
+from flask import json
 import os
 import shutil
 import uuid
@@ -27,8 +29,6 @@ from skimage.metrics import structural_similarity as ssim # type: ignore
 from imagehash import phash # type: ignore
 from matplotlib import pyplot as plt
 import pytesseract
-# print(pytesseract.get_tesseract_version())
-
 
 load_dotenv()
 app = create_app()
@@ -169,9 +169,12 @@ def upload_map():
         with open(combined_image_path, 'wb') as f:
             f.write(base64.b64decode(combined_image.split(',')[1]))
         
-
+        original_image_path = os.path.join(HEXAGONS_FOLDER, f'original_{uuid.uuid4()}.png')
+        with open(original_image_path, 'wb') as f:
+            f.write(base64.b64decode(image_data.split(',')[1]))
         # Call the isolate_ocean function to isolate ocean color
-        map_Json = processMap(title, author, image_data, hex_mask_type, selected_color, combined_image)
+
+        map_Json = processMap(title, author, image_data, original_image_path, hex_mask_type, selected_color, combined_image)
 
         # Example response
         response = {
@@ -186,7 +189,7 @@ def upload_map():
         return jsonify({'message': 'Internal Server Error'}), 500
 
 
-def processMap(title, author, image_data, hex_mask_type, selected_color, combined_image, Testing = False):
+def processMap(title, author, image_data, original_image_path, hex_mask_type, selected_color, combined_image, Testing = False):
     try:
         if selected_color.startswith('#'):
             # Convert the selected_color from hex to RGB
@@ -202,9 +205,13 @@ def processMap(title, author, image_data, hex_mask_type, selected_color, combine
 
         ocean_layer = isolate_ocean(image_data, selected_color_hsv)
         print(f"Isolated ocean image saved at: {ocean_layer}")
+        base64_ocean_layer = base64.b64encode(open(ocean_layer, 'rb').read()).decode('utf-8')
 
         Base64Image = combined_image.split(',')[1]
-        # text_data = pytesseract.image_to_string(image)
+
+        text_data = process_image_ocr(original_image_path)
+        information_layer = add_mystara_info(text_data)
+        print(information_layer)
 
         # Convert the combined_image from base64 to a NumPy array
         combined_image_data = base64.b64decode(combined_image.split(',')[1])
@@ -251,11 +258,11 @@ def processMap(title, author, image_data, hex_mask_type, selected_color, combine
             for result in combined_results[0]:
                 print(i)
                 i+=1
-                testing_results.append(save_map(result, row_counts, ocean_layer, title, author, Base64Image, Testing))
+                testing_results.append(save_map(result, row_counts, base64_ocean_layer, information_layer, title, author, Base64Image, Testing))
             return testing_results
         
         processedHexagons = processHexagons(hexagons, author, Testing)
-        map_id = save_map(processedHexagons, row_counts, ocean_layer, title, author, Base64Image, Testing)
+        map_id = save_map(processedHexagons, row_counts, base64_ocean_layer, information_layer, title, author, Base64Image, Testing)
         response = {
             'message': 'Map processed successfully',
             'map_id': str(map_id),
@@ -263,20 +270,75 @@ def processMap(title, author, image_data, hex_mask_type, selected_color, combine
             'hexMaskType': hex_mask_type,
             'selectedColor': selected_color,
             'isolatedColorPath': ocean_layer,  # Include isolated color path in response
-            # 'textData': text_data  # Include OCR text data
+            'information_layer': information_layer  # Include OCR text data enriched with mystara info
         }
 
         return response
     except ValueError as e:
         print(f"Error processing map: {str(e)}")
         return jsonify({'message': str(e)}), 400
+
+def process_image_ocr(image_path):
+    image = cv2.imread(image_path)
+
+    # Convert to grayscale
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    # Denoise the image to remove any noise or artifacts
+    denoised_image = cv2.fastNlMeansDenoising(gray_image, None, 30, 7, 21)
+
+    # Apply a threshold to make the text stand out
+    _, threshold_image = cv2.threshold(denoised_image, 128, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
+
+    # Set up Tesseract config: English letters only, no dictionary correction
+    config = '--psm 6 -c tessedit_char_whitelist=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
     
-def save_map(processedHexagons, row_counts, ocean_layer, title, author, Base64Image, Testing):
+    # Get the data including positions
+    data = pytesseract.image_to_data(threshold_image, config=config, output_type=pytesseract.Output.DICT)
+
+    filtered_words = []
+    
+    for i in range(len(data['text'])):
+        word = data['text'][i]
+        if len(word) >= 3 and is_pronounceable(word):
+            # Get the bounding box coordinates
+            x, y, w, h = data['left'][i], data['top'][i], data['width'][i], data['height'][i]
+            filtered_words.append({
+                'word': word,
+                'position': {'x': x, 'y': y, 'width': w, 'height': h}
+            })
+
+    return filtered_words
+
+def is_pronounceable(word):
+    # Check if the word contains at least one vowel
+    return bool(re.search(r'[aeiou]', word, re.IGNORECASE))
+
+def add_mystara_info(ocr_output):
+    information_layer = []
+
+    for entry in ocr_output:
+        word = entry['word']
+        position = entry['position']
+        info = find_mystara_info(word)
+        if info == -1:
+            continue
+
+        enriched_entry = {
+            'word': word,
+            'position': position,
+            'info': info
+        }
+        information_layer.append(enriched_entry)
+
+    return information_layer
+
+def save_map(processedHexagons, row_counts, ocean_layer, information_layer, title, author, Base64Image, Testing):
     if not Testing:
         current_y = 0
         hexagon_index = 0
 
-        map_id = create_map(title, author, Base64Image)
+        map_id = create_map(title, author, Base64Image, ocean_layer, information_layer)
         for row_count in row_counts:
             for x in range(row_count):
                 if hexagon_index >= len(processedHexagons):
@@ -310,7 +372,7 @@ def save_map(processedHexagons, row_counts, ocean_layer, title, author, Base64Im
     
     return output_for_testing
 
-def create_map(title, author, Base64Image):
+def create_map(title, author, Base64Image, ocean_layer, information_layer):
     # Create the map document with an empty hexagon layer
     map_document = {
         "title": title,
@@ -323,11 +385,11 @@ def create_map(title, author, Base64Image):
             },
             { 
                 "type": "ocean_layer", 
-                "image": None 
+                "ocean_layer": ocean_layer 
             },
             { 
-                "type": "layer_3",  # Placeholder for the information layer
-                "content": None 
+                "type": "information_layer",  # Placeholder for the information layer
+                "content": information_layer 
             }
         ]
     }
@@ -717,7 +779,7 @@ def print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, SIFT_r
     if Testing:
         return majority_filename, intersection_filename, ranking_filename, confidence_filename, weighted_filename
     # TODO: Change this after finding out the best algorythm
-    return confidence_filename
+    return Bhattacharyya_results[0][0]
 
 def display_image(image, title="Hexagon Image"):
     plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
@@ -1321,12 +1383,14 @@ def get_image_base64():
     # Dictionary to store the base64 images
     images_base64 = {}
 
-    # Function to find the image file without considering extension
+    # Function to find the image file without considering the extension
     def find_image_file(base_name, folder):
-        for ext in ['.jpg', '.jpeg', '.png', '.gif']:
-            image_path = os.path.join(folder, base_name + ext)
-            if os.path.exists(image_path):
-                return image_path
+        base_name = base_name.lower()  # Ensure case-insensitivity
+        base_name, base_ext = os.path.splitext(base_name)
+        for file in os.listdir(folder):
+            file_base, file_ext = os.path.splitext(file)
+            if file_base.lower() == base_name:
+                return os.path.join(folder, file)
         return None
 
     # Iterate through each hex type and retrieve the corresponding image
@@ -1468,7 +1532,7 @@ def find_mystara_info(place):
         # Construct the URLs for the main Atlas page, Maps page, and search
         atlas_url = "https://www.pandius.com/atlas.html"
         maps_url = "https://www.pandius.com/maps.html"
-        search_url = f"https://www.pandius.com/search.html?q={place}&s=Search"
+        search_url = f"http://search.freefind.com/find.html?id=574922&pageid=r&mode=ALL&n=0&_charset_=UTF-8&bcd=%C3%B7&scs=1&q1={place}&q2=&q3=&q4=&rpp=10&dl=m&stm="
         
         # Send a GET request to the Atlas page
         atlas_response = requests.get(atlas_url)
@@ -1506,28 +1570,34 @@ def find_mystara_info(place):
         # Check if the request to the search page was successful
         if search_response.status_code == 200:
             # Parse the HTML content of the search page
-            search_soup = BeautifulSoup(search_response.content, 'html.parser')
+            search_soup = BeautifulSoup(search_response.content.decode('utf-8'), 'html.parser')
             
-            # Find relevant information in the search results
-            results = search_soup.find_all('div', class_='Result')
+                        # Find all search result entries
+            # Find all search result entries
+            results = []
+            for result in search_soup.find_all('font', class_='search-results')[:10]:  # Limit to 10 results
+                link = result.find('a')
+                if link:
+                    title = link.get_text(strip=True)
+                    url = link['href']
+                    description = result.get_text(strip=True).replace(title, '')  # Remove title from description
+                    results.append({'title': title, 'url': url, 'description': description.strip()})
+
+            # Check if there are at least 2 results to filter out locations that aren't relevant or correspond to noise
+            if len(results) < 2:
+                return -1
             
-            # Check if there are any results
-            if results:
-                # Extract the first result
-                first_result = results[0]
-                
-                # Extract the title and URL
-                title = first_result.find('a').text.strip()
-                url = first_result.find('a')['href']
-                
-                return f"Title: {title}\nMore information: {url}"
+            # Return results as a JSON object
+            json_results = json.dumps(results)
+            return (json_results)
             
-        return "No information found for that place."
+        return -1
+
 
     except Exception as e:
         print(f"Error finding map information for place {place}: {str(e)}")
         return None
-
+ 
 # Route for getting details of a specific map
 @app.route('/getMapFromVault/<place>', methods=['GET'])
 def get_map_from_vault(place):

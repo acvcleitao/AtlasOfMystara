@@ -56,7 +56,8 @@ const EditMap = () => {
 
         // Set the base image from the map document
         setBaseImage(data.baseImage);
-        
+        console.log('Ocean Layer:', data.layers.find(layer => layer.type === 'ocean_layer'));
+        console.log('Information Layer:', data.layers.find(layer => layer.type === 'information_layer'));
 
         const hexagonLayer = data.layers.find(layer => layer.type === 'hexagon_layer');
         if (hexagonLayer) {
@@ -183,7 +184,6 @@ const EditMap = () => {
 
   return (
     <div className="edit-atlas-container">
-      
       <HexGrid 
         hexagonsData={hexagons} 
         centerX={0} 
@@ -236,7 +236,6 @@ const EditMap = () => {
           />
         </Rnd>
       )}
-    
     </div>
   );
 };
