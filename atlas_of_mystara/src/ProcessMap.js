@@ -89,27 +89,29 @@ const ProcessMap = ({ uploadedImage, mapName, mapAuthor, onConfirm, onBack }) =>
             style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '15px' }}
             ref={imageRef}
           />
-          <Rnd
-            className="rnd-outline"
-            size={{ width: hexGridWidth, height: hexGridHeight }}
-            position={{ x: hexGridX, y: hexGridY }}
-            onDragStop={(e, d) => {
-              setHexGridX(d.x);
-              setHexGridY(d.y);
-            }}
-            onResizeStop={(e, direction, ref, delta, position) => {
-              setHexGridWidth(parseInt(ref.style.width, 10));
-              setHexGridHeight(parseInt(ref.style.height, 10));
-              setHexGridX(position.x);
-              setHexGridY(position.y);
-            }}
-          >
-            <img
-              src={`/resources/hexmapMask_${hexMaskType.charAt(0).toUpperCase() + hexMaskType.slice(1)}_${columns}_${lines}.png`}
-              alt={`Hex Grid Mask ${hexMaskType} x:${columns} y:${lines} not found`}
-              style={{ width: '100%', height: '100%', zIndex:9999 }}
-            />
-          </Rnd>
+          {step === 1 &&(
+            <Rnd
+              className="rnd-outline"
+              size={{ width: hexGridWidth, height: hexGridHeight }}
+              position={{ x: hexGridX, y: hexGridY }}
+              onDragStop={(e, d) => {
+                setHexGridX(d.x);
+                setHexGridY(d.y);
+              }}
+              onResizeStop={(e, direction, ref, delta, position) => {
+                setHexGridWidth(parseInt(ref.style.width, 10));
+                setHexGridHeight(parseInt(ref.style.height, 10));
+                setHexGridX(position.x);
+                setHexGridY(position.y);
+              }}
+            >
+              <img
+                src={`/resources/hexmapMask_${hexMaskType.charAt(0).toUpperCase() + hexMaskType.slice(1)}_${columns}_${lines}.png`}
+                alt={`Hex Grid Mask ${hexMaskType} x:${columns} y:${lines} not found`}
+                style={{ width: '100%', height: '100%', zIndex:9999 }}
+              />
+            </Rnd>
+          )}
         </div>
       </div>
       <div className="map-upload-details-container">

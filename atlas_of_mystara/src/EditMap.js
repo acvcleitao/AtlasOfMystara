@@ -182,6 +182,10 @@ const EditMap = () => {
     setIsBaseImageVisible(!isBaseImageVisible);
   };
 
+  const uploadMapToDatabase = () => {
+    console.log(hexagons);
+  };
+
   return (
     <div className="edit-atlas-container">
       <HexGrid 
@@ -194,9 +198,10 @@ const EditMap = () => {
         hexImages={hexImages}
         selectedHex={selectedHex} 
       />
-
-      {selectedHex.size > 0 && (
-        <div className="edit-tools">
+      
+      <div className="edit-tools">
+        {/* Dropdown menu and Save button container */}
+        <div className="dropdown-save-container">
           <label htmlFor="hex-type">Hex Type: </label>
           <select id="hex-type" value={hexType} onChange={handleHexTypeChange}>
             <option key={hexType} value={hexType}>{hexType}</option>
@@ -206,12 +211,16 @@ const EditMap = () => {
               ) : null
             ))}
           </select>
-          <button onClick={saveHexType}>Save</button>
+          <button className="upload-map-button" onClick={saveHexType}>Save</button>
         </div>
-      )}
-      <button className='base-image-toggle-button' onClick={toggleBaseImageVisibility}>
-        {isBaseImageVisible ? 'Hide Base Image' : 'Show Base Image'}
-      </button>
+  
+        <button className="base-image-toggle-button" onClick={toggleBaseImageVisibility}>
+          {isBaseImageVisible ? 'Hide Base Image' : 'Show Base Image'}
+        </button>
+  
+        <button className="upload-map-button" onClick={uploadMapToDatabase}>Upload Map</button>
+      </div>
+  
       {isBaseImageVisible && (
         <Rnd
           className="rnd-outline"
@@ -229,7 +238,7 @@ const EditMap = () => {
           }}
         >
           <img
-            className='base-image-overlay'
+            className="base-image-overlay"
             src={baseImage ? `data:image/png;base64,${baseImage}` : 'https://archive.org/download/placeholder-image/placeholder-image.jpg'}
             alt="Base Image"
             style={{ width: '100%', height: '100%', opacity: 0.5 }}
@@ -238,7 +247,7 @@ const EditMap = () => {
       )}
     </div>
   );
-};
+};  
 
 const HexGrid = ({ hexagonsData, centerX, centerY, zoomLevel, author, onHexClick, hexImages, selectedHex }) => {
   const hexSize = 50;
