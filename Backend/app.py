@@ -371,6 +371,60 @@ def save_map(processedHexagons, row_counts, ocean_layer, information_layer, titl
     
     return output_for_testing
 
+@app.route('/updateMap/<map_id>', methods=['POST'])
+def update_map(map_id):
+    try:
+        # Parse the hexagons data from the JSON request
+        print("Updating hexagons")
+        hexagons_data = request.json.get("hexagons", [])
+        
+        # Validate if the map exists
+        map_document = mongo.db.hex_maps.find_one({"_id": ObjectId(map_id)})
+        if not map_document:
+            return jsonify({"error": "Map not found"}), 404
+        
+        # Update the hexagon layer with the provided hexagons
+        mongo.db.hex_maps.update_one(
+            {"_id": ObjectId(map_id)},  # Find the map by its ID
+            {"$set": {"layers.$[layer].hexagons": hexagons_data}},  # Update the hexagons
+            array_filters=[{"layer.type": "hexagon_layer"}]  # Ensure we update the correct layer
+        )
+        
+        return jsonify({"success": True, "message": "Map updated successfully!"}), 200
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/updateSomeHexagons/<map_id>', methods=['POST'])
+def update_some_hexagons(map_id):
+    try:
+        # Parse the hexagons data from the JSON request
+        hexagons_data = request.json.get("hexagons", [])
+        
+        # Validate if the map exists
+        map_document = mongo.db.hex_maps.find_one({"_id": ObjectId(map_id)})
+        if not map_document:
+            return jsonify({"error": "Map not found"}), 404
+
+        # Iterate over each hexagon received in the request
+        for hexagon in hexagons_data:
+            coordinate = hexagon.get("coordinate")
+            if coordinate:
+                # Update the specific hexagon in the database by its coordinate
+                mongo.db.hex_maps.update_one(
+                    {"_id": ObjectId(map_id), "layers.type": "hexagon_layer", "layers.hexagons.coordinate": coordinate},
+                    {"$set": {"layers.$[layer].hexagons.$[hexagon]": hexagon}},
+                    array_filters=[
+                        {"layer.type": "hexagon_layer"},
+                        {"hexagon.coordinate": coordinate}
+                    ]
+                )
+        
+        return jsonify({"success": True, "message": "Hexagons updated successfully!"}), 200
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 def create_map(title, author, Base64Image, ocean_layer, information_layer):
     # Create the map document with an empty hexagon layer
     map_document = {

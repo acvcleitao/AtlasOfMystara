@@ -182,8 +182,30 @@ const EditMap = () => {
     setIsBaseImageVisible(!isBaseImageVisible);
   };
 
-  const uploadMapToDatabase = () => {
-    console.log(hexagons);
+  const uploadMapToDatabase = async () => {
+    try {
+        const updatedHexagons = hexagons.filter(hex => selectedHex.has(`${author}_${hex.coordinate[0]}_${hex.coordinate[1]}`));
+        console.log("Updating map")
+        const response = await fetch(`http://127.0.0.1:5000/updateMap/${mapId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                hexagons: updatedHexagons
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to upload map');
+        }
+
+        const result = await response.json();
+        console.log('Map updated successfully:', result);
+
+    } catch (error) {
+        console.error('Error uploading map:', error);
+    }
   };
 
   return (
@@ -328,8 +350,6 @@ const Hexagon = ({ id, x, y, size, hexagonData, onHexClick, coordinate, isSelect
   ].map((point) => point.join(',')).join(' ');
 
   const handleClick = (event) => {
-    console.log(coordinate)
-    console.log(hexagonData.type)
     onHexClick(id, event); // Pass the event to handleHexClick
   };
 
