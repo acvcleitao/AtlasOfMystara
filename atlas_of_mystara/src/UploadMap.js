@@ -95,7 +95,7 @@ const UploadMap = ({ onUpload }) => {
         />
       ) : (
         <>
-          <div className="upload-image-container" onClick={handleImageClick}>
+          <div className="upload-map-image-container" onClick={handleImageClick}>
             {uploadedImage ? (
               <img src={uploadedImage} alt="Uploaded Map" className="uploaded-image" />
             ) : (

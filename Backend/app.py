@@ -335,18 +335,18 @@ def add_mystara_info(ocr_output):
 
 def save_map(processedHexagons, row_counts, ocean_layer, information_layer, title, author, Base64Image, Testing):
     if not Testing:
-        current_y = 0
+        current_x = 0
         hexagon_index = 0
 
         map_id = create_map(title, author, Base64Image, ocean_layer, information_layer)
         for row_count in row_counts:
-            for x in range(row_count):
+            for y in range(row_count):
                 if hexagon_index >= len(processedHexagons):
                     # print(coordinate + "error")
                     return  map_id # Exit the function to avoid further errors
                 
                 # Calculate the coordinate for the current hexagon
-                coordinate = (x, current_y)
+                coordinate = (current_x, y)
                 # Assuming create_hexagon is a function that takes hex_type and coordinate as arguments
                 # TODO: Add information to the hexagon
                 create_hexagon(map_id, processedHexagons[hexagon_index], coordinate, None)
@@ -355,8 +355,7 @@ def save_map(processedHexagons, row_counts, ocean_layer, information_layer, titl
                 hexagon_index += 1
             
             # Move to the next row (increment the y-coordinate)
-            current_y += 1
-        # print(coordinate + "error2")
+            current_x += 1        
         return map_id
     
     output_for_testing = []
@@ -497,53 +496,65 @@ def extract_hexagons(image, mask, hex_side_length):
         # Store the hexagon image along with its centroid
         hexagon_data.append((hex_image, (cx, cy)))
     
-    # Adjust the sorting to group close coordinates
+    # Adjust the sorting to group close coordinates (offset "Odd-Q" sorting)
     def adjusted_sort_key(item):
         # Extract the centroid coordinates
         cx, cy = item[1]
         
-        # Use the y-coordinate first to sort by row, then the x-coordinate to sort within the row
-        return (cy, cx)  # Directly use cy and cx to avoid issues with rounding
+        # Calculate the column based on the x-coordinate
+        col = cx // (hex_side_length * 1.5)  # approximate x-spacing for pointy-topped hexes
+        
+        # Adjust the row for odd-numbered columns
+        if col % 2 == 1:
+            row = (cy - hex_side_length // 2) // hex_side_length
+        else:
+            row = cy // hex_side_length
+        
+        # Sort by column first (x), then by adjusted row (y)
+        return (col, row)
     
-    # Sort the hexagons by the adjusted centroids' y-coordinate first, then x-coordinate
+    # Sort the hexagons by the adjusted centroids
     hexagon_data.sort(key=adjusted_sort_key)
     
     # Extract the sorted hexagons and determine the row counts
     sorted_hexagons = []
     row_counts = []
     current_row_count = 0
-    previous_y = None
-    y_threshold = hex_side_length * 0.75  # Use 75% of the hex side length as a threshold for row change
+    previous_col = None
+    previous_row = None
     y = 0
     x = 0
     sorted_coordinates = []
-    # Iterate over the sorted hexagon data to count hexagons per row
+    
     for hex_image, (cx, cy) in hexagon_data:
-        if previous_y is None:
-            # First hexagon, initialize the previous_y
-            previous_y = cy
-        elif abs(cy - previous_y) > y_threshold:
-            # Significant change in the y-coordinate indicates a new row
-            row_counts.append(current_row_count)
+        col = cx // (hex_side_length * 1.5)
+        if col % 2 == 1:
+            row = (cy - hex_side_length // 2) // hex_side_length
+        else:
+            row = cy // hex_side_length
+        
+        # Handle new column detection
+        if previous_col is None or col != previous_col:
+            if current_row_count > 0:
+                row_counts.append(current_row_count)
             current_row_count = 0
-            previous_y = cy
-            y += 1
-            x = 0
-        # Increment the current row's hexagon count
-        current_row_count += 1
-
+            previous_col = col
+            x += 1
+            y = 0
+        
+        # Handle new row within the same column
+        if previous_row is None or row != previous_row:
+            previous_row = row
+            current_row_count += 1
+        
         sorted_hexagons.append(hex_image)
-        sorted_coordinates.append((x,y),)
-        x += 1
+        sorted_coordinates.append((col, row))
     
     # Append the last row count
     if current_row_count > 0:
         row_counts.append(current_row_count)
 
-    # Turns coordinates into doubled coordinates for easier hexagon manipulation ((col + row) % 2 == 0)
-    pairwise_sum = lambda lst: [lst[i] + lst[i + 1] for i in range(0, len(lst) - 1, 2)]
-
-    return sorted_hexagons, pairwise_sum(row_counts), sorted_coordinates
+    return sorted_hexagons, row_counts, sorted_coordinates
 
 
 def hex_to_rgb(hex_color):

@@ -107,12 +107,12 @@ const ProcessMap = ({ uploadedImage, mapName, mapAuthor, onConfirm, onBack }) =>
             <img
               src={`/resources/hexmapMask_${hexMaskType.charAt(0).toUpperCase() + hexMaskType.slice(1)}_${columns}_${lines}.png`}
               alt={`Hex Grid Mask ${hexMaskType} x:${columns} y:${lines} not found`}
-              style={{ width: '100%', height: '100%' }}
+              style={{ width: '100%', height: '100%', zIndex:9999 }}
             />
           </Rnd>
         </div>
       </div>
-      <div className="map-details-container">
+      <div className="map-upload-details-container">
         <div className="controls">
           <div className="instruction-text">
             {step === 1 
@@ -135,40 +135,50 @@ const ProcessMap = ({ uploadedImage, mapName, mapAuthor, onConfirm, onBack }) =>
             </>
           )}
           {step === 2 && (
-            <>
-              <div className="color-picker-container">
-                <div className="selected-color" style={{ backgroundColor: selectedColor }}></div>
-                <ChromePicker color={selectedColor} onChangeComplete={(color) => setSelectedColor(color.hex)} />
+          <>
+            <div className="color-picker-container">
+              <div className="selected-color" style={{ backgroundColor: selectedColor }}></div>
+              <div className="color-picker-wrapper">
+                <ChromePicker
+                  color={selectedColor}
+                  onChangeComplete={(color) => setSelectedColor(color.hex)}
+                  width="150px"
+                />
+                <div className="button-group">
+                  <button className="button" onClick={handleConfirmUpload}>
+                    Confirm Upload
+                  </button>
+                  <button className="button" onClick={onBack}>
+                    Back
+                  </button>
+                </div>
               </div>
-              <button className="button" onClick={handleConfirmUpload}>
-                Confirm Upload
-              </button>
-              <button className="button" onClick={onBack}>
-                Back
-              </button>
-            </>
-          )}
+            </div>
+          </>
+        )}
         </div>
-        <div className="dynamic-grid-controls">
-          <label>
-            Columns:
-            <input
-              type="number"
-              min="1"
-              value={columns}
-              onChange={(e) => setColumns(Number(e.target.value))}
-            />
-          </label>
-          <label>
-            Lines:
-            <input
-              type="number"
-              min="1"
-              value={lines}
-              onChange={(e) => setLines(Number(e.target.value))}
-            />
-          </label>
-        </div>
+        {step === 1 && (
+          <div className="dynamic-grid-controls">
+            <label>
+              Columns:
+              <input
+                type="number"
+                min="1"
+                value={columns}
+                onChange={(e) => setColumns(Number(e.target.value))}
+              />
+            </label>
+            <label>
+              Lines:
+              <input
+                type="number"
+                min="1"
+                value={lines}
+                onChange={(e) => setLines(Number(e.target.value))}
+              />
+            </label>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -8,7 +8,7 @@
     
   }
   
-  .upload-image-container {
+  .upload-map-image-container {
     width: 80%;
     height: 70%;
     margin-top: 90px;
@@ -45,13 +45,9 @@
   }
   
   
-  .map-details-container {
+  .map-upload-details-container {
     width: 80%;
     margin-top: 30px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-end;
     margin-left: 50px;
     margin-right: 50px;
     background-color: #a2d1e7;
@@ -73,6 +69,30 @@
     font-size: 1em;
     margin-right: 10px;
   }
+  .color-picker-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .color-picker-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* Space between the color picker and buttons */
+  }
+  
+  .button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Space between buttons */
+  }
+  
+  .button {
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+  
+
   
   .upload-button {
     background-color: #4CAF50;

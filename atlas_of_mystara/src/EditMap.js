@@ -319,6 +319,8 @@ const Hexagon = ({ id, x, y, size, hexagonData, onHexClick, coordinate, isSelect
   ].map((point) => point.join(',')).join(' ');
 
   const handleClick = (event) => {
+    console.log(coordinate)
+    console.log(hexagonData.type)
     onHexClick(id, event); // Pass the event to handleHexClick
   };
 
