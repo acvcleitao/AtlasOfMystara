@@ -246,7 +246,7 @@ def processMap(title, author, image_data, original_image_path, hex_mask_type, se
 
         if Testing:
             print("Processing...")
-            combined_results = processHexagons(hexagons, author, Testing)
+            combined_results, coastlines = processHexagons(hexagons, author, selected_color, Testing)
             print("Hexagons processed!")
             """
             [MSE, PSNR, SSIM, ORB, PHash, Template Matching, Contour Matching, ChiSquare, Bhattacharyya Distance, 
@@ -258,11 +258,11 @@ def processMap(title, author, image_data, original_image_path, hex_mask_type, se
             for result in combined_results[0]:
                 print(i)
                 i+=1
-                testing_results.append(save_map(result, row_counts, base64_ocean_layer, information_layer, title, author, Base64Image, Testing))
+                testing_results.append(save_map(result, row_counts, base64_ocean_layer, information_layer, title, author, Base64Image, coastlines, Testing))
             return testing_results
         
-        processedHexagons = processHexagons(hexagons, author, Testing)
-        map_id = save_map(processedHexagons, row_counts, base64_ocean_layer, information_layer, title, author, Base64Image, Testing)
+        processedHexagons, coastlines = processHexagons(hexagons, author, selected_color, Testing)
+        map_id = save_map(processedHexagons, row_counts, base64_ocean_layer, information_layer, title, author, Base64Image, coastlines, Testing)
         response = {
             'message': 'Map processed successfully',
             'map_id': str(map_id),
@@ -333,11 +333,11 @@ def add_mystara_info(ocr_output):
 
     return information_layer
 
-def save_map(processedHexagons, row_counts, ocean_layer, information_layer, title, author, Base64Image, Testing):
+def save_map(processedHexagons, row_counts, ocean_layer, information_layer, title, author, Base64Image, coastlines, Testing):
     if not Testing:
         current_x = 0
         hexagon_index = 0
-
+        coastline = None
         map_id = create_map(title, author, Base64Image, ocean_layer, information_layer)
         for row_count in row_counts:
             for y in range(row_count):
@@ -349,7 +349,9 @@ def save_map(processedHexagons, row_counts, ocean_layer, information_layer, titl
                 coordinate = (current_x, y)
                 # Assuming create_hexagon is a function that takes hex_type and coordinate as arguments
                 # TODO: Add information to the hexagon
-                create_hexagon(map_id, processedHexagons[hexagon_index], coordinate, None)
+                if coastlines[hexagon_index] != 0:
+                    coastline = coastlines[hexagon_index]
+                create_hexagon(map_id, processedHexagons[hexagon_index], coordinate, coastline, None)
                 '''print("hex_type: " + processedHexagons[hexagon_index] + "\ncoordinate: " + str(coordinate))'''
                 # Move to the next hexagon in the sorted list
                 hexagon_index += 1
@@ -453,12 +455,13 @@ def create_map(title, author, Base64Image, ocean_layer, information_layer):
     # Return the ID of the inserted document as confirmation
     return result.inserted_id
 
-def create_hexagon(map_id, processedHexagon, coordinate, metadata):
+def create_hexagon(map_id, processedHexagon, coordinate, coastline, metadata):
 
     # Ensure the hexagon has the required structure
     hexagon = {
         "type": processedHexagon,  # Use "default_type" if no type is provided
         "coordinate": coordinate,  # Use (0,0) if no coordinate is provided
+        "coastline": coastline,
         "metadata": metadata  # Use an empty dictionary if no metadata is provided
     }
 
@@ -620,7 +623,7 @@ def rgb_str_to_tuple(rgb_str):
     return tuple(map(int, rgb_str.split(',')))
 
 
-def processHexagons(hexagon_images, author, Testing = False):
+def processHexagons(hexagon_images, author, selected_color, Testing = False):
     # hexagon_images is a list of hexagons to be processed
     # each author should, idealy have its own tile set which corresponds to a folder
     temp_path = r"C:\Users\acvcl\Documents\GitHub\AtlasOfMystara\Backend\Hexagons\Temp"
@@ -639,6 +642,7 @@ def processHexagons(hexagon_images, author, Testing = False):
     ranking_results = []
     confidence_results = []
     weighted_results = []
+    coastlines = []
 
     # Save each hexagon image into the temporary folder
     for idx, hexagon_image in enumerate(hexagon_images):
@@ -680,12 +684,57 @@ def processHexagons(hexagon_images, author, Testing = False):
             weighted_results.append(weighted_result)
         else:
             # When not testing, return only the most relevant result
-            processedHexagons.append(print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, "SIFT_results", "SURF_results", ORB_results, PHash_results, TemplateMatching_results, ContourMatching_results, ChiSquare_results, Bhattacharyya_results, author, Testing))
+            hex_type = print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, "SIFT_results", "SURF_results", ORB_results, PHash_results, TemplateMatching_results, ContourMatching_results, ChiSquare_results, Bhattacharyya_results, author, Testing)
+            processedHexagons.append(hex_type)
+            coastline = extract_color_image(hexagon_image, selected_color)
+            if hex_type != 'ocean.png':
+                coastlines.append(coastline)
+            else:
+                coastlines.append(0)
+    
+    # display_base64_images(coastlines)         # Use this to debug if coastlines aren't working properly
     
     clear_temp()
     if Testing:
         return (MSE_results_best, PSNR_results_best, SSIM_results_best, ORB_results_best, PHash_results_best, Template_results_best, Contour_results_best, ChiSquare_results_best, Bhattacharyya_results_best, majority_results, intersection_results, ranking_results, confidence_results, weighted_results),
-    return processedHexagons
+    return processedHexagons, coastlines
+
+def extract_color_image(cv_image, selected_color):
+    # Convert selected color to RGB
+    if selected_color.startswith('#'):
+        selected_color_rgb = hex_to_rgb(selected_color)
+    elif selected_color.startswith('rgb'):
+        selected_color_rgb = rgb_str_to_tuple(selected_color)
+    else:
+        raise ValueError(f"Invalid color format: {selected_color}")
+
+    # Convert the RGB color to HSV
+    selected_color_hsv = cv2.cvtColor(np.uint8([[selected_color_rgb]]), cv2.COLOR_RGB2HSV)[0][0]
+
+    # Define HSV color range for the selected color
+    lower_bound = np.array([selected_color_hsv[0] - 10, 100, 100])
+    upper_bound = np.array([selected_color_hsv[0] + 10, 255, 255])
+
+    # Convert image to HSV
+    hsv_image = cv2.cvtColor(cv_image, cv2.COLOR_BGR2HSV)
+
+    # Create a mask for the selected color
+    mask = cv2.inRange(hsv_image, lower_bound, upper_bound)
+
+    # Extract the colored pixels from the original image
+    extracted_image = cv2.bitwise_and(cv_image, cv_image, mask=mask)
+
+    # Check if the mask contains enough pixels (color region is significant)
+    pixel_count = cv2.countNonZero(mask)
+    pixel_threshold = 15
+    if pixel_count < pixel_threshold:
+        return 0  # Color region too small or not found
+
+    # Convert the extracted image to base64
+    _, buffer = cv2.imencode('.png', extracted_image)
+    base64_image = base64.b64encode(buffer).decode('utf-8')
+
+    return base64_image
 
 def clear_temp():
     # empty the temp folder
@@ -1585,7 +1634,7 @@ def get_map(map_id):
     map_document = mongo.db.hex_maps.find_one({'_id': map_id})  # Replace 'maps' with your collection name
 
     if map_document:
-        # Remove '_id' from response if you don't want to expose it
+        # Remove '_id' from response
         map_document['_id'] = str(map_document['_id'])
         return jsonify(map_document), 200
     else:
@@ -1692,7 +1741,27 @@ def get_authors():
     except Exception as e:
         print(f"Error fetching authors: {str(e)}")
         return jsonify({'message': 'Internal Server Error'}), 500
-    
+
+# Function purely for debug purposes
+def display_base64_images(base64_images):
+    for img in base64_images:
+        if img == 0: continue
+        # Decode the base64 image
+        img_data = base64.b64decode(img)
+        nparr = np.frombuffer(img_data, np.uint8)
+        
+        # Decode the image to a format OpenCV can work with
+        image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
+        # Display the image using OpenCV
+        cv2.imshow('Image', image)
+
+        # Wait for a key press for 2 seconds (2000 ms) or until a key is pressed
+        if cv2.waitKey(2000) & 0xFF == ord('q'):
+            break  # Exit if 'q' is pressed
+
+    cv2.destroyAllWindows()
+
 
 if __name__ == '__main__':
     # For development with Flask's built-in server
