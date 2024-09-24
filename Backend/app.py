@@ -337,7 +337,6 @@ def save_map(processedHexagons, row_counts, ocean_layer, information_layer, titl
     if not Testing:
         current_x = 0
         hexagon_index = 0
-        coastline = None
         map_id = create_map(title, author, Base64Image, ocean_layer, information_layer)
         for row_count in row_counts:
             for y in range(row_count):
@@ -349,6 +348,7 @@ def save_map(processedHexagons, row_counts, ocean_layer, information_layer, titl
                 coordinate = (current_x, y)
                 # Assuming create_hexagon is a function that takes hex_type and coordinate as arguments
                 # TODO: Add information to the hexagon
+                coastline = None
                 if coastlines[hexagon_index] != 0:
                     coastline = coastlines[hexagon_index]
                 create_hexagon(map_id, processedHexagons[hexagon_index], coordinate, coastline, None)
@@ -686,13 +686,13 @@ def processHexagons(hexagon_images, author, selected_color, Testing = False):
             # When not testing, return only the most relevant result
             hex_type = print_results(hexagon_image, MSE_results, PSNR_results, SSIM_results, "SIFT_results", "SURF_results", ORB_results, PHash_results, TemplateMatching_results, ContourMatching_results, ChiSquare_results, Bhattacharyya_results, author, Testing)
             processedHexagons.append(hex_type)
-            coastline = extract_color_image(hexagon_image, selected_color)
             if hex_type != 'ocean.png':
-                coastlines.append(coastline)
+                coastline = extract_color_image(hexagon_image, selected_color)
             else:
-                coastlines.append(0)
+                coastline = remove_color_image(hexagon_image, selected_color)
+            coastlines.append(coastline)
     
-    # display_base64_images(coastlines)         # Use this to debug if coastlines aren't working properly
+    #  display_base64_images(coastlines)         # Use this to debug if coastlines aren't working properly
     
     clear_temp()
     if Testing:
@@ -732,6 +732,72 @@ def extract_color_image(cv_image, selected_color):
 
     # Convert the extracted image to base64
     _, buffer = cv2.imencode('.png', extracted_image)
+    base64_image = base64.b64encode(buffer).decode('utf-8')
+
+    return base64_image
+
+def remove_color_image(hexagon_image, selected_color):
+    # Convert selected color to RGB
+    if selected_color.startswith('#'):
+        selected_color_rgb = hex_to_rgb(selected_color)
+    elif selected_color.startswith('rgb'):
+        selected_color_rgb = rgb_str_to_tuple(selected_color)
+    else:
+        raise ValueError(f"Invalid color format: {selected_color}")
+
+    # Convert the RGB color to HSV
+    selected_color_hsv = cv2.cvtColor(np.uint8([[selected_color_rgb]]), cv2.COLOR_RGB2HSV)[0][0]
+
+    # Define HSV color range for the selected color
+    lower_bound_color = np.array([selected_color_hsv[0] - 10, 100, 100])
+    upper_bound_color = np.array([selected_color_hsv[0] + 10, 255, 255])
+
+    # Convert image to HSV
+    hsv_image = cv2.cvtColor(hexagon_image, cv2.COLOR_BGR2HSV)
+
+    # Create a mask for the selected color
+    mask_color = cv2.inRange(hsv_image, lower_bound_color, upper_bound_color)
+
+    # Apply the mask to remove the selected color from the image
+    remaining_image = cv2.bitwise_and(hexagon_image, hexagon_image, mask=cv2.bitwise_not(mask_color))
+
+    # Define HSV color range for black
+    lower_bound_black = np.array([0, 0, 0])
+    upper_bound_black = np.array([180, 255, 100])
+
+    # Create a mask for black
+    mask_black = cv2.inRange(cv2.cvtColor(remaining_image, cv2.COLOR_BGR2HSV), lower_bound_black, upper_bound_black)
+
+    # Apply the mask to remove black from the remaining image
+    remaining_image = cv2.bitwise_and(remaining_image, remaining_image, mask=cv2.bitwise_not(mask_black))
+
+    # Now handle the grid color (BGR format)
+    grid_color_bgr = [160, 0, 0]  # Grid color in BGR format
+    grid_color_bgr_np = np.uint8([[grid_color_bgr]])
+
+    # Convert the grid color from BGR to HSV
+    grid_color_hsv = cv2.cvtColor(grid_color_bgr_np, cv2.COLOR_BGR2HSV)[0][0]
+
+    # Define a range for the grid color
+    lower_bound_grid = np.array([grid_color_hsv[0] - 10, 100, 100])
+    upper_bound_grid = np.array([grid_color_hsv[0] + 10, 255, 255])
+
+    # Create a mask for the grid color
+    mask_grid = cv2.inRange(cv2.cvtColor(remaining_image, cv2.COLOR_BGR2HSV), lower_bound_grid, upper_bound_grid)
+
+    # Apply the mask to remove the grid color from the remaining image
+    remaining_image = cv2.bitwise_and(remaining_image, remaining_image, mask=cv2.bitwise_not(mask_grid))
+
+    # Count the non-zero pixels (remaining pixels)
+    remaining_pixel_count = cv2.countNonZero(cv2.cvtColor(remaining_image, cv2.COLOR_BGR2GRAY))
+
+    # If the remaining pixels are less than 15, return 0 as it's considered noise
+    pixel_threshold = 15
+    if remaining_pixel_count < pixel_threshold:
+        return 0
+
+    # Convert the remaining image to base64
+    _, buffer = cv2.imencode('.png', remaining_image)
     base64_image = base64.b64encode(buffer).decode('utf-8')
 
     return base64_image

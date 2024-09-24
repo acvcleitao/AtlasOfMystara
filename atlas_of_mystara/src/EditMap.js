@@ -33,7 +33,6 @@ const EditMap = () => {
         }
         const data = await response.json();
         setHexagonTypes(data.hexagonTypes);
-        console.log("Got Types", data.hexagonTypes);
       } catch (error) {
         console.error('Error fetching hexagon types:', error);
       }
@@ -56,13 +55,12 @@ const EditMap = () => {
 
         // Set the base image from the map document
         setBaseImage(data.baseImage);
-        console.log('Ocean Layer:', data.layers.find(layer => layer.type === 'ocean_layer'));
-        console.log('Information Layer:', data.layers.find(layer => layer.type === 'information_layer'));
 
         const hexagonLayer = data.layers.find(layer => layer.type === 'hexagon_layer');
         if (hexagonLayer) {
           const hexagons = hexagonLayer.hexagons;
           setHexagons(hexagons);
+          console.log(hexagons)
         
           const uniqueTypes = [...new Set(hexagons.map(hex => hex.type))];
         
@@ -288,8 +286,8 @@ const HexGrid = ({ hexagonsData, centerX, centerY, zoomLevel, author, onHexClick
 
   if (hexagonsData && hexagonsData.length > 0) {
     const hexagonsMap = {};
-    hexagonsData.forEach(({ type, coordinate: [x, y] }) => {
-      hexagonsMap[`${x}-${y}`] = { type, coordinate: [x, y], imageBase64: hexImages[type] };
+    hexagonsData.forEach(({ type, coordinate: [x, y], coastline }) => {
+      hexagonsMap[`${x}-${y}`] = { type, coordinate: [x, y], imageBase64: hexImages[type], coastline };
     });
 
     for (let row = centerY; row < numRows + centerY; row++) {
@@ -350,6 +348,7 @@ const Hexagon = ({ id, x, y, size, hexagonData, onHexClick, coordinate, isSelect
   ].map((point) => point.join(',')).join(' ');
 
   const handleClick = (event) => {
+    console.log(hexagonData);
     onHexClick(id, event); // Pass the event to handleHexClick
   };
 
@@ -366,7 +365,14 @@ const Hexagon = ({ id, x, y, size, hexagonData, onHexClick, coordinate, isSelect
           y={y - size}
         />
       )}
-      {/* Draw the border on top */}
+      {hexagonData && hexagonData.coastline && (
+        <image
+          className='hexagonProp'
+          href={`data:image/png;base64,${hexagonData.coastline}`}
+          x={x - size}
+          y={y - size}
+        />
+      )}
       {isSelected && (
         <polygon
           points={points}
