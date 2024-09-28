@@ -200,6 +200,26 @@
   align-items: center; /* Centers content horizontally */
 }
 
+.overlay-button-container {
+  display: flex;
+  flex-direction: column; /* Stack buttons vertically */
+  gap: 3px; /* Add space between buttons */
+}
+
+.overlay-button-container button {
+  padding: 10px 15px; /* Add padding for better clickability */
+  border: none; /* Remove default button border */
+  background-color: #007bff; /* Use a primary color */
+  color: white; /* Text color */
+  cursor: pointer; /* Show pointer on hover */
+  border-radius: 5px; /* Round corners */
+  transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+.overlay-button-container button:hover {
+  background-color: #0056b3; /* Darker shade on hover */
+}
+
 .close-button {
   position: absolute;
   top: 10px;
@@ -233,3 +253,4 @@
   position: absolute;
   z-index: 2;
 }
+

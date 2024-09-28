@@ -26,6 +26,7 @@ const EditMap = () => {
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [selectedHexCoastline, setSelectedHexCoastline] = useState('')
   const [selectedHexBaseImage, setSelectedHexBaseImage] = useState('')
+  const [tempCoastline, setTempCoastline] = useState(selectedHexCoastline);
   
 
   useEffect(() => {
@@ -133,7 +134,8 @@ const EditMap = () => {
     }
     
     setSelectedHexCoastline(hex.coastline);
-    setSelectedHexBaseImage(hexImages[hex.type])
+    setSelectedHexBaseImage(hexImages[hex.type]);
+    setTempCoastline(hex.coastline);
   };
 
   const handleHexTypeChange = (event) => {
@@ -197,15 +199,15 @@ const EditMap = () => {
 
   const uploadMapToDatabase = async () => {
     try {
-        const updatedHexagons = hexagons.filter(hex => selectedHex.has(`${author}_${hex.coordinate[0]}_${hex.coordinate[1]}`));
         console.log("Updating map")
+        console.log(hexagons);
         const response = await fetch(`http://127.0.0.1:5000/updateMap/${mapId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                hexagons: updatedHexagons
+                hexagons: hexagons
             }),
         });
 
@@ -263,7 +265,7 @@ const EditMap = () => {
   
           // Set desired width and height for the new image
           const desiredWidth = 64;
-          const desiredHeight = 56
+          const desiredHeight = 56;
   
           // Resize the canvas
           canvas.width = desiredWidth;
@@ -275,22 +277,28 @@ const EditMap = () => {
           // Get the resized image as a base64 string
           const base64Image = canvas.toDataURL('image/png').split(',')[1];
   
-          if (selectedHex.size > 0) {
-            const hexId = Array.from(selectedHex)[0]; // Only one hex selected at a time
-            const selectedHexagon = hexagons.find(hex => `${author}_${hex.coordinate[0]}_${hex.coordinate[1]}` === hexId);
-  
-            if (selectedHexagon) {
-              // Update the selected hexagon's coastline
-              selectedHexagon.coastline = base64Image;
-  
-              // Update the UI or state accordingly
-              setSelectedHexCoastline(base64Image); // Update the coastline image in the UI
-            }
-          }
+          // Store the new coastline in temporary state
+          setTempCoastline(base64Image);
         };
       };
   
       reader.readAsDataURL(file); // Convert the image file to a base64 string
+    }
+  };
+
+  // Function to confirm and update the selected hexagon's coastline
+  const confirmCoastlineChange = () => {
+    if (selectedHex.size > 0) {
+      const hexId = Array.from(selectedHex)[0]; // Only one hex selected at a time
+      const selectedHexagon = hexagons.find(hex => `${author}_${hex.coordinate[0]}_${hex.coordinate[1]}` === hexId);
+
+      if (selectedHexagon) {
+        // Update the selected hexagon's coastline
+        selectedHexagon.coastline = tempCoastline;
+
+        // Update the UI or state accordingly
+        setSelectedHexCoastline(tempCoastline); // Update the coastline image in the UI
+      }
     }
   };
 
@@ -308,7 +316,6 @@ const EditMap = () => {
       />
       
       <div className="edit-tools">
-        {/* Dropdown menu and Save button container */}
         <div className="dropdown-save-container">
           <label htmlFor="hex-type">Hex Type: </label>
           <select id="hex-type" value={hexType} onChange={handleHexTypeChange}>
@@ -328,59 +335,62 @@ const EditMap = () => {
         <button className="upload-map-button" onClick={openOverlay}>Edit Coastline</button>
 
         <button className="upload-map-button" onClick={uploadMapToDatabase}>Upload Map</button>
-
-
       </div> 
-      {isOverlayOpen && (
-        <div className="overlay">
-          <div className="overlay-content">
-            <button className="close-button" onClick={closeOverlay}>
-              X
-            </button>
+      <div>
+        {isOverlayOpen && (
+          <div className="overlay">
+            <div className="overlay-content">
+              <button className="close-button" onClick={closeOverlay}>
+                X
+              </button>
 
-            <div className="hexagon-info">
-              <h3>Selected Hexagon: {hexType}</h3>
-              <h4>Base Image</h4>
-              <img 
-                src={`data:image/png;base64,${selectedHexBaseImage}`} 
-                alt="Hexagon" 
-              />
-            </div>
+              <div className="hexagon-info">
+                <h3>Selected Hexagon: {hexType}</h3>
+                <h4>Base Image</h4>
+                <img 
+                  src={`data:image/png;base64,${selectedHexBaseImage}`} 
+                  alt="Hexagon" 
+                />
+              </div>
 
-            <div className="coastline-info">
-              <h4>Coastline Image</h4>
-              {/* Properly format the coastline base64 URL */}
-              <img 
-                src={`data:image/png;base64,${selectedHexCoastline}`} 
-                alt="Coastline" 
-              />
+              <div className="coastline-info">
+                <h4>Coastline Image</h4>
+                {/* Properly format the coastline base64 URL */}
+                <img 
+                  src={`data:image/png;base64,${tempCoastline}`} 
+                  alt="Coastline" 
+                />
+              </div>
+              <div className="image-stack">
+                <h4>Hexagon Image</h4>
+                <img
+                  className="base-image"
+                  src={`data:image/png;base64,${selectedHexBaseImage}`}
+                  alt="Hexagon Base"
+                />
+                <img
+                  className="coastline-image"
+                  src={`data:image/png;base64,${tempCoastline}`}
+                  alt="Coastline"
+                />
+              </div>
+              <div className="overlay-button-container">
+                <button onClick={downloadCoastline}>Download Coastline</button>
+                <button onClick={swapCoastline}>Swap Coastline</button>
+                <input 
+                  type="file" 
+                  id="fileInput" 
+                  style={{ display: "none" }} 
+                  accept="image/*" 
+                  onChange={handleFileChange} 
+                />
+                <button onClick={confirmCoastlineChange}>Confirm Coastline Change</button>
+                <button onClick={closeOverlay}>Cancel</button>
+              </div>
             </div>
-            <div className="image-stack">
-              <h4>Hexagon Image</h4>
-              <img
-                className="base-image"
-                src={`data:image/png;base64,${selectedHexBaseImage}`}
-                alt="Hexagon Base"
-              />
-
-              <img
-                className="coastline-image"
-                src={`data:image/png;base64,${selectedHexCoastline}`}
-                alt="Coastline"
-              />
-            </div>
-            <button onClick={downloadCoastline}>Download Coastline</button>
-            <button onClick={swapCoastline}>Swap Coastline</button>
-            <input 
-              type="file" 
-              id="fileInput" 
-              style={{ display: "none" }} 
-              accept="image/*" 
-              onChange={handleFileChange} 
-            />
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {isBaseImageVisible && (
         <Rnd
