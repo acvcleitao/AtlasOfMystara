@@ -22,6 +22,10 @@ const EditMap = () => {
   const [isBaseImageVisible, setIsBaseImageVisible] = useState(false); // Toggle visibility
   const [loading, setLoading] = useState(true); 
   const [error, setError] = useState(null);
+  const [imageWidth, setImageWidth] = useState(null);
+  const [isOverlayOpen, setIsOverlayOpen] = useState(false);
+  const [selectedHexCoastline, setSelectedHexCoastline] = useState('')
+  const [selectedHexBaseImage, setSelectedHexBaseImage] = useState('')
   
 
   useEffect(() => {
@@ -101,6 +105,7 @@ const EditMap = () => {
 
   const handleHexClick = (hexId, event) => {
     const isCtrlPressed = event.ctrlKey;
+    const hex = hexagons.find(hex => `${author}_${hex.coordinate[0]}_${hex.coordinate[1]}` === hexId);
     if (isCtrlPressed) {
       setSelectedHex(prevSelectedHex => {
         const newSelectedHex = new Set(prevSelectedHex);
@@ -120,13 +125,15 @@ const EditMap = () => {
         return newSelectedHex;
       });
       // Update hexType to the type of the clicked hexagon
-      const hex = hexagons.find(hex => `${author}_${hex.coordinate[0]}_${hex.coordinate[1]}` === hexId);
       if (hex) {
         setHexType(hex.type.split('.')[0]);
       } else {
         setHexType('');
       }
     }
+    
+    setSelectedHexCoastline(hex.coastline);
+    setSelectedHexBaseImage(hexImages[hex.type])
   };
 
   const handleHexTypeChange = (event) => {
@@ -180,6 +187,14 @@ const EditMap = () => {
     setIsBaseImageVisible(!isBaseImageVisible);
   };
 
+  const openOverlay = () => {
+    setIsOverlayOpen(true);
+  };
+
+  const closeOverlay = () => {
+    setIsOverlayOpen(false);
+  };
+
   const uploadMapToDatabase = async () => {
     try {
         const updatedHexagons = hexagons.filter(hex => selectedHex.has(`${author}_${hex.coordinate[0]}_${hex.coordinate[1]}`));
@@ -199,10 +214,83 @@ const EditMap = () => {
         }
 
         const result = await response.json();
-        console.log('Map updated successfully:', result);
+        console.log('Map updated successfully:');
+        // Show a pop-up on success and redirect to the base route "/"
+        window.alert("Map uploaded successfully!");
+        window.location.href = "/";
 
     } catch (error) {
         console.error('Error uploading map:', error);
+    }
+  };
+
+  const downloadCoastline = () => {
+    if (selectedHex.size > 0) {
+      const hexId = Array.from(selectedHex)[0]; // Only one hex selected at a time
+      const selectedHexagon = hexagons.find(hex => `${author}_${hex.coordinate[0]}_${hex.coordinate[1]}` === hexId);
+
+      if (selectedHexagon && selectedHexagon.coastline) {
+        const base64Image = selectedHexagon.coastline;
+        const link = document.createElement('a');
+        link.href = `data:image/png;base64,${base64Image}`;
+        link.download = `coastline_hex_${selectedHexagon.coordinate[0]}_${selectedHexagon.coordinate[1]}.png`;
+        link.click();
+      } else {
+        console.log("No coastline image found for the selected hexagon.");
+      }
+    }
+  };
+
+  const swapCoastline = () => {
+    // Trigger the hidden file input
+    document.getElementById('fileInput').click();
+  };
+  
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+  
+    if (file) {
+      const reader = new FileReader();
+  
+      reader.onloadend = () => {
+        const originalImage = new Image();
+        originalImage.src = reader.result;
+  
+        originalImage.onload = () => {
+          // Create an off-screen canvas
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+  
+          // Set desired width and height for the new image
+          const desiredWidth = 64;
+          const desiredHeight = 56
+  
+          // Resize the canvas
+          canvas.width = desiredWidth;
+          canvas.height = desiredHeight;
+  
+          // Draw the original image onto the canvas, resizing it in the process
+          ctx.drawImage(originalImage, 0, 0, desiredWidth, desiredHeight);
+  
+          // Get the resized image as a base64 string
+          const base64Image = canvas.toDataURL('image/png').split(',')[1];
+  
+          if (selectedHex.size > 0) {
+            const hexId = Array.from(selectedHex)[0]; // Only one hex selected at a time
+            const selectedHexagon = hexagons.find(hex => `${author}_${hex.coordinate[0]}_${hex.coordinate[1]}` === hexId);
+  
+            if (selectedHexagon) {
+              // Update the selected hexagon's coastline
+              selectedHexagon.coastline = base64Image;
+  
+              // Update the UI or state accordingly
+              setSelectedHexCoastline(base64Image); // Update the coastline image in the UI
+            }
+          }
+        };
+      };
+  
+      reader.readAsDataURL(file); // Convert the image file to a base64 string
     }
   };
 
@@ -237,10 +325,63 @@ const EditMap = () => {
         <button className="base-image-toggle-button" onClick={toggleBaseImageVisibility}>
           {isBaseImageVisible ? 'Hide Base Image' : 'Show Base Image'}
         </button>
-  
+        <button className="upload-map-button" onClick={openOverlay}>Edit Coastline</button>
+
         <button className="upload-map-button" onClick={uploadMapToDatabase}>Upload Map</button>
-      </div>
-  
+
+
+      </div> 
+      {isOverlayOpen && (
+        <div className="overlay">
+          <div className="overlay-content">
+            <button className="close-button" onClick={closeOverlay}>
+              X
+            </button>
+
+            <div className="hexagon-info">
+              <h3>Selected Hexagon: {hexType}</h3>
+              <h4>Base Image</h4>
+              <img 
+                src={`data:image/png;base64,${selectedHexBaseImage}`} 
+                alt="Hexagon" 
+              />
+            </div>
+
+            <div className="coastline-info">
+              <h4>Coastline Image</h4>
+              {/* Properly format the coastline base64 URL */}
+              <img 
+                src={`data:image/png;base64,${selectedHexCoastline}`} 
+                alt="Coastline" 
+              />
+            </div>
+            <div className="image-stack">
+              <h4>Hexagon Image</h4>
+              <img
+                className="base-image"
+                src={`data:image/png;base64,${selectedHexBaseImage}`}
+                alt="Hexagon Base"
+              />
+
+              <img
+                className="coastline-image"
+                src={`data:image/png;base64,${selectedHexCoastline}`}
+                alt="Coastline"
+              />
+            </div>
+            <button onClick={downloadCoastline}>Download Coastline</button>
+            <button onClick={swapCoastline}>Swap Coastline</button>
+            <input 
+              type="file" 
+              id="fileInput" 
+              style={{ display: "none" }} 
+              accept="image/*" 
+              onChange={handleFileChange} 
+            />
+          </div>
+        </div>
+      )}
+
       {isBaseImageVisible && (
         <Rnd
           className="rnd-outline"
@@ -348,7 +489,6 @@ const Hexagon = ({ id, x, y, size, hexagonData, onHexClick, coordinate, isSelect
   ].map((point) => point.join(',')).join(' ');
 
   const handleClick = (event) => {
-    console.log(hexagonData);
     onHexClick(id, event); // Pass the event to handleHexClick
   };
 

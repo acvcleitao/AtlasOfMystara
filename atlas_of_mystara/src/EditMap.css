@@ -177,3 +177,59 @@
   pointer-events: none; /* Ensure the image doesn't capture the click events */
   object-fit: cover; /* Ensure the image fits within the hexagon */
 }
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Centers content vertically */
+}
+
+.overlay-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centers content horizontally */
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+}
+
+.hexagon-info img,
+.coastline-info img {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+.image-stack {
+  position: relative;
+  text-align: center;
+  width: 200px;
+  height: 100px;
+  margin-bottom: 50px;
+}
+
+.base-image {
+  right: 68px;
+  position: absolute;
+  z-index: 1;
+}
+
+.coastline-image {
+  right: 68px;
+  position: absolute;
+  z-index: 2;
+}
