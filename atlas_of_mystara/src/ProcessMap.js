@@ -63,7 +63,7 @@ const ProcessMap = ({ uploadedImage, mapName, mapAuthor, onConfirm, onBack }) =>
         // Call onConfirm function with necessary data
         onConfirm({ ...data, combinedImage });
       };
-      hexGridImage.src = `/resources/hexmapMask_${hexMaskType.charAt(0).toUpperCase() + hexMaskType.slice(1)}_${columns}_${lines}.png`;
+      hexGridImage.src = `/resources/HexMapGrid/hexmapMask_${hexMaskType.charAt(0).toUpperCase() + hexMaskType.slice(1)}_${columns}_${lines}.png`;
 
     } catch (error) {
       console.error('Error confirming upload:', error);
@@ -106,7 +106,7 @@ const ProcessMap = ({ uploadedImage, mapName, mapAuthor, onConfirm, onBack }) =>
               }}
             >
               <img
-                src={`/resources/hexmapMask_${hexMaskType.charAt(0).toUpperCase() + hexMaskType.slice(1)}_${columns}_${lines}.png`}
+                src={`/resources/HexMapGrid/hexmapMask_${hexMaskType.charAt(0).toUpperCase() + hexMaskType.slice(1)}_${columns}_${lines}.png`}
                 alt={`Hex Grid Mask ${hexMaskType} x:${columns} y:${lines} not found`}
                 style={{ width: '100%', height: '100%', zIndex:9999 }}
               />
