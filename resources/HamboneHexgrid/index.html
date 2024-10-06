@@ -737,11 +737,11 @@
             INPUT.hexLineWidth = 5;
             INPUT.hexLineColor = "#0000a0"
             INPUT.hexSize = 100;
-            INPUT.hexOrientation = 'pointy';
+            INPUT.hexOrientation = 'flat';
             INPUT.coordsShow = false;
 
-            for (let width = 31; width <= 40; width++) {
-                for (let height = 31; height <= 40; height++) {
+            for (let width = 41; width <= 50; width++) {
+                for (let height = 41; height <= 50; height++) {
                     console.log(width);
                     console.log(height);
                     // Set the map size
@@ -751,7 +751,7 @@
 
                     // Draw the hex grid
                     drawHexes();
-                    let exportFilename = "hexmapMask_Pointy_" + width + "_" + height + ".png";
+                    let exportFilename = "hexmapMask_Flat_" + width + "_" + height + ".png";
                     let canvas = document.getElementById("codon-canvas");
                     let link = document.createElement('a');
 
