@@ -106,9 +106,10 @@ const ProcessMap = ({ uploadedImage, mapName, mapAuthor, onConfirm, onBack }) =>
               }}
             >
               <img
+                className="hexmask-image-overlay"
                 src={`/resources/HexMapGrid/hexmapMask_${hexMaskType.charAt(0).toUpperCase() + hexMaskType.slice(1)}_${columns}_${lines}.png`}
                 alt={`Hex Grid Mask ${hexMaskType} x:${columns} y:${lines} not found`}
-                style={{ width: '100%', height: '100%', zIndex:9999 }}
+                style={{ width: '100%', height: '100%'}}
               />
             </Rnd>
           )}
