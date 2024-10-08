@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { useEffect } from 'react';
 import { Rnd } from 'react-rnd';
 import './ProcessMap.css';
 import { ChromePicker } from 'react-color';
@@ -76,16 +77,18 @@ const ProcessMap = ({ uploadedImage, mapName, mapAuthor, onConfirm, onBack }) =>
   };
 
   return (
-    <div className="process-map-container">
+    <div className = {`process-map-container ${step === 2 ? 'color-picker-cursor' : ''}`}>
       <label className="map-title">
         {mapName}, by {mapAuthor}
       </label>
-      <div className="upload-image-container" onClick={step === 2 ? handleImageClick : null}>
+      <div 
+        className={`upload-image-container ${step === 2 ? 'color-picker-cursor' : ''}`} 
+        onClick={step === 2 ? handleImageClick : null}>
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
           <img
             src={uploadedImage}
             alt="Process Map"
-            className="uploaded-image"
+            className="uploaded-map"
             style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '15px' }}
             ref={imageRef}
           />

@@ -38,12 +38,11 @@
   box-shadow: 0 0 15px #132c3f;
 }
 
-.uploaded-image {
+.uploaded-map {
   width: 100%; /* Ensure the image scales properly */
   height: 100%; /* Ensure the image scales properly */
   object-fit: contain;
   border-radius: 15px;
-  cursor: pointer;
 }
 
 .rnd-outline {
@@ -113,4 +112,8 @@
   pointer-events: none; /* Prevents interactions blocking hexagons */
   border: 2px solid #0000a0; /* Add a black outline */
   box-sizing: border-box; /* Ensures the border is included in the width and height */
+}
+
+.color-picker-cursor {
+  cursor: url(pipette-cursor.png), auto;
 }
