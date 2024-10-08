@@ -103,7 +103,6 @@
   font-size: 1.2em;
 }
 
-
 .hexmask-image-overlay {
   position: absolute;
   top: 0;
@@ -112,4 +111,6 @@
   height: 100%;
   z-index: 998; /* Ensures it is on top of everything */
   pointer-events: none; /* Prevents interactions blocking hexagons */
+  border: 2px solid #0000a0; /* Add a black outline */
+  box-sizing: border-box; /* Ensures the border is included in the width and height */
 }
